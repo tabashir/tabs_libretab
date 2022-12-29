@@ -2,6 +2,8 @@
 include <./lib/chamfered_cylinder.scad>;
 include <./lib/hulled_objects.scad>;
 include <./lib/roundedcube.scad>;
+include <../../libs/radius_block.scad>;
+
 
 thickness=4;
 three_finger_width=65;
@@ -30,6 +32,10 @@ tilted_slot_count=6;
 tilted_slot_gap=(three_finger_width * 0.8) / tilted_slot_count;
 tilted_slot_angle=15;
 tilted_slot_length=9;
+
+round_palm_plate=true;
+
+
 
 if (base_plate) {
   union() {
@@ -69,6 +75,10 @@ if (base_plate) {
     bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
   }
 
+  if (round_palm_plate) {
+  translate([60, 30, 0]) rotate([180, 0, 0])  round_palm_plate();
+}
+  
 // Modules below
 
 module palm_plate(radius, length_mod, palm_depth) {
@@ -230,6 +240,60 @@ module base_plate(depth, height, thickness) {
   }
 }
 
+module round_palm_plate() {
+
+slot_length=10;
+tilt_angle=14;
+length=20;
+
+rpp_base_plate();
+
+module rpp_base_plate() {
+
+  difference(){
+    translate([length/1.1,length/1.2,0]) {
+      rotate([0,tilt_angle,00]) {
+        scale([1.2, 1, 0.5]) {
+          sphere(r = length);
+        }
+      }
+    }
+    translate([10-length,10-length,-1]) {
+      radiusedblock(length*3,length*3,length,3);
+    }
+    translate([5-length,-length/2,-length]) {
+        cube([length,length*2,length]);
+    }
+    translate([3,-13,-10]) {
+      slots(13,15,0);
+    }
+  }
+}
+
+
+module slots(x,y,z) {
+  translate([x,y,z]) {
+      union() {
+        translate([0,0,-5]) { rotate([0,0,0]) { bar(slot_length,11,22,0); } }
+        translate([0,0,0]) { rotate([0,0,0]) { bar(slot_length,5,25,0); } }
+        translate([5,23,-5]) { rotate([0,0,0]) { bar(slot_length+1,11,22,0); } }
+        translate([5,23,0]) { rotate([0,0,0]) { bar(slot_length+1,5,25,0); } }
+    }
+  }
+}
+
+module cutouts() {
+  rotate([0,tilt_angle,0]) {
+    // rounded finger cutout
+    translate([85,-35,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=100); }
+  }
+  rotate([0,tilt_angle,0]) {
+    // rounded finger cutout
+    translate([-20,108,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=100); }
+  }
+}
+
+}
 
 // module chamfercyl(
 //    r,              // cylinder radius
