@@ -35,6 +35,10 @@ tilted_slot_length=9;
 
 round_palm_plate=true;
 
+tulip_chin_plate=true;
+
+grooved_tulip_chin_plate=true;
+
 
 
 if (base_plate) {
@@ -62,23 +66,31 @@ if (base_plate) {
   }
 }
 
-  if (thumb_plate) {
-    thumb_plate(0, thumb_plate_y_pos, 1, 1);
-  }
-
-  if (palm_plate) {
-    x_size = three_finger_width*0.25;
-    palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
-  }
-
-  if (bolt_on_thumb_plate) {
-    bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
-  }
-
-  if (round_palm_plate) {
-  translate([60, 30, 0]) rotate([180, 0, 0])  round_palm_plate();
+if (thumb_plate) {
+  thumb_plate(0, thumb_plate_y_pos, 1, 1);
 }
-  
+
+if (palm_plate) {
+  x_size = three_finger_width*0.25;
+  palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
+}
+
+if (bolt_on_thumb_plate) {
+  bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
+}
+
+if (round_palm_plate) {
+translate([60, 30, 0]) rotate([180, 0, 0])  round_palm_plate();
+}
+
+if (tulip_chin_plate) {
+translate([60, 60, 0]) rotate([90, 0, 0])  tulip_chin_plate();
+}
+
+if (grooved_tulip_chin_plate) {
+  translate([60, 90, 0]) rotate([90, 0, 0])  grooved_tulip_chin_plate();
+}
+
 // Modules below
 
 module palm_plate(radius, length_mod, palm_depth) {
@@ -100,6 +112,336 @@ module palm_plate(radius, length_mod, palm_depth) {
   }
   }
 }
+
+module tulip_chin_plate() {
+  module tulip_plate() {
+    length=38;
+    width=30;
+    height=1;
+    intersection() {
+      radiusedblock(length,width,height,height);
+      translate([36,80,0]) { chamfercyl(80,3,-2,-2, $fn=200); }
+      translate([36,-55,0]) { chamfercyl(80,3,-2,-2, $fn=200); }
+      translate([-length/5,-length-4,0]) { rotate([0,0,45]) {
+        radiusedblock(length*2,(length*2)-3,height,height);
+      } }
+    }
+  }
+
+  module myfillet(length, side) {
+    centre=side+3;
+    radius=centre*2;
+      difference() {
+        cube([side,side,length]);
+        translate([side+1,side+1,-1]) {
+        cylinder(length+2,side,side,$fn=100);
+        }
+      }
+  }
+
+  module tilted_slot(xoffset) {
+    translate([xoffset,-1,0]) {
+      rotate([0,0,60]) {
+        bar(2.5,4,12,0);
+      }
+    }
+  }
+
+
+  difference() {
+    union() {
+      // mounting plate
+      translate([2,0,0]) {
+        intersection() {
+          intersection() {
+            difference(){
+              union() {
+                // main block
+                translate([0,-5,0]) {
+                  radiusedblock(70,37,2.5,1);
+                }
+                // front block
+                translate([39,20,0]) { radiusedblock(31,10,2.5,1); }
+                // front block to main block taper
+                translate([41,17.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+              }
+              // circular front cutout
+              translate([32,105,0]) { chamfercyl(80,5,2,2); }
+            }
+          }
+            // bottom corner
+            // translate([34,-60,0]) { rotate([0,0,45]) { radiusedblock(100,100,2.5,1); } }
+            translate([29,-57,0]) {
+              rotate([0,0,54]) {
+                radiusedblock(90,90,2.5,1);
+              }
+            }
+        }
+          // translate([41,39.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+      } // end main plate and intersections
+
+      // Thumb plate and fillets
+      translate([0,-10,0]) {
+        // plate
+        translate([0,5,-10]) {
+          rotate([90,0,90]) {
+             tulip_plate();
+          }
+        }
+
+        // Thumb plate fillet 1
+        translate([2,16,1]) {
+          rotate([-90,0,0]) {
+             myfillet(23,5);
+          }
+        }
+
+        // Thumb plate fillet 2
+        translate([2,39,3.6]) {
+          rotate([90,0,0]) {
+             myfillet(23,5);
+          }
+        }
+      } // end thumb plate and fillets
+
+    } // end main plate union
+
+    // All the below are removals
+
+    tilted_slot(08);
+    tilted_slot(16);
+    tilted_slot(24);
+    tilted_slot(32);
+    tilted_slot(40);
+    tilted_slot(48);
+    tilted_slot(56);
+    tilted_slot(64);
+
+    // top slot on rest
+    translate([10,8,0]) {
+      rotate([0,0,90]) {
+        bar(10,5,19,0);
+      }
+      // cutout for loop
+      translate([5,1,-0.5]) { rotate([90,0,90]) { bar(9,4.5,12,0); } }
+    }
+
+  translate([22,0,0]) {
+    // top hole for elastic
+    translate([-3,7,0]) {
+      hull(){
+        // top
+        translate([2,1,0]) { rotate([0,0,90]) { bar(9,7,12,0); } }
+        // bottom
+        translate([2,1,0]) { rotate([0,0,35]) { bar(14,7,12,0); } }
+        // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+      }
+    }
+
+    // mounting bolt slots
+    translate([13,7.5,-1]) {
+      // left slot
+      bar(8,4.5,19,0);
+      // right slot
+      translate([6,9,0]) { bar(8,4.5,19,0); }
+    }
+
+    // large hole for finger loop fastener
+      translate([33.5,7,0]) {
+        hull(){
+          // top
+          translate([0,1,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // bottom
+          translate([7,1,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+        }
+        // cutout for loop
+        translate([13,2,0]) { rotate([90,0,90]) { bar(10,4.5,12,0); } }
+      }
+    } // translate
+
+  } // end difference
+
+}
+
+module grooved_tulip_chin_plate() {
+  $fn=100;
+  module tulip_plate() {
+    length=28;
+    width=30;
+    height=5;
+    difference() {
+    intersection() {
+      radiusedblock(length,width,height,height);
+      translate([36,80,0]) { chamfercyl(80,height+2,-3,-3); }
+      translate([36,-50,0]) { chamfercyl(80,height+2,-3,-3); }
+      translate([16,15,0]) { chamfercyl(25,height+2,-3,-3); }
+      }
+
+      translate([-7,9.5,16]) {
+        rotate([-8,90,0]) {
+          cylinder(length+20,12,14,$fn=200);
+        }
+      }
+      }
+  }
+
+  module curved_plate() {
+    length=32;
+    width=15;
+    height=5;
+    difference() {
+      intersection() {
+        radiusedblock(length,width,height,height);
+        translate([44,78,0]) { chamfercyl(80,height+2,-2,-4); }
+        translate([20,28,0]) { chamfercyl(30,height+2,-2,-4); }
+      }
+      translate([-1,5,16]) {
+        rotate([-3,90,0]) {
+          cylinder(length+12,13,14,$fn=200);
+        }
+      }
+    }
+  }
+
+  module myfillet(length, side) {
+    centre=side+3;
+    radius=centre*2;
+      difference() {
+        cube([side,side,length]);
+        translate([side+1,side+1,-1]) {
+        cylinder(length+2,side,side,$fn=200);
+        }
+      }
+  }
+
+  module tilted_slot(xoffset) {
+    translate([xoffset,-5,0]) {
+      rotate([0,0,60]) {
+        bar(5,4,12,0);
+      }
+    }
+  }
+
+
+  difference() {
+    union() {
+      // mounting plate
+      translate([2,0,0]) {
+        intersection() {
+          intersection() {
+            difference(){
+              union() {
+                // main block
+                translate([0,-10,0]) {
+                  radiusedblock(68,32,2.5,1);
+                }
+                // front block
+                translate([46,19,0]) { radiusedblock(22,8,2.5,1); }
+                // front block to main block taper
+                translate([48,14.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+              }
+            }
+              // top corner
+                translate([44,-60,0]) { rotate([0,0,45]) { radiusedblock(100,100,2.5,1); } }
+          }
+            // bottom corner
+            // translate([34,-60,0]) { rotate([0,0,45]) { radiusedblock(100,100,2.5,1); } }
+            translate([37,-60,0]) {
+              rotate([0,0,60]) {
+                radiusedblock(90,90,2.5,1);
+              }
+            }
+        }
+          // translate([41,39.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+      } // end main plate and intersections
+
+      // Thumb plate and fillets
+      translate([0,-10,10]) {
+        // plate
+        translate([4.2,0,10]) {
+          rotate([0,-90,0]) {
+            rotate([0,0,90]) {
+               tulip_plate();
+            }
+          }
+        }
+
+        // Thumb plate fillet 1
+        translate([2.5,11,-9.2]) {
+          rotate([-90,0,0]) {
+             myfillet(22,4);
+          }
+        }
+
+        // Thumb plate fillet 2
+        translate([3.5,33,-6.9]) {
+          rotate([90,0,0]) {
+             myfillet(26,5);
+          }
+        }
+      } // end thumb plate and fillets
+
+    } // end main plate union
+
+    // All the below are removals
+
+    tilted_slot(10);
+    tilted_slot(21);
+    tilted_slot(31);
+    tilted_slot(40);
+    tilted_slot(48);
+    tilted_slot(56);
+    tilted_slot(64);
+
+    // top slot on rest
+    translate([10,6,0]) {
+      rotate([0,0,90]) {
+        bar(9,5,19,0);
+      }
+      // cutout for loop
+      translate([5,0,0]) { rotate([90,0,90]) { bar(9,4.5,12,0); } }
+    }
+
+  translate([22,0,0]) {
+
+    // top hole for elastic
+    translate([0,6,0]) {
+      // hull(){
+        // top
+        translate([-2,1,0]) { rotate([0,0,90]) { bar(7,7,12,0); } }
+        // bottom
+        translate([8,8,1]) { rotate([0,0,34]) { bar(3,7,12,0); } }
+        // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+      // }
+    }
+
+    // mounting bolt slots
+    translate([13,7.5,-1]) {
+      // left slot
+      bar(8,4.5,19,0);
+      // right slot
+      translate([6,9,0]) { bar(8,4.5,19,0); }
+    }
+
+    // large hole for finger loop fastener
+      translate([33.5,5.5,0]) {
+        hull(){
+          // top
+          translate([0,2,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // bottom
+          translate([4,2,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+        }
+        // cutout for loop
+        translate([13,2,0]) { rotate([90,0,90]) { bar(10,4.5,12,0); } }
+      }
+    } // translate
+
+  } // end difference
+
+}
+
 
 module bolt_on_thumb_plate(tp_length, tp_depth, tp_height) {
   translate([-30,30,0]) {
