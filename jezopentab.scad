@@ -1,63 +1,42 @@
 
+// Which parts to build
+base_plate=false;
+thumb_plate=false;
+bolt_on_thumb_plate=false;
+palm_plate=false;
+round_palm_plate=false;
+tulip_chin_plate=false;
+grooved_tulip_chin_plate=false;
+tulip_full_plate=true;
+//
+// Global Sizing Variables
 thickness=4;
 three_finger_width=65;
 bolt_slot_width=4;
 
-base_plate=true;
-
-thumb_plate=false;
+// Part Specific Variables
 thumb_plate_y_pos=three_finger_width*0.76;
 
-bolt_on_thumb_plate=true;
 botp_length=25;
 botp_depth=18;
 botp_height_mod=0.38;
 botp_height=three_finger_width*botp_height_mod;
 
-palm_plate=true;
 palm_plate_length_mod=1.8;
 palm_plate_depth=14;
-
 
 depth=three_finger_width*0.6;
 slot_depth=thickness+4;
 z_slot_offset=2;
-tilted_slot_count=6;
-tilted_slot_gap=(three_finger_width * 0.8) / tilted_slot_count;
+tilted_slot_gap=8.6;
+tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
 tilted_slot_angle=15;
 tilted_slot_length=9;
-
-round_palm_plate=true;
-
-tulip_chin_plate=true;
-
-grooved_tulip_chin_plate=true;
 
 
 
 if (base_plate) {
-  union() {
-    difference() {
-      base_plate(depth, three_finger_width, thickness);
-      translate([depth*0.6, three_finger_width*0.68, z_slot_offset]) {
-        bar(depth/4, bolt_slot_width, slot_depth, 0);
-      }
-      translate([depth*0.75, 10, -z_slot_offset]) {
-        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-      }
-      translate([depth*0.75, three_finger_width*0.87, -z_slot_offset]) {
-        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-      }
-      elastic_slot(4);
-      elastic_slot(17);
-      elastic_slot(21);
-      elastic_slot(three_finger_width*0.95);
-
-      for (slot=[1:1:tilted_slot_count]) {
-        tilted_slot(7, tilted_slot_gap*slot, tilted_slot_angle);
-      }
-    }
-  }
+  base_plate(false);
 }
 
 if (thumb_plate) {
@@ -78,33 +57,282 @@ translate([60, 30, 0]) rotate([180, 0, 0])  round_palm_plate();
 }
 
 if (tulip_chin_plate) {
-translate([60, 60, 0]) rotate([90, 0, 0])  tulip_chin_plate();
+translate([60, 60, 5]) rotate([90, 0, 0])  tulip_chin_plate();
 }
 
 if (grooved_tulip_chin_plate) {
-  translate([60, 90, 0]) rotate([90, 0, 0])  grooved_tulip_chin_plate();
+  translate([60, 90, 10]) rotate([90, 0, 0])  grooved_tulip_chin_plate();
+}
+
+if (tulip_full_plate) {
+translate([60, 120, 5]) rotate([90, 0, 0])  tulip_full_plate();
 }
 
 // Modules below
 
+module base_plate(square_plate=false) {
+  union() {
+    difference() {
+      plain_base_plate(depth, three_finger_width, thickness, square_plate);
+      translate([depth*0.6, three_finger_width*0.68, z_slot_offset]) {
+        bar(depth/4, bolt_slot_width, slot_depth, 0);
+      }
+      translate([depth*0.75, 10, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      }
+      translate([depth*0.75, three_finger_width*0.87, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      }
+      elastic_slot(4);
+      elastic_slot(17);
+      elastic_slot(21);
+      elastic_slot(38);
+      elastic_slot(three_finger_width*0.95);
+
+      for (slot=[1:1:tilted_slot_count]) {
+        if (slot <= 3) {
+          tilted_slot(7, tilted_slot_gap*slot, -tilted_slot_angle);
+        } else {
+          tilted_slot(7, tilted_slot_gap*slot, tilted_slot_angle);
+        }
+      }
+    }
+  }
+}
+
 module palm_plate(radius, length_mod, palm_depth) {
   // translate([-width*0.5,width,0]) { 
   translate([-50,0,0]) {
-  cube_length=radius*length_mod;
-  difference() {
-    union() {
-      roundedcube(size=[cube_length,radius*1.5,thickness+1], radius=2);
-      translate([0,radius*0.75,0]) {
-        chamfercyl(radius,palm_depth,-2,-palm_depth/2);
+    cube_length=radius*length_mod;
+    difference() {
+      union() {
+        roundedcube(size=[cube_length,radius*1.5,thickness+1], radius=2);
+        translate([0,radius*0.75,0]) {
+          chamfercyl(radius,palm_depth,-2,-palm_depth/2);
+        }
+        translate([cube_length,radius*0.75,0]) {
+          chamfercyl(radius*0.75,thickness+1,-2,-2);
+        }
       }
-      translate([cube_length,radius*0.75,0]) {
-        chamfercyl(radius*0.75,thickness+1,-2,-2);
+      tilted_slot(cube_length-4, tilted_slot_gap-2, tilted_slot_angle);
+      tilted_slot(cube_length-4, (tilted_slot_gap*2)-2, tilted_slot_angle);
+    }
+  }
+}
+
+module tulip_full_plate() {
+
+  plate_offset=2;
+  length=38;
+  width=30;
+  height=1.75;
+
+  module tulip_plate() {
+    intersection() {
+      radiusedblock(length,width,height,height);
+      translate([36,80,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
+      translate([36,-55,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
+      translate([-length/5,-length-6,0]) { rotate([0,0,45]) {
+        radiusedblock(length*2,(length*2)-3,height,height);
+      } }
+    }
+  }
+
+  module myfillet(length, side) {
+    centre=side+3;
+    radius=centre*2;
+      difference() {
+        cube([side,side,length]);
+        translate([side+1,side+1,-1]) {
+        cylinder(length+2,side,side,$fn=100);
+        }
+      }
+  }
+
+  union() {
+    // plate
+    translate([0,0,-10+plate_offset]) {
+      rotate([90,0,90]) {
+         tulip_plate();
       }
     }
-    tilted_slot(cube_length-4, tilted_slot_gap-2, tilted_slot_angle);
-    tilted_slot(cube_length-4, (tilted_slot_gap*2)-2, tilted_slot_angle);
+
+    // base_plate
+    translate([three_finger_width+height,0,0.3]) {
+      rotate([0,0,90]) {
+         base_plate(true);
+      }
+    }
+
+  translate([0,-2,0]) {
+    // plate fillet 1
+    translate([2,17,1]) {
+      rotate([-90,0,0]) {
+         myfillet(22,5);
+      }
+    }
+
+    // plate fillet 2
+    translate([2,39,3.6]) {
+      rotate([90,0,0]) {
+         myfillet(28,5);
+      }
+    }
   }
+
+  } // end main plate union
+
+}
+
+module tulip_chin_plate() {
+  module tulip_plate() {
+    length=38;
+    width=30;
+    height=1;
+    intersection() {
+      radiusedblock(length,width,height,height);
+      translate([36,80,0]) { chamfercyl(80,3,-2,-2, $fn=200); }
+      translate([36,-55,0]) { chamfercyl(80,3,-2,-2, $fn=200); }
+      translate([-length/5,-length-4,0]) { rotate([0,0,45]) {
+        radiusedblock(length*2,(length*2)-3,height,height);
+      } }
+    }
   }
+
+  module myfillet(length, side) {
+    centre=side+3;
+    radius=centre*2;
+      difference() {
+        cube([side,side,length]);
+        translate([side+1,side+1,-1]) {
+        cylinder(length+2,side,side,$fn=100);
+        }
+      }
+  }
+
+  module tilted_slot(xoffset) {
+    translate([xoffset,-1,0]) {
+      rotate([0,0,60]) {
+        bar(2.5,4,12,0);
+      }
+    }
+  }
+
+
+  difference() {
+    union() {
+      // mounting plate
+      translate([2,0,0]) {
+        intersection() {
+          intersection() {
+            difference(){
+              union() {
+                // main block
+                translate([0,-5,0]) {
+                  radiusedblock(70,37,2.5,1);
+                }
+                // front block
+                translate([39,20,0]) { radiusedblock(31,10,2.5,1); }
+                // front block to main block taper
+                translate([41,17.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+              }
+              // circular front cutout
+              translate([32,105,0]) { chamfercyl(80,5,2,2); }
+            }
+          }
+            // bottom corner
+            // translate([34,-60,0]) { rotate([0,0,45]) { radiusedblock(100,100,2.5,1); } }
+            translate([29,-57,0]) {
+              rotate([0,0,54]) {
+                radiusedblock(90,90,2.5,1);
+              }
+            }
+        }
+          // translate([41,39.3,0]) { rotate([0,0,54]) { radiusedblock(9,8,2.5,1); } }
+      } // end main plate and intersections
+
+      // Thumb plate and fillets
+      translate([0,-10,0]) {
+        // plate
+        translate([0,5,-10]) {
+          rotate([90,0,90]) {
+             tulip_plate();
+          }
+        }
+
+        // Thumb plate fillet 1
+        translate([2,16,1]) {
+          rotate([-90,0,0]) {
+             myfillet(23,5);
+          }
+        }
+
+        // Thumb plate fillet 2
+        translate([2,39,3.6]) {
+          rotate([90,0,0]) {
+             myfillet(23,5);
+          }
+        }
+      } // end thumb plate and fillets
+
+    } // end main plate union
+
+    // All the below are removals
+
+    tilted_slot(08);
+    tilted_slot(16);
+    tilted_slot(24);
+    tilted_slot(32);
+    tilted_slot(40);
+    tilted_slot(48);
+    tilted_slot(56);
+    tilted_slot(64);
+
+    // top slot on rest
+    translate([10,8,0]) {
+      rotate([0,0,90]) {
+        bar(10,5,19,0);
+      }
+      // cutout for loop
+      translate([5,1,-0.5]) { rotate([90,0,90]) { bar(9,4.5,12,0); } }
+    }
+
+  translate([22,0,0]) {
+    // top hole for elastic
+    translate([-3,7,0]) {
+      hull(){
+        // top
+        translate([2,1,0]) { rotate([0,0,90]) { bar(9,7,12,0); } }
+        // bottom
+        translate([2,1,0]) { rotate([0,0,35]) { bar(14,7,12,0); } }
+        // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+      }
+    }
+
+    // mounting bolt slots
+    translate([13,7.5,-1]) {
+      // left slot
+      bar(8,4.5,19,0);
+      // right slot
+      translate([6,9,0]) { bar(8,4.5,19,0); }
+    }
+
+    // large hole for finger loop fastener
+      translate([33.5,7,0]) {
+        hull(){
+          // top
+          translate([0,1,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // bottom
+          translate([7,1,0]) { rotate([0,0,83]) { bar(14,7,12,0); } }
+          // translate([8,0,0]) { rotate([0,0,83]) { bar(16,4.5,12,0); } }
+        }
+        // cutout for loop
+        translate([13,2,0]) { rotate([90,0,90]) { bar(10,4.5,12,0); } }
+      }
+    } // translate
+
+  } // end difference
+
 }
 
 module tulip_chin_plate() {
@@ -549,20 +777,10 @@ module elastic_slot(yoffset) {
   }
 }
 
-module base_plate(depth, height, thickness) {
+module plain_base_plate(depth, height, thickness, square_plate) {
   intersection() {
-    intersection() {
-      union() {
-        roundedcube(size=[depth,height,thickness], radius=1);
-        difference() {
-          top_corner_x=depth*1.15;
-          top_corner_y=height*0.55;
-          roundedcube(size=[top_corner_x,top_corner_y,thickness], radius=1);
-          translate([top_corner_x, top_corner_y]) {
-            chamfercyl(depth*0.15, thickness, b=1, t=1);
-          }
-        }
-      }
+    square_base_plate();
+    if (!square_plate) {
       translate([depth*0.8, depth*0.01]) {
         chamfercyl(height, thickness, b=-1, t=-1);
       }
@@ -572,6 +790,20 @@ module base_plate(depth, height, thickness) {
     }
     translate([depth*0.6, depth*1.65]) {
       chamfercyl(height, thickness, b=-1, t=-1);
+    }
+  }
+
+  module square_base_plate() {
+    union() {
+      roundedcube(size=[depth,height,thickness], radius=1);
+      difference() {
+        top_corner_x=depth*1.15;
+        top_corner_y=height*0.55;
+        roundedcube(size=[top_corner_x,top_corner_y,thickness], radius=1);
+        translate([top_corner_x, top_corner_y]) {
+          chamfercyl(depth*0.15, thickness, b=1, t=1);
+        }
+      }
     }
   }
 }
