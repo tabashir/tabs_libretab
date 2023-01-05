@@ -131,10 +131,10 @@ module jezr_plate() {
     }
 
     // bolt holes to secure tab
-    translate([103*scaling, 30*scaling, -z_slot_offset]) {
+    translate([106*scaling, 30*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
-    translate([103*scaling, 127*scaling, -z_slot_offset]) {
+    translate([106*scaling, 127*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
 }
@@ -398,7 +398,7 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
     // base_plate
     translate([length+height,0,0]) {
       rotate([0,0,90]) {
-         chin_plate_base(length, width, height, bolt_slot_width);
+         chin_plate_base(length, width, 3, bolt_slot_width);
       }
     }
 
@@ -478,7 +478,7 @@ module grooved_tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, 
       // base_plate
       translate([length+height,-10,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length, width, height, bolt_slot_width);
+           chin_plate_base(length, width, 3, bolt_slot_width);
         }
       }
 
