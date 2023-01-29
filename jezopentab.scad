@@ -2,15 +2,15 @@
 // Which parts to build
 base_plate=false;
 thumb_plate=false;
-bolt_on_thumb_plate=true;
-palm_plate=true;
+bolt_on_thumb_plate=false;
+palm_plate=false;
 round_palm_plate=false;
-wedge_palm_plate=true;
-tulip_chin_plate=true;
+wedge_palm_plate=false;
+tulip_chin_plate=false;
 grooved_tulip_chin_plate=true;
 tulip_full_plate=false;
-jezr_plate=true;
-pinky_trigger=true;
+jezr_plate=false;
+pinky_trigger=false;
 //
 // Global Sizing Variables
 thickness=4;
@@ -70,7 +70,9 @@ if (tulip_chin_plate) {
 }
 
 if (grooved_tulip_chin_plate) {
-  translate([30, 280, 10]) grooved_tulip_chin_plate();
+  translate([30, 280, 10]) {
+    grooved_tulip_chin_plate(plate_offset=0, length=38, width=30, height=2, angle=-9, groove_radius=13, second_fillet=true);
+  }
 }
 
 if (tulip_full_plate) {
@@ -355,11 +357,11 @@ module tulip_full_plate() {
 
 }
 
-module chin_plate_base(length, width, height, bolt_slot_width) {
+module chin_plate_base(length, width, height, bolt_slot_width, slot_angle=0) {
   difference() {
     roundedcube(size=[length, length, height], radius=1);
     translate([length*1.5,0,-1]) { chamfercyl(length,height+1,2,2, $fn=200); }
-    translate([length/3.5,7,0]) { rotate([0, 0, 90]) { bar(length/2,bolt_slot_width,12,0); }
+    translate([length/3.5,7,0]) { rotate([0, 0, 90-slot_angle]) { bar(length/2,bolt_slot_width,12,0); }
     }
   }
 }
@@ -423,10 +425,10 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
   } // end main plate union
 }
 
-module grooved_tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_fillet=true) {
+module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
   $fn=100;
 
-  module tulip_plate() {
+  module grooved_tulip_plate(angle=-8, groove_radius=12) {
     length=28;
     width=30;
     height=5;
@@ -438,26 +440,8 @@ module grooved_tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, 
         translate([16,15,0]) { chamfercyl(25,height+2,-3,-3); }
       }
       translate([-7,9.5,16]) {
-        rotate([-8,90,0]) {
-          cylinder(length+20,12,14,$fn=200);
-        }
-      }
-    }
-  }
-
-  module curved_plate() {
-    length=32;
-    width=15;
-    height=5;
-    difference() {
-      intersection() {
-        radiusedblock(length,width,height,height);
-        translate([44,78,0]) { chamfercyl(80,height+2,-2,-4); }
-        translate([20,28,0]) { chamfercyl(30,height+2,-2,-4); }
-      }
-      translate([-1,5,16]) {
-        rotate([-3,90,0]) {
-          cylinder(length+12,13,14,$fn=200);
+        rotate([angle,90,0]) {
+          cylinder(length+20,groove_radius,groove_radius+2, $fn=200);
         }
       }
     }
@@ -474,25 +458,26 @@ module grooved_tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, 
     }
   }
 
-    union() {
-      // base_plate
-      translate([length+height,-10,0]) {
+  // modules put together
+  union() {
+    // chin plate
+    translate([4.2,-10,20]) {
+      rotate([0,-90,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length, width, 3, bolt_slot_width);
+           grooved_tulip_plate(angle, groove_radius);
+        }
+      }
+    }
+
+    translate([0,0,plate_offset]) {
+      // base_plate
+      translate([length+height-4,-9,0]) {
+        rotate([0,0,90]) {
+           chin_plate_base(length-5, width, 3, bolt_slot_width, slot_angle=15);
         }
       }
 
-      // Thumb plate and fillets
-      translate([0,-10,10]) {
-        // plate
-        translate([4.2,0,10]) {
-          rotate([0,-90,0]) {
-            rotate([0,0,90]) {
-               tulip_plate();
-            }
-          }
-        }
-
+      translate([0,-12,10]) {
         // Thumb plate fillet 1
         translate([2.5,11,-9.2]) {
           rotate([-90,0,0]) {
@@ -501,15 +486,14 @@ module grooved_tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, 
         }
 
         // Thumb plate fillet 2
-        translate([3.5,33,-6.9]) {
+        translate([3.5,30,-6.9]) {
           rotate([90,0,0]) {
-             myfillet(26,5);
+             myfillet(20,5);
           }
         }
-      } // end thumb plate and fillets
-
-    } // end main plate union
-
+      }
+    } // end thumb plate and fillets
+  } // end main plate union
 }
 
 
