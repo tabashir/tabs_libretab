@@ -6,15 +6,15 @@ bolt_on_thumb_plate=false;
 palm_plate=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
-tulip_chin_plate=false;
-grooved_tulip_chin_plate=true;
+tulip_chin_plate=true;
+grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 pinky_trigger=false;
 //
 // Global Sizing Variables
 thickness=4;
-three_finger_width=65;
+three_finger_width=55;
 bolt_slot_width=4.5;
 
 // Part Specific Variables
@@ -48,19 +48,19 @@ if (thumb_plate) {
 
 if (palm_plate) {
   x_size = three_finger_width*0.25;
-  translate([80, 130, 0]) palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
+  translate([65, 130, 0]) palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
 if (bolt_on_thumb_plate) {
-  translate([120, 100, 0]) bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
+  translate([120, 50, 0]) bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
 }
 
 if (round_palm_plate) {
-  translate([60, 30, 0]) round_palm_plate();
+  translate([60, 30, 0]) rotate([180, 0, 0]) round_palm_plate();
 }
 
 if (wedge_palm_plate) {
-  translate([120, 260, 0]) wedge_palm_plate();
+  translate([140, 230, 0]) rotate([180, 0, 0]) wedge_palm_plate();
 }
 
 if (tulip_chin_plate) {
@@ -283,11 +283,11 @@ module wedge_palm_plate(slot_length=12, tilt_angle=3, length=35, height=25, thic
       }
       rotate([0,tilt_angle,0]) { 
         // rounded finger cutout
-        translate([75,-45,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=100); }
+        translate([75,-45,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=75); }
       }
       rotate([0,tilt_angle,0]) { 
         // rounded finger cutout
-        translate([-20,90,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=100); }
+        translate([-20,90,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=75); }
       }
     }
   }
@@ -303,8 +303,8 @@ module tulip_full_plate() {
   module tulip_plate() {
     intersection() {
       radiusedblock(length,width,height,height);
-      translate([36,80,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
-      translate([36,-55,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
+      translate([36,80,0]) { chamfercyl(80,height+2,-2,-2, $fn=100); }
+      translate([36,-55,0]) { chamfercyl(80,height+2,-2,-2, $fn=100); }
       translate([-length/5,-length-6,0]) { rotate([0,0,45]) {
         radiusedblock(length*2,(length*2)-3,height,height);
       } }
