@@ -1,15 +1,15 @@
 
 // Which parts to build
-base_plate=false;
+base_plate=true;
 thumb_plate=false;
-bolt_on_thumb_plate=false;
-palm_plate=false;
+bolt_on_thumb_plate=true;
+palm_plate=true;
 palm_ball=true;
-round_palm_plate=false;
-wedge_palm_plate=false;
-tulip_chin_plate=false;
-grooved_tulip_chin_plate=false;
-tulip_full_plate=false;
+round_palm_plate=true;
+wedge_palm_plate=true;
+tulip_chin_plate=true;
+grooved_tulip_chin_plate=true;
+tulip_full_plate=true;
 jezr_plate=true;
 pinky_trigger=true;
 //
@@ -47,53 +47,54 @@ if (base_plate) {
 }
 
 if (thumb_plate) {
+  // This plate is attached to the base plate
   thumb_plate(0, thumb_plate_y_pos, 1, 1);
 }
 
 if (palm_plate) {
   x_size = three_finger_width*0.25;
-  translate([65, 130, 0]) palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
+  translate([0, 80, 0]) palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
 if (palm_ball) {
   x_size = three_finger_width*0.25;
-  translate([145, 250, 0]) palm_ball(x_size, palm_plate_length_mod, palm_ball_depth);
+  translate([-40, 40, 0]) palm_ball(x_size, palm_plate_length_mod, palm_ball_depth);
 }
 
 if (bolt_on_thumb_plate) {
-  translate([120, 50, 0]) bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
+  translate([60, -150, 0]) bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
 }
 
 if (round_palm_plate) {
-  translate([60, 30, 0]) rotate([180, 0, 0]) round_palm_plate();
+  translate([-120, 40, 0]) rotate([180, 0, 0]) round_palm_plate();
 }
 
 if (wedge_palm_plate) {
-  translate([140, 230, 0]) rotate([180, 0, 0]) wedge_palm_plate();
+  translate([-80, 60, 0]) rotate([180, 0, 0]) wedge_palm_plate();
 }
 
 if (tulip_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate([90, 270, 5]) tulip_chin_plate(1, 38, 30, 2, false);
+  translate([90, -70, 5]) tulip_chin_plate(1, 38, 30, 2, false);
 }
 
 if (grooved_tulip_chin_plate) {
-  translate([30, 280, 10]) {
+  translate([30, -60, 10]) {
     grooved_tulip_chin_plate(plate_offset=6, length=38, width=30, height=2, angle=-9, groove_radius=13, second_fillet=true);
   }
 }
 
 if (tulip_full_plate) {
-  translate([60, 120, 5]) tulip_full_plate();
+  translate([10, 80, 5]) tulip_full_plate();
 }
 
 if (jezr_plate) {
-  translate([0, 180, 0]) jezr_plate();
+  translate([70, 0, 0]) jezr_plate();
 }
 
 if (pinky_trigger) {
-  translate([90, 180, 0]) pinky_trigger();
+  translate([-40, -60, 0]) pinky_trigger();
 }
 
 // Modules below
