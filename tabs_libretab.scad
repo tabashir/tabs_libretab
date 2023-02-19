@@ -1,17 +1,18 @@
 
 // Which parts to build
-base_plate=true;
+base_plate=false;
 thumb_plate=false;
-bolt_on_thumb_plate=true;
-palm_plate=true;
-palm_ball=true;
-round_palm_plate=true;
+bolt_on_thumb_plate=false;
+palm_plate=false;
+palm_ball=false;
+round_palm_plate=false;
 wedge_palm_plate=true;
-tulip_chin_plate=true;
-grooved_tulip_chin_plate=true;
-tulip_full_plate=true;
-jezr_plate=true;
-pinky_trigger=true;
+tulip_chin_plate=false;
+grooved_tulip_chin_plate=false;
+tulip_full_plate=false;
+jezr_plate=false;
+jezr_palm_plate=false;
+pinky_trigger=false;
 //
 // Global Sizing Variables
 thickness=4;
@@ -30,7 +31,9 @@ botp_height=three_finger_width*botp_height_mod;
 palm_plate_length_mod=1.8;
 palm_plate_depth=14;
 
-palm_ball_depth=7;
+palm_ball_depth=5;
+
+jezr_palm_plate_depth=5;
 
 depth=three_finger_width*0.6;
 slot_depth=thickness+4;
@@ -71,6 +74,10 @@ if (round_palm_plate) {
 
 if (wedge_palm_plate) {
   translate([-80, 60, 0]) rotate([180, 0, 0]) wedge_palm_plate();
+}
+
+if (jezr_palm_plate) {
+  translate([70, 0, -10]) jezr_palm_plate();
 }
 
 if (tulip_chin_plate) {
@@ -150,38 +157,76 @@ module jezr_plate() {
     translate([106*scaling, 127*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
+  }
 }
 
-
-  module ww_base_plate(scaling) {
-    scale([scaling, scaling, 1]) {
-      linear_extrude(height = thickness) {
-        translate([66, 72, 0]) {
-          polygon([
-          // top index finger front
-          [58,64], [58,42],
-          // nock cutout
-          [51,32],[51,18],
-          // middle and ring finger front
-          [64,9],[64,-48],
-          // bottom front curve
-          [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-68],[7,-61],
-          // rear bottom join
-          [-7,-52],[-25,-41],[-44,-28],
-          // rear curve
-          [-58,-18],[-61,-13],[-62,-7],[-62,0],[-61,4],[-58,9],
-          // top lifeline curve
-          [-54,14],[-52,15],[-48,18],[-37,25],[-23,38],[-14,52],[-3,60],
-          // top curve
-          [9,66],[23,70],[38,72],
-          // top front join curve
-          [51,72],[55,70],[56,69],[58,67]
-          ]);
-        }
+module ww_base_plate(scaling) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = thickness) {
+      translate([66, 72, 0]) {
+        polygon([
+        // top index finger front
+        [58,64], [58,42],
+        // nock cutout
+        [51,32],[51,18],
+        // middle and ring finger front
+        [64,9],[64,-48],
+        // bottom front curve
+        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-68],[7,-61],
+        // rear bottom join
+        [-7,-52],[-25,-41],[-44,-28],
+        // rear curve
+        [-58,-18],[-61,-13],[-62,-7],[-62,0],[-61,4],[-58,9],
+        // top lifeline curve
+        [-54,14],[-52,15],[-48,18],[-37,25],[-23,38],[-14,52],[-3,60],
+        // top curve
+        [9,66],[23,70],[38,72],
+        // top front join curve
+        [51,72],[55,70],[56,69],[58,67]
+        ]);
       }
     }
   }
+}
 
+module jezr_palm_plate() {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    jezr_palm_plate_base(scaling, jezr_palm_plate_depth);
+
+    // extra slots for ring mount
+    slot_y_offset2=39*scaling;
+    for (slotno=[1:1:3]) {
+      angled_slot(41*scaling, (tilted_slot_gap*slotno)+slot_y_offset2, thickness=jezr_palm_plate_depth);
+    }
+    slot_y_offset3=45*scaling;
+    for (slotno=[1:1:2]) {
+      angled_slot(20*scaling, (tilted_slot_gap*slotno)+slot_y_offset3, thickness=jezr_palm_plate_depth);
+    }
+  }
+}
+
+module jezr_palm_plate_base(scaling, thickness) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = thickness) {
+      translate([66, 72, 0]) {
+        polygon([
+        // rear bottom join
+        [-7,-16],[-32,-36],[-44,-28],
+        // rear curve
+        [-58,-18],[-61,-13],[-62,-7],[-62,0],[-61,4],[-58,9],
+        // top lifeline curve
+        [-54,14],[-52,15],[-48,18],[-37,25],[-23,38],[-10,32]
+        ]);
+      }
+    }
+  }
 }
 
 module pinky_trigger(desired_height=35) {
@@ -608,7 +653,7 @@ module myfillet(length, side) {
     }
 }
 
-module angled_slot(xpos, ypos, slot_angle=30, slot_length=5, slot_width=bolt_slot_width, scaling=1) {
+module angled_slot(xpos, ypos, slot_angle=30, slot_length=5, slot_width=bolt_slot_width, scaling=1, thickness=thickness) {
   slot_depth=thickness*2;
   translate([xpos*scaling,ypos*scaling,thickness/2]) {
     rotate([0,0,slot_angle]) {
