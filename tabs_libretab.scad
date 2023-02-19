@@ -1,16 +1,17 @@
 
 // Which parts to build
 base_plate=false;
-thumb_plate=false;
+fixed_thumb_plate=false;
 bolt_on_thumb_plate=false;
 palm_plate=false;
 palm_ball=false;
 round_palm_plate=false;
-wedge_palm_plate=true;
+wedge_palm_plate=false;
 tulip_chin_plate=false;
 grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
+jezc_plate=true;
 jezr_palm_plate=false;
 pinky_trigger=false;
 //
@@ -21,7 +22,7 @@ bolt_slot_width=4.5;
 bolt_head_width=10;
 
 // Part Specific Variables
-thumb_plate_y_pos=three_finger_width*0.76;
+fixed_thumb_plate_y_pos=three_finger_width*0.76;
 
 botp_length=25;
 botp_depth=18;
@@ -43,15 +44,15 @@ tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
 tilted_slot_angle=15;
 tilted_slot_length=9;
 
-
+elastic_slot_width=2;
 
 if (base_plate) {
   base_plate(false);
 }
 
-if (thumb_plate) {
+if (fixed_thumb_plate) {
   // This plate is attached to the base plate
-  thumb_plate(0, thumb_plate_y_pos, 1, 1);
+  fixed_thumb_plate(0, fixed_thumb_plate_y_pos, 1, 1);
 }
 
 if (palm_plate) {
@@ -100,6 +101,11 @@ if (jezr_plate) {
   translate([70, 0, 0]) jezr_plate();
 }
 
+if (jezc_plate) {
+  translate([140, 0, 0]) jezc_plate();
+}
+
+
 if (pinky_trigger) {
   translate([-40, -60, 0]) pinky_trigger();
 }
@@ -133,6 +139,7 @@ module jezr_plate() {
     // elastic slots
     elastic_slot(92, 136, scaling=scaling);
     elastic_slot(92, 84, scaling=scaling);
+    elastic_slot(92, 78, scaling=scaling);
     elastic_slot(92, 72, scaling=scaling);
     elastic_slot(92, 66, scaling=scaling);
     elastic_slot(92, 60, scaling=scaling);
@@ -183,6 +190,80 @@ module ww_base_plate(scaling) {
         [9,66],[23,70],[38,72],
         // top front join curve
         [51,72],[55,70],[56,69],[58,67]
+        ]);
+      }
+    }
+  }
+}
+
+module jezc_plate() {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    jc_base_plate(scaling);
+
+    // spacer slot
+    angled_slot(92, 100, 0, 8, scaling=scaling);
+
+    // chin or thumb rest slots
+    slot_y_offset=48*scaling;
+    for (slotno=[1:1:3]) {
+      angled_slot(60*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
+    }
+
+    // pinky mount slot
+    angled_slot(58, 37, -31, 20, scaling=scaling);
+    angled_slot(92, 17, -6, 8, scaling=scaling);
+
+    // elastic slots
+    elastic_slot(92, 127, scaling=scaling);
+    elastic_slot(92, 84, scaling=scaling);
+    elastic_slot(92, 78, scaling=scaling);
+    elastic_slot(92, 72, scaling=scaling);
+    elastic_slot(92, 66, scaling=scaling);
+    elastic_slot(92, 60, scaling=scaling);
+    elastic_slot(92, 54, scaling=scaling);
+    elastic_slot(92, 48, scaling=scaling);
+    elastic_slot(92, 42, scaling=scaling);
+
+    // bolt holes to secure tab
+    translate([100*scaling, 30*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+    translate([100*scaling, 120*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+  }
+}
+
+module jc_base_plate(scaling) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = thickness) {
+      translate([66, 72, 0]) {
+        polygon([
+        // top index finger front
+        [58,54], [58,42],
+        // nock cutout
+        [51,32],[51,18],
+        // middle and ring finger front
+        [64,9],[64,-48],
+        // bottom front curve
+        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-68],[7,-61],
+        // rear bottom join
+        [-7,-52],[-21,-40],[-25,-34],
+        // rear top join
+        [-25,24],[-23,32],
+        // top lifeline curve
+        [-21,37],[-14,44],[-3,50],
+        // top curve
+        [9,56],[23,60],[38,62],
+        // top front join curve
+        [51,62],[55,60],[56,59],[58,57]
         ]);
       }
     }
@@ -268,11 +349,11 @@ module base_plate(square_plate=false) {
       translate([depth*0.75, three_finger_width*0.87, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
-      elastic_slot(4);
-      elastic_slot(17);
-      elastic_slot(21);
-      elastic_slot(38);
-      elastic_slot(three_finger_width*0.95);
+      offset_elastic_slot(4);
+      offset_elastic_slot(17);
+      offset_elastic_slot(21);
+      offset_elastic_slot(38);
+      offset_elastic_slot(three_finger_width*0.95);
 
       for (slot=[1:1:tilted_slot_count]) {
         if (slot <= 3) {
@@ -283,10 +364,8 @@ module base_plate(square_plate=false) {
       }
     }
   }
-  module elastic_slot(yoffset) {
-    translate([depth*0.6,yoffset,z_slot_offset]) {
-      bar(10,1.5,slot_depth,0);
-    }
+  module offset_elastic_slot(yoffset) {
+    elastic_slot(depth*0.6, yoffset);
   }
 }
 
@@ -612,7 +691,7 @@ module bolt_on_thumb_plate(tp_length, tp_depth, tp_height) {
 }
 
 
-module thumb_plate(x_pos, y_pos, x_scale, y_scale) {
+module fixed_thumb_plate(x_pos, y_pos, x_scale, y_scale) {
   length=30;
   width=30;
   height=thickness-2;
@@ -687,7 +766,7 @@ module tilted_slot(xoffset, yoffset, angle) {
 
 module elastic_slot(xpos, ypos, scaling=1) {
   translate([xpos*scaling,ypos*scaling,z_slot_offset]) {
-    bar(10,1.5,slot_depth,0);
+    bar(10,elastic_slot_width,slot_depth,0);
   }
 }
 
