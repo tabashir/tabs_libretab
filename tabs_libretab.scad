@@ -11,11 +11,14 @@ tulip_chin_plate=false;
 grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
-jezc_plate=true;
+jezc_plate=false;
 jezr_palm_plate=false;
-pinky_trigger=false;
+pinky_trigger=true;
 spacer_ring=true;
-//
+
+// saves mirroring some objects in the slicer
+right_handed=false;
+
 // Global Sizing Variables
 thickness=4;
 three_finger_width=65;
@@ -217,8 +220,8 @@ module jezc_plate() {
     }
 
     // pinky mount slot
-    angled_slot(58, 37, -31, 20, scaling=scaling);
-    angled_slot(92, 17, -6, 8, scaling=scaling);
+    angled_slot(58, 37, -33, 20, scaling=scaling);
+    angled_slot(93, 14, -4, 8, scaling=scaling);
 
     // elastic slots
     elastic_slot(90, 132, scaling=scaling);
@@ -315,6 +318,7 @@ module jezr_palm_plate_base(scaling, thickness) {
 module pinky_trigger(desired_height=35) {
     // polygon is 84 high
     scaling=desired_height/84;
+    union() {
     difference() {
       linear_extrude(height = thickness) {
         scale([scaling*1.2, scaling, 1]) {
@@ -332,7 +336,10 @@ module pinky_trigger(desired_height=35) {
       translate([10*scaling, 71*scaling, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
-      translate([37*scaling, 71*scaling, -z_slot_offset]) {
+      }
+      handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
+      translate([37*scaling, 71*scaling, handed_z_offset]) {
+      // translate([37*scaling, 71*scaling, 0]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
     }
