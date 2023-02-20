@@ -14,6 +14,7 @@ jezr_plate=false;
 jezc_plate=true;
 jezr_palm_plate=false;
 pinky_trigger=false;
+spacer_ring=true;
 //
 // Global Sizing Variables
 thickness=4;
@@ -206,14 +207,13 @@ module jezc_plate() {
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
     jc_base_plate(scaling);
-
     // spacer slot
     angled_slot(92, 100, 0, 8, scaling=scaling);
 
     // chin or thumb rest slots
-    slot_y_offset=48*scaling;
-    for (slotno=[1:1:3]) {
-      angled_slot(60*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
+    slot_y_offset=38*scaling;
+    for (slotno=[1:1:4]) {
+      angled_slot(57*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=11);
     }
 
     // pinky mount slot
@@ -221,7 +221,7 @@ module jezc_plate() {
     angled_slot(92, 17, -6, 8, scaling=scaling);
 
     // elastic slots
-    elastic_slot(92, 127, scaling=scaling);
+    elastic_slot(90, 132, scaling=scaling);
     elastic_slot(92, 84, scaling=scaling);
     elastic_slot(92, 78, scaling=scaling);
     elastic_slot(92, 72, scaling=scaling);
@@ -235,7 +235,7 @@ module jezc_plate() {
     translate([100*scaling, 30*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
-    translate([100*scaling, 120*scaling, -z_slot_offset]) {
+    translate([100*scaling, 122*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
   }
@@ -251,19 +251,21 @@ module jc_base_plate(scaling) {
         // nock cutout
         [51,32],[51,18],
         // middle and ring finger front
-        [64,9],[64,-48],
+        [64,2],[64,-48],
         // bottom front curve
         [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-68],[7,-61],
         // rear bottom join
-        [-7,-52],[-21,-40],[-25,-34],
+        [-7,-52],[-20,-40],[-24,-34],
+        // rear
+        [-25,-30],[-25,24],
         // rear top join
         [-25,24],[-23,32],
         // top lifeline curve
-        [-21,37],[-14,44],[-3,50],
+        [-21,37],[-17,47],[-5,59],
         // top curve
-        [9,56],[23,60],[38,62],
+        [9,65],[23,67],[38,67],[48,67],
         // top front join curve
-        [51,62],[55,60],[56,59],[58,57]
+        [54,65],[57,61],[58,57]
         ]);
       }
     }
