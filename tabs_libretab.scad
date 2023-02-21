@@ -8,13 +8,14 @@ palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
+half_tulip_chin_plate=true;
 grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 jezr_palm_plate=false;
-pinky_trigger=true;
-spacer_ring=true;
+pinky_trigger=false;
+// spacer_ring=true;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -89,6 +90,12 @@ if (tulip_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
   translate([90, -70, 5]) tulip_chin_plate(1, 38, 30, 2, false);
+}
+
+if (half_tulip_chin_plate) {
+  // last param is whether to include a second fillet on outside of the base plate
+  // stronger, but doesn't butt up well against edge of main base plate if used
+  translate([90, -120, 0]) half_tulip_chin_plate(25, 30, 2);
 }
 
 if (grooved_tulip_chin_plate) {
@@ -584,6 +591,43 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
   }
 
   } // end main plate union
+}
+
+module half_tulip_chin_plate( length=28, width=30, height=2) {
+  union() {
+    plate_width=3;
+    // base_plate
+    translate([length+height,0,-plate_width]) {
+      rotate([0,0,90]) {
+         chin_plate_base(length, width, plate_width, bolt_slot_width);
+      }
+    }
+
+    // plate
+    translate([height*2,-length/3,width/2]) {
+      rotate([-90,0,90]) {
+        half_tulip_plate(length, width, height);
+      }
+    }
+
+    // plate fillet 2
+    translate([height+1,length-5,height-2.5]) {
+      rotate([90,0,0]) {
+         myfillet(length-6,5);
+      }
+    }
+  } // end main plate union
+
+  module myfillet(length, side) {
+    centre=side+3;
+    radius=centre*2;
+      difference() {
+        cube([side,side,length]);
+        translate([side+1,side+1,-1]) {
+        cylinder(length+2,side,side,$fn=100);
+        }
+      }
+  }
 }
 
 module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {

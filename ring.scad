@@ -32,7 +32,7 @@ union() {
     }
   }
 
-  roundedcube(size=[plate_length,plate_width,plate_depth], radius=1);
+  roundedcube(size=[plate_length,plate_width,plate_depth], radius=plate_depth/2);
 
 }
 
