@@ -8,14 +8,14 @@ palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
-half_tulip_chin_plate=true;
+half_chin_plate=true;
 grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
-// spacer_ring=true;
+spacer_ring=false;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -92,10 +92,10 @@ if (tulip_chin_plate) {
   translate([90, -70, 5]) tulip_chin_plate(1, 38, 30, 2, false);
 }
 
-if (half_tulip_chin_plate) {
+if (half_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate([90, -120, 0]) half_tulip_chin_plate(25, 30, 2);
+  translate([90, -120, 0]) half_chin_plate(30, 22, 3.5);
 }
 
 if (grooved_tulip_chin_plate) {
@@ -119,6 +119,10 @@ if (jezc_plate) {
 
 if (pinky_trigger) {
   translate([-40, -60, 0]) pinky_trigger();
+}
+
+if (spacer_ring) {
+  translate([140, 80, 0]) spacer_ring();
 }
 
 // Modules below
@@ -331,8 +335,8 @@ module pinky_trigger(desired_height=35) {
         scale([scaling*1.2, scaling, 1]) {
           translate([20, 40, 0]) {
             polygon([
-              [-9,43],[12,43],[18,40],[21,37],[22,32],[22,28],
-              [19,24],[15,21],[11,19],[6,15],[4,10],[3,5],[4,-3],
+              [-9,43],[5,43],[9,40],[11,37],[12,32],[11,24],
+              [6,15],[4,10],[3,5],[4,-3],
               [6,-9],[9,-15],[13,-21],[15,-26],[15,-31],[12,-36],
               [9,-38],[4,-40],[1,-40],[-4,-37],[-10,-27],[-14,-16],[-18,0],
               [-23,16],[-25,29],[-22,38],[-14,43]
@@ -345,8 +349,7 @@ module pinky_trigger(desired_height=35) {
       }
       }
       handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
-      translate([37*scaling, 71*scaling, handed_z_offset]) {
-      // translate([37*scaling, 71*scaling, 0]) {
+      translate([26*scaling, 76*scaling, handed_z_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
     }
@@ -527,9 +530,11 @@ module tulip_full_plate() {
 
 module chin_plate_base(length, width, height, bolt_slot_width, slot_angle=0) {
   difference() {
-    roundedcube(size=[length, length, height], radius=1);
+    slot_bottom_offset=7;
+    slot_length=(width-slot_bottom_offset)/2;
+    roundedcube(size=[length, width, height], radius=1);
     translate([length*1.5,0,-1]) { chamfercyl(length,height+1,2,2, $fn=200); }
-    translate([length/3.5,7,0]) { rotate([0, 0, 90-slot_angle]) { bar(length/2,bolt_slot_width,12,0); }
+    translate([length/3.5,slot_bottom_offset,0]) { rotate([0, 0, 90-slot_angle]) { bar(slot_length,bolt_slot_width,12,0); }
     }
   }
 }
@@ -568,7 +573,7 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
     // base_plate
     translate([length+height,0,0]) {
       rotate([0,0,90]) {
-         chin_plate_base(length, width, 3, bolt_slot_width);
+         chin_plate_base(length, length, 3, bolt_slot_width);
       }
     }
 
@@ -593,29 +598,36 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
   } // end main plate union
 }
 
-module half_tulip_chin_plate( length=28, width=30, height=2) {
+module half_chin_plate( length=28, width=20, height=3) {
   union() {
-    plate_width=3;
+    plate_thickness=2;
+    fillet_length=length-6;
+    plate_radius=width/2;
+    plate_scale_factor=length/plate_radius/2;
     // base_plate
-    translate([length+height,0,-plate_width]) {
-      rotate([0,0,90]) {
-         chin_plate_base(length, width, plate_width, bolt_slot_width);
+    chin_plate_base(length-2, length, plate_thickness, bolt_slot_width);
+
+    // plate fillet 2
+    translate([fillet_length,length,plate_thickness]) {
+      rotate([90,0,-90]) {
+         myfillet(fillet_length-1,5);
       }
     }
 
     // plate
-    translate([height*2,-length/3,width/2]) {
-      rotate([-90,0,90]) {
-        half_tulip_plate(length, width, height);
-      }
+    translate([(length/2)-1, length, plate_radius/2]) {
+      rotate([-90,0,0]) {
+        intersection() {
+          translate([0,0,-height/2]) {
+            scale([plate_scale_factor,1,1]) { chamfercyl(plate_radius,height,-1,-1); }
+          }
+          roundedcube(size=[length, plate_radius, height],1,1);
+        // rotate([0,0,-10]) {
+        //   roundedcube(size=[length, width/2, height],1,1);
+        // }
+ }     }
     }
 
-    // plate fillet 2
-    translate([height+1,length-5,height-2.5]) {
-      rotate([90,0,0]) {
-         myfillet(length-6,5);
-      }
-    }
   } // end main plate union
 
   module myfillet(length, side) {
@@ -678,7 +690,7 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
       // base_plate
       translate([length+height-4,-9,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length-5, width, 3, bolt_slot_width, slot_angle=15);
+           chin_plate_base(length-5, length-5, 3, bolt_slot_width, slot_angle=15);
         }
       }
 
@@ -910,9 +922,64 @@ module cutouts() {
 
 }
 
+module spacer_ring() {
+  inner_circumference=75;
+  inner_diameter=inner_circumference/3.142;
+  ring_thickness=4;
+  ring_height=15;
+  plate_length=70;
+  plate_width=30;
+  plate_depth=3;
+
+  spacer_length_mod=1.2;
+
+  //use to adjust if you like tight or loose fit
+  ring_fudge_factor=0.97;
+
+  inner_radius=(inner_diameter/2)*ring_fudge_factor;
+  outer_radius=inner_radius+ring_thickness;
+  ring_y_offset_ratio=0.55;
+  ring_y_offset=plate_length*ring_y_offset_ratio;
+
+  union() {
+    $fn=100;
+    translate([ring_y_offset,plate_width/3,outer_radius]) {
+      rotate([90,0.0]) {
+        resize([0,0,ring_height]) torus(outer_radius, inner_radius);
+      }
+    }
+    translate([ring_y_offset-(outer_radius*1.1),plate_width/2.3,0]) {
+      scale([1,spacer_length_mod,1]) {
+        rotate([0,0,270]) {
+          import("cphughes_tab_spacer.stl");
+        }
+      }
+    }
+
+    roundedcube(size=[plate_length,plate_width,plate_depth], radius=plate_depth/2);
+
+  }
+
+
+}
+
 // Third Party Modules
 //
 // modules
+
+module torus(outerRadius, innerRadius)
+{
+  r=(outerRadius-innerRadius)/2;
+  rotate_extrude() translate([innerRadius+r,0,0]) circle(r);
+}
+
+
+module oval_torus(inner_radius, thickness=[0, 0])
+{
+  rotate_extrude() translate([inner_radius+thickness[0]/2,0,0]) ellipse(width=thickness[0], height=thickness[1]);
+}
+
+
 module radiusedblock(xlen,ylen,zlen,radius){
   hull(){
     translate([radius,radius,radius]) sphere(r=radius);

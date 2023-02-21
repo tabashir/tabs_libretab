@@ -10,11 +10,11 @@ plate_depth=3;
 spacer_length_mod=1.2;
 
 //use to adjust if you like tight or loose fit
-ring_fudge_factor=0.95;
+ring_fudge_factor=0.97;
 
 inner_radius=(inner_diameter/2)*ring_fudge_factor;
 outer_radius=inner_radius+ring_thickness;
-ring_y_offset_ratio=4/7;
+ring_y_offset_ratio=0.55;
 ring_y_offset=plate_length*ring_y_offset_ratio;
 
 union() {
