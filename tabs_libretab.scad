@@ -95,7 +95,7 @@ if (tulip_chin_plate) {
 if (half_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate([90, -120, 0]) half_chin_plate(30, 22, 3.5);
+  translate([90, -120, 0]) half_chin_plate(28, 15, 3.5);
 }
 
 if (grooved_tulip_chin_plate) {
@@ -604,6 +604,8 @@ module half_chin_plate( length=28, width=20, height=3) {
     fillet_length=length-6;
     plate_radius=width/2;
     plate_scale_factor=length/plate_radius/2;
+    plate_edge_radius=-height*0.5;
+    left_right_offset=plate_radius*0.35;
     // base_plate
     chin_plate_base(length-2, length, plate_thickness, bolt_slot_width);
 
@@ -615,17 +617,17 @@ module half_chin_plate( length=28, width=20, height=3) {
     }
 
     // plate
+    scale([1,1,2]) {
     translate([(length/2)-1, length, plate_radius/2]) {
       rotate([-90,0,0]) {
         intersection() {
-          translate([0,0,-height/2]) {
-            scale([plate_scale_factor,1,1]) { chamfercyl(plate_radius,height,-1,-1); }
-          }
           roundedcube(size=[length, plate_radius, height],1,1);
-        // rotate([0,0,-10]) {
-        //   roundedcube(size=[length, width/2, height],1,1);
-        // }
- }     }
+          translate([0,left_right_offset,-height/2]) {
+            scale([plate_scale_factor,1,1]) { chamfercyl(plate_radius,height,-1, plate_edge_radius); }
+          }
+        }
+      }
+    }
     }
 
   } // end main plate union
