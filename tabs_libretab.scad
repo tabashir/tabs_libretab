@@ -51,14 +51,22 @@ tilted_slot_angle=15;
 tilted_slot_length=9;
 
 // spacer ring variables
+// width around your middle finger
 ring_finger_circumference=75;
+// 1=loose, reduce to make tighter
+ring_snug_factor=0.97;
+// reduce if very small hands, too small may make the ring too weak.
 ring_thickness=4;
+// how wide the band is from front>back of the tab
 ring_depth=15;
+// stretch the spacer from front>back
 ring_spacer_length_mod=1.5;
+// stretch the spacer from top>bottom
 ring_spacer_width_mod=1.1;
+// greater than 0 shifts ring and spacer forward
+ring_spacer_forward_mod=2;
+// too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=2.5;
-//use to adjust if you like tight or loose fit
-ring_fudge_factor=0.97;
 
 
 if (base_plate) {
@@ -345,7 +353,7 @@ module pinky_trigger(desired_height=35) {
         scale([scaling*1.2, scaling, 1]) {
           translate([20, 40, 0]) {
             polygon([
-              [-9,43],[5,43],[9,40],[11,37],[12,32],[11,24],
+              [-9,43],[-6,40],[-1,43],[5,42],[7,40],[9,37],[10,32],[9,24],
               [6,15],[4,10],[3,5],[4,-3],
               [6,-9],[9,-15],[13,-21],[15,-26],[15,-31],[12,-36],
               [9,-38],[4,-40],[1,-40],[-4,-37],[-10,-27],[-14,-16],[-18,0],
@@ -354,7 +362,7 @@ module pinky_trigger(desired_height=35) {
           }
         }
       }
-      translate([10*scaling, 71*scaling, -z_slot_offset]) {
+      translate([10*scaling, 73*scaling, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
       }
@@ -809,14 +817,15 @@ module myfillet(length, side) {
     }
 }
 
-module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_fudge_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
+module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
   inner_diameter=ring_finger_circumference/3.142;
-  inner_radius=(inner_diameter/2)*ring_fudge_factor;
+  inner_radius=(inner_diameter/2)*ring_snug_factor;
   outer_radius=inner_radius+ring_thickness;
   ring_rotation = right_handed ? 0 : 180;
   stl_width_shimmy=1;
   ring_translation = right_handed ? -outer_radius-stl_width_shimmy : outer_radius+stl_width_shimmy;
   z_move = right_handed ? 0 : ring_spacer_plate_thickness;
+  // z_move = right_handed ? ring_spacer_plate_thickness-0.5 : 0.5;
 
   translate([0,0,z_move]) {
     rotate([ring_rotation,0,0]) {
@@ -825,7 +834,9 @@ module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth,
           import("cphughes_tab_spacer.stl");
       }
       // finger ring
-      translate([ring_thickness,ring_translation,outer_radius]) {
+      // translate([ring_thickness-2,ring_translation,inner_radius+(ring_thickness/2)]) {
+      x_move = ring_thickness-(ring_thickness * ring_spacer_length_mod*0.5);
+      translate([x_move,ring_translation,outer_radius]) {
         rotate([90,0,90]) {
           resize([0,0,ring_depth]) torus(outer_radius, inner_radius);
         }
@@ -961,9 +972,6 @@ module cutouts() {
 }
 
 module spacer_ring() {
-  ring_x_offset=92;
-  ring_y_offset=100;
-
   // Tab sketch is 144px high
   // Tab is 74px high
   // This is from tab with three_finger_width=65
@@ -972,6 +980,9 @@ module spacer_ring() {
   scaling=pic_scale*resize_scale;
 
   $fn=100;
+
+  ring_x_offset=92+ring_spacer_forward_mod;
+  ring_y_offset=100;
 
   union() {
     difference() {
@@ -999,7 +1010,7 @@ module spacer_ring() {
 
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
-        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_fudge_factor, ring_spacer_length_mod, ring_spacer_width_mod, false);
+        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
       }
     }
   }
