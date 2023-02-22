@@ -8,14 +8,14 @@ palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
-half_chin_plate=true;
+half_chin_plate=false;
 grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
-spacer_ring=false;
+spacer_ring=true;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -25,6 +25,7 @@ thickness=4;
 three_finger_width=65;
 bolt_slot_width=4.5;
 bolt_head_width=10;
+elastic_slot_width=2;
 
 // Part Specific Variables
 fixed_thumb_plate_y_pos=three_finger_width*0.76;
@@ -49,7 +50,16 @@ tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
 tilted_slot_angle=15;
 tilted_slot_length=9;
 
-elastic_slot_width=2;
+// spacer ring variables
+ring_finger_circumference=75;
+ring_thickness=4;
+ring_depth=15;
+ring_spacer_length_mod=1.5;
+ring_spacer_width_mod=1.1;
+ring_spacer_plate_thickness=2.5;
+//use to adjust if you like tight or loose fit
+ring_fudge_factor=0.97;
+
 
 if (base_plate) {
   base_plate(false);
@@ -255,9 +265,9 @@ module jezc_plate() {
   }
 }
 
-module jc_base_plate(scaling) {
+module jc_base_plate(scaling, plate_height=thickness) {
   scale([scaling, scaling, 1]) {
-    linear_extrude(height = thickness) {
+    linear_extrude(height = plate_height) {
       translate([66, 72, 0]) {
         polygon([
         // top index finger front
@@ -799,6 +809,32 @@ module myfillet(length, side) {
     }
 }
 
+module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_fudge_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
+  inner_diameter=ring_finger_circumference/3.142;
+  inner_radius=(inner_diameter/2)*ring_fudge_factor;
+  outer_radius=inner_radius+ring_thickness;
+  ring_rotation = right_handed ? 0 : 180;
+  stl_width_shimmy=1;
+  ring_translation = right_handed ? -outer_radius-stl_width_shimmy : outer_radius+stl_width_shimmy;
+  z_move = right_handed ? 0 : ring_spacer_plate_thickness;
+
+  translate([0,0,z_move]) {
+    rotate([ring_rotation,0,0]) {
+      // finger spacer
+      scale([ring_spacer_length_mod,ring_spacer_width_mod,1]) {
+          import("cphughes_tab_spacer.stl");
+      }
+      // finger ring
+      translate([ring_thickness,ring_translation,outer_radius]) {
+        rotate([90,0,90]) {
+          resize([0,0,ring_depth]) torus(outer_radius, inner_radius);
+        }
+      }
+    }
+  }
+}
+
+
 module angled_slot(xpos, ypos, slot_angle=30, slot_length=5, slot_width=bolt_slot_width, scaling=1, thickness=thickness) {
   slot_depth=thickness*2;
   translate([xpos*scaling,ypos*scaling,thickness/2]) {
@@ -925,44 +961,48 @@ module cutouts() {
 }
 
 module spacer_ring() {
-  inner_circumference=75;
-  inner_diameter=inner_circumference/3.142;
-  ring_thickness=4;
-  ring_height=15;
-  plate_length=70;
-  plate_width=30;
-  plate_depth=3;
+  ring_x_offset=92;
+  ring_y_offset=100;
 
-  spacer_length_mod=1.2;
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
 
-  //use to adjust if you like tight or loose fit
-  ring_fudge_factor=0.97;
-
-  inner_radius=(inner_diameter/2)*ring_fudge_factor;
-  outer_radius=inner_radius+ring_thickness;
-  ring_y_offset_ratio=0.55;
-  ring_y_offset=plate_length*ring_y_offset_ratio;
+  $fn=100;
 
   union() {
-    $fn=100;
-    translate([ring_y_offset,plate_width/3,outer_radius]) {
-      rotate([90,0.0]) {
-        resize([0,0,ring_height]) torus(outer_radius, inner_radius);
+    difference() {
+      jc_base_plate(scaling, ring_spacer_plate_thickness);
+      // slots (not needed but uncomment if you want to see where it would be)
+      // angled_slot(ring_x_offset, ring_y_offset, 0, 4, scaling=scaling);
+      // slot_y_offset=38*scaling;
+      // for (slotno=[1:1:4]) {
+      //   angled_slot(57*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=11);
+      // }
+      //
+
+      translate([30*scaling, 0, -1]) {
+            cube([40*scaling,150*scaling,ring_spacer_plate_thickness+2]);
       }
-    }
-    translate([ring_y_offset-(outer_radius*1.1),plate_width/2.3,0]) {
-      scale([1,spacer_length_mod,1]) {
-        rotate([0,0,270]) {
-          import("cphughes_tab_spacer.stl");
-        }
+
+      // bolt holes to secure tab
+      translate([100*scaling, 30*scaling, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      }
+      translate([100*scaling, 122*scaling, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
     }
 
-    roundedcube(size=[plate_length,plate_width,plate_depth], radius=plate_depth/2);
-
+    translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
+      rotate([0,0,0]) {
+        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_fudge_factor, ring_spacer_length_mod, ring_spacer_width_mod, false);
+      }
+    }
   }
-
-
 }
 
 // Third Party Modules
