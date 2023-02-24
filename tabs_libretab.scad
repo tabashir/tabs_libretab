@@ -9,13 +9,13 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
-grooved_tulip_chin_plate=false;
+grooved_tulip_chin_plate=true;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
-spacer_ring=true;
+spacer_ring=false;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -118,7 +118,7 @@ if (half_chin_plate) {
 
 if (grooved_tulip_chin_plate) {
   translate([30, -60, 10]) {
-    grooved_tulip_chin_plate(plate_offset=6, length=38, width=30, height=2, angle=-9, groove_radius=13, second_fillet=true);
+    grooved_tulip_chin_plate(plate_offset=5, length=38, width=30, height=2, angle=0, groove_radius=13, second_fillet=true);
   }
 }
 
@@ -676,8 +676,8 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
         translate([36,-50,0]) { chamfercyl(80,height+2,-3,-3); }
         translate([16,15,0]) { chamfercyl(25,height+2,-3,-3); }
       }
-      translate([-7,9.5,16]) {
-        rotate([angle,90,0]) {
+      translate([-2,15,19]) {
+        rotate([angle,96,0]) {
           cylinder(length+20,groove_radius,groove_radius+2, $fn=200);
         }
       }
@@ -698,7 +698,7 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
   // modules put together
   union() {
     // chin plate
-    translate([4.2,-10,20]) {
+    translate([3.2,-9,20]) {
       rotate([0,-90,0]) {
         rotate([0,0,90]) {
            grooved_tulip_plate(angle, groove_radius);
@@ -706,26 +706,19 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
       }
     }
 
-    translate([0,0,plate_offset]) {
+    translate([-0.75,1,plate_offset]) {
       // base_plate
       translate([length+height-4,-9,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length-5, length-5, 3, bolt_slot_width, slot_angle=15);
+           chin_plate_base(length-14, length-5, 2, bolt_slot_width, slot_angle=15);
         }
       }
 
-      translate([0,-7,10]) {
-        // Thumb plate fillet 1
-        translate([2.5,7,-9.2]) {
-          rotate([-90,0,0]) {
-             myfillet(22,4);
-          }
-        }
-
+      translate([0.5,-8,9]) {
         // Thumb plate fillet 2
-        translate([3.5,27,-6.9]) {
+        translate([2.5,20,-7.9]) {
           rotate([90,0,0]) {
-             myfillet(20,5);
+             myfillet(18,6);
           }
         }
       }
