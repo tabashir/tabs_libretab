@@ -16,6 +16,7 @@ jezc_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
 spacer_ring=false;
+bb_spacer_ring=false;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -118,7 +119,7 @@ if (half_chin_plate) {
 
 if (grooved_tulip_chin_plate) {
   translate([30, -60, 10]) {
-    grooved_tulip_chin_plate(plate_offset=5, length=38, width=30, height=2, angle=0, groove_radius=13, second_fillet=true);
+    grooved_tulip_chin_plate(plate_offset=5, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
 
@@ -665,10 +666,7 @@ module half_chin_plate( length=28, width=20, height=3) {
 module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
   $fn=100;
 
-  module grooved_tulip_plate(angle=-8, groove_radius=12) {
-    length=28;
-    width=30;
-    height=5;
+  module grooved_tulip_plate(angle=-8, groove_radius=12, length=28, width=30, height=5) {
     difference() {
       intersection() {
         radiusedblock(length,width,height,height);
@@ -676,9 +674,9 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
         translate([36,-50,0]) { chamfercyl(80,height+2,-3,-3); }
         translate([16,15,0]) { chamfercyl(25,height+2,-3,-3); }
       }
-      translate([-2,15,19]) {
+      translate([-35,15,19]) {
         rotate([angle,96,0]) {
-          cylinder(length+20,groove_radius,groove_radius+2, $fn=200);
+          cylinder(length+60,groove_radius,groove_radius+2, $fn=200);
         }
       }
     }
