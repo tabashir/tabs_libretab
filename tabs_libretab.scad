@@ -9,14 +9,15 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
-grooved_tulip_chin_plate=true;
+grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
+tab_bb_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
-spacer_ring=false;
-bb_spacer_ring=false;
+ring_finger_spacer=false;
+bb_finger_ring=true;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -140,8 +141,16 @@ if (pinky_trigger) {
   translate([-40, -60, 0]) pinky_trigger();
 }
 
-if (spacer_ring) {
-  translate([140, 80, 0]) spacer_ring();
+if (ring_finger_spacer) {
+  translate([140, 80, 0]) ring_finger_spacer();
+}
+
+if (tab_bb_plate) {
+  translate([150, 180, 0]) tab_bb_plate();
+}
+
+if (bb_finger_ring) {
+  translate([100, 180, 0]) bb_finger_ring();
 }
 
 // Modules below
@@ -303,6 +312,38 @@ module jc_base_plate(scaling, plate_height=thickness) {
       }
     }
   }
+}
+
+module bb_base_plate(scaling, plate_height=thickness) {
+ 
+  difference() {
+    scale([scaling, scaling, 1]) {
+      linear_extrude(height = plate_height) {
+          polygon([
+          // top index finger front
+          [64,127],
+          // middle and ring finger front
+          [64,75],[64,3],
+          // bottom front curve
+          [61,0],[31,1],[20,5],
+          // rear bottom join
+          [7,20], [0,39],
+          // top rear corner
+          [20,132], [22,134], [26,136],
+          // top
+          [48,140],[62,140],[64,138]
+          ]);
+      }
+    }
+    // bolt holes to secure tab
+    translate([34*scaling, 22*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+    translate([34*scaling, 120*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+  }
+
 }
 
 module jezr_palm_plate() {
@@ -875,6 +916,7 @@ module elastic_slot(xpos, ypos, scaling=1) {
   }
 }
 
+
 module plain_base_plate(depth, height, thickness, square_plate) {
   intersection() {
     square_base_plate();
@@ -962,7 +1004,7 @@ module cutouts() {
 
 }
 
-module spacer_ring() {
+module ring_finger_spacer() {
   // Tab sketch is 144px high
   // Tab is 74px high
   // This is from tab with three_finger_width=65
@@ -1002,6 +1044,85 @@ module spacer_ring() {
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
         finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
+      }
+    }
+  }
+}
+
+module bb_finger_ring() {
+  // Tab sketch is 144px high
+  // Tab is 65px high
+  // This is from tab with three_finger_width=65
+  pic_scale=65/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+
+  $fn=100;
+
+  ring_x_offset=36;
+  ring_y_offset=100;
+
+  union() {
+    bb_base_plate(scaling, ring_spacer_plate_thickness);
+
+    translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
+      rotate([0,0,0]) {
+        finger_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor);
+      }
+    }
+  }
+}
+
+module finger_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor) {
+  inner_diameter=ring_finger_circumference/3.142;
+  inner_radius=(inner_diameter/2)*ring_snug_factor;
+  outer_radius=inner_radius+ring_thickness;
+  ring_rotation = right_handed ? 0 : 180;
+  stl_width_shimmy=1;
+  ring_translation = right_handed ? -outer_radius : outer_radius;
+  z_move = right_handed ? 0 : ring_spacer_plate_thickness;
+
+  translate([0,0,z_move]) {
+    rotate([ring_rotation,0,0]) {
+      // finger ring
+      // translate([ring_thickness-2,ring_translation,inner_radius+(ring_thickness/2)]) {
+      translate([0,ring_translation,outer_radius]) {
+        rotate([90,0,90]) {
+          resize([0,0,ring_depth]) torus(outer_radius, inner_radius);
+        }
+      }
+    }
+  }
+
+}
+
+module tab_bb_plate() {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=65/138;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  slot_spacing=2;
+  slot_range=124; // 144-gap for top and bottom
+  number_of_slots=slot_range/slot_spacing;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    bb_base_plate(scaling);
+
+        // translate([66, 72, 0]) {
+    // elastic slots
+    for(slot = [0 : 3 : number_of_slots]) {
+      long_slot = (slot % 2) == 0;
+      slot_len = long_slot ? 3 : 6;
+      fingernail_slot(64-(slot_len*2), 10+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
+    }
+
+  }
+  module fingernail_slot(xpos, ypos, thickness, slot_len, scaling=1) {
+    translate([xpos*scaling,ypos*scaling,0]) {
+      rotate([0,5,0]) {
+        bar(slot_len,1,10,0);
       }
     }
   }
