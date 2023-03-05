@@ -14,10 +14,11 @@ tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 tab_bb_plate=false;
+mins_bb_plate=true;
 jezr_palm_plate=false;
 pinky_trigger=false;
 ring_finger_spacer=false;
-bb_finger_ring=true;
+bb_finger_ring=false;
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -149,9 +150,14 @@ if (tab_bb_plate) {
   translate([150, 180, 0]) tab_bb_plate();
 }
 
+if (mins_bb_plate) {
+  translate([130, 242, 0]) mins_bb_plate();
+}
+
 if (bb_finger_ring) {
   translate([100, 180, 0]) bb_finger_ring();
 }
+
 
 // Modules below
 
@@ -315,7 +321,7 @@ module jc_base_plate(scaling, plate_height=thickness) {
 }
 
 module bb_base_plate(scaling, plate_height=thickness) {
- 
+
   difference() {
     scale([scaling, scaling, 1]) {
       linear_extrude(height = plate_height) {
@@ -878,6 +884,7 @@ module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth,
 }
 
 
+
 module angled_slot(xpos, ypos, slot_angle=30, slot_length=5, slot_width=bolt_slot_width, scaling=1, thickness=thickness) {
   slot_depth=thickness*2;
   translate([xpos*scaling,ypos*scaling,thickness/2]) {
@@ -1127,6 +1134,33 @@ module tab_bb_plate() {
     }
   }
 }
+
+module mins_bb_plate() {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=65/62;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  slot_spacing=2;
+  difference() {
+    translate([50,72,0]) {
+      scale([scaling,scaling,scaling]) {
+        rotate([180,180,0]) {
+          import("mins_bb_tab_plate.stl");
+        }
+      }
+    }
+    // bolt holes to secure tab
+    translate([34*scaling, 22*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+    translate([34*scaling, 60*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+  }
+}
+
 
 // Third Party Modules
 //
