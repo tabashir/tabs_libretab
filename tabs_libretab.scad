@@ -9,12 +9,12 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
-grooved_tulip_chin_plate=false;
+grooved_tulip_chin_plate=true;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
 tab_bb_plate=false;
-mins_bb_plate=true;
+mins_bb_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
 ring_finger_spacer=false;
@@ -121,7 +121,7 @@ if (half_chin_plate) {
 
 if (grooved_tulip_chin_plate) {
   translate([30, -60, 10]) {
-    grooved_tulip_chin_plate(plate_offset=5, length=38, width=25, height=2, angle=0, groove_radius=10);
+    grooved_tulip_chin_plate(plate_offset=11, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
 
@@ -755,14 +755,20 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
       // base_plate
       translate([length+height-4,-9,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length-14, length-5, 2, bolt_slot_width, slot_angle=15);
+           chin_plate_base(length-14, length-5, 4, bolt_slot_width, slot_angle=15);
         }
       }
 
-      translate([0.5,-8,9]) {
-        // Thumb plate fillet 2
-        translate([2.5,20,-7.9]) {
+      translate([0.5,-6,9]) {
+        // Thumb plate fillet 1
+        translate([2,20,-7.9]) {
           rotate([90,0,0]) {
+             // myfillet(10,6);
+          }
+        }
+        // Thumb plate fillet 2
+        translate([1.5,-2,-7.9]) {
+          rotate([270,0,0]) {
              myfillet(18,6);
           }
         }
