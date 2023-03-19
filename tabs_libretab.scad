@@ -9,8 +9,9 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
+grooved_half_chin_plate=true;
 grooved_tulip_chin_plate=false;
-half_grooved_tulip_chin_plate=true;
+half_grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
@@ -131,6 +132,13 @@ if (half_grooved_tulip_chin_plate) {
     half_grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
+
+if (grooved_half_chin_plate) {
+  translate([30, -180, 10]) {
+    grooved_half_chin_plate(length=30, width=15, height=4, groove_tilt=4, groove_radius=10);
+  }
+}
+
 
 if (tulip_full_plate) {
   translate([10, 80, 5]) tulip_full_plate();
@@ -716,6 +724,56 @@ module half_chin_plate( length=28, width=20, height=3) {
       }
   }
 }
+
+module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, groove_radius=10) {
+    plate_thickness=2.5;
+    plate_radius=1;
+    difference() {
+      radiusedblock(length,width,height,height/2);
+      translate([-1,-1,1+height*2]) {
+        rotate([0,90,0]) {
+          myfillet(length*1.5, height*2);
+        }
+      }
+      translate([-1,0,1+height*2]) {
+        rotate([270,0,0]) {
+          myfillet(length, height*2);
+        }
+      }
+      translate([-35,width+groove_radius,19]) {
+        rotate([groove_tilt,96,0]) {
+          cylinder(length+60,groove_radius,groove_radius+2, $fn=100);
+        }
+      }
+    }
+    difference() {
+      union() {
+        translate([0,0,-length]) {
+          intersection() {
+            radiusedblock(length,plate_thickness,length,plate_radius);
+            translate([-length*0.6,0,length/2]) {
+              rotate([0,25,0]) {
+                radiusedblock(length,plate_thickness,length*1.2,plate_radius);
+              }
+            }
+          }
+        }
+        translate([1,height*0.8,height*0.5]) {
+          rotate([0,90,0]) {
+            myfillet(length*0.65, height*2);
+          }
+        }
+      }
+      translate([length/4,(width*0.5)-1,-length*0.65]) {
+        rotate([90,0,0]) {
+          rotate([0,0,64]) {
+            bar(length*0.45,bolt_slot_width,width,0);
+        }
+      }
+    }
+  }
+}
+
 
 module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
   cutoff=-20; // higher=less cut off
