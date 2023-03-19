@@ -9,7 +9,8 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
-grooved_tulip_chin_plate=true;
+grooved_tulip_chin_plate=false;
+half_grooved_tulip_chin_plate=true;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=false;
@@ -121,7 +122,13 @@ if (half_chin_plate) {
 
 if (grooved_tulip_chin_plate) {
   translate([30, -60, 10]) {
-    grooved_tulip_chin_plate(plate_offset=11, length=38, width=25, height=2, angle=0, groove_radius=10);
+    grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
+  }
+}
+
+if (half_grooved_tulip_chin_plate) {
+  translate([30, -120, 10]) {
+    half_grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
 
@@ -710,6 +717,16 @@ module half_chin_plate( length=28, width=20, height=3) {
   }
 }
 
+module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
+  cutoff=-20; // higher=less cut off
+  difference() {
+    grooved_tulip_chin_plate(plate_offset, length, width, height, angle, groove_radius, second_fillet);
+    translate([-width/2,-length/4,cutoff]) {
+      cube([width,length+10,width]);
+    }
+  }
+}
+
 module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
   $fn=100;
 
@@ -753,9 +770,9 @@ module grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, 
 
     translate([-0.75,1,plate_offset]) {
       // base_plate
-      translate([length+height-4,-9,0]) {
+      translate([length+height-5,-9,0]) {
         rotate([0,0,90]) {
-           chin_plate_base(length-14, length-5, 4, bolt_slot_width, slot_angle=15);
+           chin_plate_base(length-14, length-5, 3, bolt_slot_width, slot_angle=15);
         }
       }
 
