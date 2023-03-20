@@ -135,7 +135,7 @@ if (half_grooved_tulip_chin_plate) {
 
 if (grooved_half_chin_plate) {
   translate([30, -180, 10]) {
-    grooved_half_chin_plate(length=30, width=15, height=4, groove_tilt=4, groove_radius=10);
+    grooved_half_chin_plate(length=30, width=10, height=4, groove_tilt=4, groove_radius=10);
   }
 }
 
