@@ -135,7 +135,7 @@ if (half_grooved_tulip_chin_plate) {
 
 if (grooved_half_chin_plate) {
   translate([30, -180, 10]) {
-    grooved_half_chin_plate(length=30, width=10, height=4, groove_tilt=4, groove_radius=10);
+    grooved_half_chin_plate(length=25, width=10, height=4, groove_tilt=0, groove_radius=16);
   }
 }
 
@@ -741,7 +741,7 @@ module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, gro
         }
       }
       translate([-35,width+groove_radius,19]) {
-        rotate([groove_tilt,96,0]) {
+        rotate([groove_tilt,98,0]) {
           cylinder(length+60,groove_radius,groove_radius+2, $fn=100);
         }
       }
