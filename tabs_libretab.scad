@@ -135,7 +135,7 @@ if (half_grooved_tulip_chin_plate) {
 
 if (grooved_half_chin_plate) {
   translate([30, -180, 10]) {
-    grooved_half_chin_plate(length=25, width=10, height=4, groove_tilt=0, groove_radius=16);
+    grooved_half_chin_plate(length=25, width=7, height=4, groove_tilt=0, groove_radius=16);
   }
 }
 
@@ -729,45 +729,68 @@ module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, gro
     plate_thickness=2.5;
     plate_radius=1;
     difference() {
-      radiusedblock(length,width,height,height/2);
-      translate([-1,-1,1+height*2]) {
-        rotate([0,90,0]) {
-          myfillet(length*1.5, height*2);
-        }
+      union() {
+        ghcp_chin_rest();
+        ghcp_mount_plate();
       }
-      translate([-1,0,1+height*2]) {
-        rotate([270,0,0]) {
-          myfillet(length, height*2);
-        }
-      }
-      translate([-35,width+groove_radius,19]) {
+      translate([-35,width+groove_radius-5,24]) {
         rotate([groove_tilt,98,0]) {
           cylinder(length+60,groove_radius,groove_radius+2, $fn=100);
         }
       }
     }
+    //chin rest
+    //
+    //
+  module ghcp_chin_rest() {
+    difference() {
+      radiusedblock(length,width,height,height/2);
+      // translate([-1,-1,1+height*2]) {
+      //   rotate([0,90,0]) {
+      //     myfillet(length*1.5, height*2);
+      //   }
+      // }
+      // translate([-1,width+plate_thickness*2,1+height*2]) {
+      //   rotate([0,0,270]) {
+      //     rotate([270,0,0]) {
+      //     myfillet(length*1.5, height*2);
+      //     }
+      //   }
+      // }
+      translate([-1,0,1+height*2]) {
+        rotate([270,0,0]) {
+          myfillet(length, height*2);
+        }
+      }
+    }
+  }
+
+  module ghcp_mount_plate() {
+    //mount plate
+    plate_height=length+10;
     difference() {
       union() {
-        translate([0,0,-length]) {
+        translate([0,0,-plate_height]) {
           intersection() {
-            radiusedblock(length,plate_thickness,length,plate_radius);
-            translate([-length*0.6,0,length/2]) {
+            radiusedblock(length,plate_thickness,plate_height,plate_radius);
+            translate([-length*0.6,0,plate_height/2]) {
               rotate([0,25,0]) {
-                radiusedblock(length,plate_thickness,length*1.2,plate_radius);
+                radiusedblock(length,plate_thickness,plate_height*1.2,plate_radius);
               }
             }
           }
         }
-        translate([1,height*0.8,height*0.5]) {
+        translate([1,height*0.2,height*0.5]) {
           rotate([0,90,0]) {
             myfillet(length*0.65, height*2);
           }
         }
       }
-      translate([length/4,(width*0.5)-1,-length*0.65]) {
+      translate([length/4,(width*0.5),-plate_height*0.55]) {
         rotate([90,0,0]) {
           rotate([0,0,64]) {
-            bar(length*0.45,bolt_slot_width,width,0);
+            bar(plate_height*0.45,bolt_slot_width,width,0);
+          }
         }
       }
     }
