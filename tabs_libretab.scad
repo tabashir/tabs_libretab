@@ -9,12 +9,12 @@ round_palm_plate=false;
 wedge_palm_plate=false;
 tulip_chin_plate=false;
 half_chin_plate=false;
-grooved_half_chin_plate=true;
+grooved_half_chin_plate=false;
 grooved_tulip_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
-jezc_plate=false;
+jezc_plate=true;
 tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
@@ -280,8 +280,8 @@ module jezc_plate() {
     }
 
     // pinky mount slot
-    angled_slot(58, 37, -33, 20, scaling=scaling);
-    angled_slot(93, 14, -4, 8, scaling=scaling);
+    angled_slot(61, 33, -36, 16, scaling=scaling);
+    angled_slot(89, 14, -4, 10, scaling=scaling);
 
     // elastic slots
     elastic_slot(90, 132, scaling=scaling);
@@ -295,13 +295,16 @@ module jezc_plate() {
     elastic_slot(92, 42, scaling=scaling);
 
     // bolt holes to secure tab
-    translate([100*scaling, 30*scaling, -z_slot_offset]) {
-      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-    }
-    translate([100*scaling, 122*scaling, -z_slot_offset]) {
-      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-    }
+    angled_slot(88, 30, 0, 12, scaling=scaling);
+    angled_slot(88, 122, 0, 12, scaling=scaling);
+
+    // translate([62*scaling, 39*scaling, thickness-z_slot_offset]) {
+    //   linear_extrude(height = thickness) {
+    //     text("JM", font = "Liberation Mono", size=7 );
+    //   }
+    // }
   }
+
 }
 
 module jc_base_plate(scaling, plate_height=thickness) {
