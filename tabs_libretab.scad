@@ -15,6 +15,7 @@ half_grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
 jezr_plate=false;
 jezc_plate=true;
+jezc_ring_plate=true;
 tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
@@ -32,6 +33,8 @@ bolt_slot_width=4.5;
 bolt_head_width=10;
 elastic_slot_width=2;
 
+initials="JM";
+
 // Part Specific Variables
 fixed_thumb_plate_y_pos=three_finger_width*0.76;
 
@@ -46,6 +49,8 @@ palm_plate_depth=14;
 palm_ball_depth=5;
 
 jezr_palm_plate_depth=5;
+
+jezc_ring_plate_scaling=1.2;
 
 depth=three_finger_width*0.6;
 slot_depth=thickness+4;
@@ -150,6 +155,10 @@ if (jezr_plate) {
 
 if (jezc_plate) {
   translate([140, 0, 0]) jezc_plate();
+}
+
+if (jezc_ring_plate) {
+  translate([200, 0, 0]) jezc_ring_plate(initials, jezc_ring_plate_scaling);
 }
 
 
@@ -271,7 +280,7 @@ module jezc_plate() {
   difference() {
     jc_base_plate(scaling);
     // spacer slot
-    angled_slot(92, 100, 0, 8, scaling=scaling);
+    angled_slot(91, 100, 0, 7, scaling=scaling);
 
     // chin or thumb rest slots
     slot_y_offset=38*scaling;
@@ -280,8 +289,8 @@ module jezc_plate() {
     }
 
     // pinky mount slot
-    angled_slot(61, 33, -36, 16, scaling=scaling);
-    angled_slot(89, 14, -4, 10, scaling=scaling);
+    angled_slot(58, 37, -38, 20, scaling=scaling);
+    angled_slot(91, 12, -4, 8, scaling=scaling);
 
     // elastic slots
     elastic_slot(90, 132, scaling=scaling);
@@ -295,14 +304,60 @@ module jezc_plate() {
     elastic_slot(92, 42, scaling=scaling);
 
     // bolt holes to secure tab
-    angled_slot(88, 30, 0, 12, scaling=scaling);
-    angled_slot(88, 122, 0, 12, scaling=scaling);
+    translate([100*scaling, 30*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+    translate([100*scaling, 122*scaling, -z_slot_offset]) {
+      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+  }
+}
 
-    // translate([62*scaling, 39*scaling, thickness-z_slot_offset]) {
-    //   linear_extrude(height = thickness) {
-    //     text("JM", font = "Liberation Mono", size=7 );
-    //   }
-    // }
+module jezc_ring_plate(initials, x_scale=1) {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    translate([ -3, 0, 0 ]) {
+      scale([x_scale,1,1]) {
+        jc_base_plate(scaling);
+      }
+    }
+
+    // chin or thumb rest slots
+    slot_y_offset=38*scaling;
+    for (slotno=[1:1:4]) {
+      angled_slot(57*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=11);
+    }
+
+
+    // decorative
+    translate([38*x_scale, 50*scaling, 0 ]) {
+      angled_slot(4, 14, 0, slot_length=21*scaling);
+      angled_slot(12, 7, 0, slot_length=21*scaling);
+      angled_slot(4, 0, 0, slot_length=21*scaling);
+
+      translate([0, 20, -1]) {
+        rotate([0,0,0]) {
+          linear_extrude(height = thickness*2) {
+            text(initials, font = "Verdana", size=10 );
+          }
+        }
+      }
+    }
+
+    // bolt slots to secure tab
+    angled_slot(88, 30, 0, 16*x_scale, scaling=scaling);
+    angled_slot(88, 122, 0, 16*x_scale, scaling=scaling);
+
+    // pinky mount slot
+    angled_slot(61, 33, -36, 16, scaling=scaling);
+    angled_slot(89, 14, -4, 16, scaling=scaling);
+
   }
 
 }
@@ -315,13 +370,13 @@ module jc_base_plate(scaling, plate_height=thickness) {
         // top index finger front
         [58,54], [58,42],
         // nock cutout
-        [51,32],[51,18],
+        [49,32],[49,18],
         // middle and ring finger front
         [64,2],[64,-48],
         // bottom front curve
-        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-68],[7,-61],
+        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-71],[7,-67],
         // rear bottom join
-        [-7,-52],[-20,-40],[-24,-34],
+        [-7,-58],[-16,-49],[-24,-34],
         // rear
         [-25,-30],[-25,24],
         // rear top join
