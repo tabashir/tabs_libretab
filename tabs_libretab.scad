@@ -13,7 +13,7 @@ grooved_half_chin_plate=false;
 grooved_tulip_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
 tulip_full_plate=false;
-jezr_plate=false;
+jezr_plate=true;
 jezc_plate=true;
 jezc_ring_plate=true;
 tab_bb_plate=false;
@@ -34,6 +34,9 @@ bolt_head_width=10;
 elastic_slot_width=2;
 
 initials="JM";
+// initials_font="Arial Mono";
+initials_font="Trebuchet MS";
+// initials_font="Source Code Pro";
 
 // Part Specific Variables
 fixed_thumb_plate_y_pos=three_finger_width*0.76;
@@ -344,7 +347,7 @@ module jezc_ring_plate(initials, x_scale=1) {
       translate([0, 20, -1]) {
         rotate([0,0,0]) {
           linear_extrude(height = thickness*2) {
-            text(initials, font = "Verdana", size=10 );
+            text(initials, font = initials_font, size=8 );
           }
         }
       }
