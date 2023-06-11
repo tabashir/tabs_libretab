@@ -7,7 +7,7 @@ palm_plate=false;
 palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
-tulip_chin_plate=false;
+tulip_chin_plate=true;
 half_chin_plate=false;
 grooved_half_chin_plate=false;
 grooved_tulip_chin_plate=false;
@@ -21,7 +21,7 @@ tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
 pinky_trigger=false;
-ring_finger_spacer=true;
+ring_finger_spacer=false;
 bb_finger_ring=false;
 
 // saves mirroring some objects in the slicer
@@ -122,7 +122,9 @@ if (jezr_palm_plate) {
 if (tulip_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate([90, -70, 5]) tulip_chin_plate(1, 38, 30, 2, false);
+  // translate([90, -70, 5]) 
+  // tulip_chin_plate(1, 38, 20, 2, 38, false);
+  tulip_chin_plate();
 }
 
 if (half_chin_plate) {
@@ -792,25 +794,41 @@ module chin_plate_base(length, width, height, bolt_slot_width, slot_angle=0) {
     slot_length=(width-slot_bottom_offset)/2;
     union() {
     roundedcube(size=[component_width, width, height], radius=1);
-    translate([(component_width*(sin(slot_angle))-2),(component_width*sin(slot_angle)),0]) { rotate([0,0,-slot_angle]) {
+    translate([(component_width*(sin(slot_angle))-2),(component_width*sin(slot_angle)),0]) {
+      rotate([0,0,-slot_angle]) {
         roundedcube(size=[component_width, width, height], radius=1);
       }
     }
     }
-    translate([length/3.5,slot_bottom_offset,0]) { rotate([0, 0, 90-slot_angle]) { bar(slot_length,bolt_slot_width,12,0); } }
+    translate([component_width/2.5,slot_bottom_offset,0]) { rotate([0, 0, 90-slot_angle]) { bar(slot_length,bolt_slot_width,12,0); } }
   }
 }
 
-module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_fillet=true) {
-  module tulip_plate() {
+module scaled_tulip_base_plate(length, width, height) {
+  tmp_fn=100;
+  $fn=tmp_fn;
+  resize([length, width, height]) {
+    tulip_base_plate();
+  }
+
+  module tulip_base_plate() {
+    base_length=38;
+    base_width=30;
+    base_height=2;
     intersection() {
-      radiusedblock(length,width,height,height);
-      translate([36,80,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
-      translate([36,-55,0]) { chamfercyl(80,height+2,-2,-2, $fn=200); }
-      translate([-length/5,-length-6,0]) { rotate([0,0,45]) {
-        radiusedblock(length*2,(length*2)-3,height,height);
+      radiusedblock(base_length,base_width,base_height,base_height);
+      translate([36,80,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
+      translate([36,-55,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
+      translate([-base_length/5,-base_length-6,0]) { rotate([0,0,45]) {
+        radiusedblock(base_length*2,(base_length*2)-3,base_height,base_height);
       } }
     }
+  }
+}
+
+module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_height=36) {
+  module tulip_plate(length, width, height) {
+    scaled_tulip_base_plate(length, width, height);
   }
 
   module myfillet(length, side) {
@@ -826,33 +844,25 @@ module tulip_chin_plate( plate_offset=2, length=38, width=30, height=2, second_f
 
   union() {
     // plate
-    translate([0,-0.5,-10+plate_offset]) {
+    translate([0,-2,-10+plate_offset]) {
       rotate([90,0,90]) {
-         tulip_plate();
+         tulip_plate(length, width, height);
       }
     }
 
     // base_plate
-    translate([length+height,0,0]) {
+    translate([plate_height,0,0]) {
       rotate([0,0,90]) {
-         chin_plate_base(length, length, 3, bolt_slot_width);
+         chin_plate_base(plate_height, plate_height, 3, bolt_slot_width);
       }
     }
 
-  translate([0,-2,0]) {
+  translate([0,-5,0]) {
     // plate fillet 1
-    if (second_fillet) {
-      translate([height+1,16,1]) {
-        rotate([-90,0,0]) {
-           myfillet(22,5);
-        }
-      }
-    }
-
-    // plate fillet 2
-    translate([height+1,length-2,height-1]) {
+    x_mod=plate_height/2;
+    translate([height,x_mod+4,height-1]) {
       rotate([90,0,0]) {
-         myfillet(length-6,5);
+         myfillet(plate_height/2,6);
       }
     }
   }
