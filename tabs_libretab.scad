@@ -67,9 +67,9 @@ tilted_slot_length=9;
 
 // spacer ring variables
 // width around your middle finger
-ring_finger_circumference=75;
+ring_finger_circumference=76;
 // 1=loose, reduce to make tighter
-ring_snug_factor=0.97;
+ring_snug_factor=1;
 // reduce if very small hands, too small may make the ring too weak.
 ring_thickness=4;
 // how wide the band is from front>back of the tab
@@ -77,7 +77,7 @@ ring_depth=15;
 // stretch the spacer from front>back
 ring_spacer_length_mod=1.5;
 // stretch the spacer from top>bottom
-ring_spacer_width_mod=1.1;
+ring_spacer_width_mod=0.9;
 // greater than 0 shifts ring and spacer forward
 ring_spacer_forward_mod=2;
 // too small will likely weaken the attachment to rest of tab
