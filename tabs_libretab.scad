@@ -124,7 +124,7 @@ if (tulip_chin_plate) {
   // stronger, but doesn't butt up well against edge of main base plate if used
   // translate([90, -70, 5]) 
   // tulip_chin_plate(1, 38, 20, 2, 38, false);
-    tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_height=36, slot_angle=0);
+    tulip_chin_plate( plate_offset=-4, length=38, width=29, height=3, plate_height=36, slot_angle=0);
 }
 
 if (half_chin_plate) {
@@ -867,7 +867,7 @@ module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_he
   translate([0,-5,0]) {
     // plate fillet 1
     x_mod=plate_height/2;
-    translate([height,x_mod+4,height-1]) {
+    translate([height-1,x_mod+4,height-2]) {
       rotate([90,0,0]) {
          myfillet(plate_height/2,6);
       }
