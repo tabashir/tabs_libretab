@@ -16,11 +16,11 @@ tulip_full_plate=false;
 jezr_plate=false;
 jezr_ring_plate=false;
 jezc_plate=false;
-jezc_ring_plate=false;
+jezc_ring_plate=true;
 tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
-pinky_trigger=false;
+pinky_trigger=true;
 ring_finger_spacer=false;
 bb_finger_ring=false;
 
@@ -124,7 +124,7 @@ if (tulip_chin_plate) {
   // stronger, but doesn't butt up well against edge of main base plate if used
   // translate([90, -70, 5]) 
   // tulip_chin_plate(1, 38, 20, 2, 38, false);
-    tulip_chin_plate( plate_offset=-4, length=38, width=29, height=3, plate_height=36, slot_angle=0);
+    tulip_chin_plate( plate_offset=-4, length=38, width=29, height=4, plate_height=36, slot_angle=0);
 }
 
 if (half_chin_plate) {
@@ -176,7 +176,7 @@ if (jezc_ring_plate) {
 
 
 if (pinky_trigger) {
-  translate([-40, -60, 0]) pinky_trigger();
+  translate([-40, -60, 0]) pinky_trigger(pin=false);
 }
 
 if (ring_finger_spacer) {
@@ -588,7 +588,7 @@ module jezr_palm_plate_base(scaling, thickness) {
   }
 }
 
-module pinky_trigger(desired_height=35) {
+module pinky_trigger(desired_height=35, pin=true) {
     // polygon is 84 high
     scaling=desired_height/84;
     union() {
@@ -597,22 +597,28 @@ module pinky_trigger(desired_height=35) {
         scale([scaling*1.2, scaling, 1]) {
           translate([20, 40, 0]) {
             polygon([
-              [-9,43],[-6,40],[-1,43],[5,42],[7,40],[9,37],[10,32],[9,24],
-              [6,15],[4,10],[3,5],[4,-3],
-              [6,-9],[9,-15],[13,-21],[15,-26],[15,-31],[12,-36],
-              [9,-38],[4,-40],[1,-40],[-4,-37],[-10,-27],[-14,-16],[-18,0],
-              [-23,16],[-25,29],[-22,38],[-14,43]
+              [-3,25],
+              [2,20],
+              [3,5],
+              [4,-3],
+              [6,-9],[9,-15],[13,-21],[15,-26],[14,-30],[12,-33],
+              [9,-33],[1,-26],[-14,-5],[-18,3],
+              [-23,16],[-21,24],[-14,25]
             ]);
           }
         }
       }
-      translate([10*scaling, 73*scaling, -z_slot_offset]) {
-        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      if (pin) {
+        translate([6*scaling, 55*scaling, -z_slot_offset]) {
+          cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+        }
       }
       }
-      handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
-      translate([26*scaling, 76*scaling, handed_z_offset]) {
-        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      if (pin) {
+        handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
+        translate([20*scaling, 55*scaling, handed_z_offset]) {
+          cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+        }
       }
     }
 }
@@ -860,7 +866,7 @@ module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_he
     // base_plate
     translate([plate_height,0,0]) {
       rotate([0,0,90]) {
-         chin_plate_base(plate_height, plate_height, 3, bolt_slot_width, slot_angle);
+         chin_plate_base(plate_height, plate_height, thickness, bolt_slot_width, slot_angle);
       }
     }
 
