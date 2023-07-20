@@ -176,7 +176,7 @@ if (jezc_ring_plate) {
 
 
 if (pinky_trigger) {
-  translate([-40, -60, 0]) pinky_trigger(pin=false);
+  translate([-40, -60, 0]) pinky_trigger(pin=true);
 }
 
 if (ring_finger_spacer) {
@@ -597,26 +597,27 @@ module pinky_trigger(desired_height=35, pin=true) {
         scale([scaling*1.2, scaling, 1]) {
           translate([20, 40, 0]) {
             polygon([
-              [-3,25],
+              [-23,16],[-21,24],[-14,28],
+              [-8,31],
+              [-3,29],
               [2,20],
               [3,5],
               [4,-3],
               [6,-9],[9,-15],[13,-21],[15,-26],[14,-30],[12,-33],
               [9,-33],[1,-26],[-14,-5],[-18,3],
-              [-23,16],[-21,24],[-14,25]
             ]);
           }
         }
       }
       if (pin) {
-        translate([6*scaling, 55*scaling, -z_slot_offset]) {
+        translate([6*scaling, 57*scaling, -z_slot_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
       }
       }
       if (pin) {
         handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
-        translate([20*scaling, 55*scaling, handed_z_offset]) {
+        translate([17*scaling, 63*scaling, handed_z_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
       }
@@ -873,7 +874,7 @@ module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_he
   translate([0,-5,0]) {
     // plate fillet 1
     x_mod=plate_height/2;
-    translate([height-1,x_mod+4,height-2]) {
+    translate([height-1,x_mod+12,height-2]) {
       rotate([90,0,0]) {
          myfillet(plate_height/2,6);
       }
