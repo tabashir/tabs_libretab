@@ -136,8 +136,8 @@ if (half_chin_plate) {
 if (grooved_tulip_chin_plate) {
   translate([30, -60, 10]) {
     // grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
-    // grooved_tulip_chin_plate( plate_offset=13, length=28, width=25, height=3, angle=0, groove_radius=12, second_fillet=false);
-    grooved_tulip_chin_plate();
+    // grooved_tulip_chin_plate();
+    grooved_tulip_chin_plate( plate_offset=-4, length=38, width=30, height=6, angle=-5,  plate_height=38, slot_angle=4);
   }
 }
 
@@ -798,7 +798,7 @@ module tulip_full_plate() {
 
 module chin_plate_base(length, width, height, bolt_slot_width, slot_angle=0) {
   component_width=width/2;
-  slot_bottom_offset=7;
+  slot_bottom_offset=9;
   slot_length=(width-slot_bottom_offset)/2;
   difference() {
     union() {
@@ -1016,9 +1016,10 @@ module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, heigh
 module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=-14,  plate_height=38, slot_angle=8, second_fillet=true) {
   tmp_fn=50;
   $fn=tmp_fn;
+  plate_thickness=4;
   module grooved_tulip_plate(angle, length, width, height) {
-    tilt=96;
-    groove_radius=width*1.1;
+    tilt=98;
+    groove_radius=width*0.9;
     y_translate=sin(tilt-90);
     difference() {
       scaled_tulip_base_plate(length, width, height);
@@ -1054,14 +1055,14 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
     // base_plate
     translate([plate_height-(height/2),0,0]) {
       rotate([0,0,90]) {
-         chin_plate_base(plate_height, plate_height, 3, bolt_slot_width, slot_angle);
+         chin_plate_base(plate_height, plate_height, plate_thickness, bolt_slot_width, slot_angle);
       }
     }
 
   translate([0,-5,0]) {
     // plate fillet 1
     x_mod=plate_height/4;
-    translate([-height/3,x_mod*2.7,height-1.5]) {
+    translate([-0.5,x_mod*2.5,plate_offset+plate_thickness+3]) {
       rotate([90,0,0]) {
          myfillet(x_mod,6);
       }
