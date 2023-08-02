@@ -208,10 +208,10 @@ module jezr_ring_plate(initials, x_scale=1) {
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
     ww_base_plate_new(scaling);
-    translate([-4, 0, 0]) ring_plate_slots(scaling, x_scale);
+    translate([-8, 0, 0]) ring_plate_slots(scaling, x_scale);
 
     // Initials
-    translate([20*x_scale, 1*scaling, 0 ]) {
+    translate([35*x_scale, 50*scaling, 0 ]) {
       translate([0, 20, -1]) {
         initials_a();
       }
@@ -220,11 +220,11 @@ module jezr_ring_plate(initials, x_scale=1) {
     angled_slot(106*scaling, 180*scaling, 70, 15, scaling=scaling);
 
     // pinky mount slot
-    angled_slot(40, 28, -18, 25, scaling=scaling);
-    angled_slot(85, 13, -3, 10, scaling=scaling);
+    angled_slot(45, 44, -22, 20, scaling=scaling);
+    // angled_slot(85, 13, -3, 10, scaling=scaling);
 
     // palm pad slot
-    angled_slot(16, 44, 48, 15, scaling=scaling);
+    angled_slot(18, 54, 48, 10, scaling=scaling);
   }
 }
 
@@ -289,25 +289,25 @@ module ww_base_plate_new(scaling) {
       translate([66, 72, 0]) {
         polygon([
         // top index finger front
-        [58,64], [58,42],
+        [58,60], [58,42],
         // nock cutout
         [54,42],[48,32],[48,18],[57,9],[63,9],
         // middle and ring finger front
-        [64,7],[64,-48],
+        [64,7],[64,-33],
         // bottom front curve
-        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-71],
+        [62,-40],[59,-46],[54,-51],[50,-54],[45,-56],[38,-57],[31,-57],[20,-56],
         // rear bottom join
-        [7,-68],[-7,-64],[-20,-60],[-42,-50],
+        [7,-54],[-7,-49],[-20,-45],[-42,-35],
         // rear curve
-        [-58,-42],[-63,-33],[-64,-27],[-62,-20],[-61,-16],[-58,-11],
+        [-58,-27],[-63,-18],[-64,-12],[-62,-5],[-61,-1],[-58,4],
         // top of rear curve
-        [-54,-6],[-52,-5],[-48,-2],[-38,7],
+        [-50,9],[-35,15],
         // top lifeline curve
-        [-28,21],[-18,44],[-9,60],[-1,68],
+        [-28,21],[-18,44],[-8,60],[-1,66],
         // top curve
-        [5,72],[9,73],[23,75],[38,75],
+        [5,68],[9,69],[23,71],[38,71],
         // top front join curve
-        [51,73],[55,70],[56,69],[58,67]
+        [51,69],[55,66],[56,65],[58,63]
         ]);
       }
     }
