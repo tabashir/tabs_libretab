@@ -420,7 +420,7 @@ module jezc_ring_plate(initials, x_scale=1) {
 
 
     // pinky mount slot
-    angled_slot(79, 22, -14, 24, scaling=scaling);
+    angled_slot(79, 35, -16, 8, scaling=scaling);
 
   }
 
@@ -450,6 +450,7 @@ module ring_plate_slots(scaling, x_scale) {
 
 
 }
+
 module jc_base_plate(scaling, plate_height=thickness) {
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height) {
@@ -460,11 +461,37 @@ module jc_base_plate(scaling, plate_height=thickness) {
         // nock cutout
         [54,42],[48,32],[48,18],[57,9],[63,9],
         // middle and ring finger front
+        [64,7],[64,-35],
+        // bottom front curve
+        [62,-40],[59,-46],[54,-51],[50,-54],[45,-56],[38,-57],[31,-57],[20,-56],[7,-52],
+        // rear bottom join
+        [-5,-43],[-10,-34],[-11,-29],
+        // rear
+        [-12,-25],[-12,24],
+        // rear top join
+        [-12,37],
+        // top lifeline curve
+        [-10,45],[-9,49],[-6,56],[1,68],
+        // top curve
+        [9,71],[12,72],[38,72],[48,72],
+        // top front join curve
+        [54,68],[57,64],[58,57]
+        ]);
+      }
+    }
+  }
+}
+module jc_base_plate_larger(scaling, plate_height=thickness) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = plate_height) {
+      translate([66, 72, 0]) {
+        polygon([
+        // top index finger front
+        [58,54], [58,42],
+        // nock cutout
+        [54,42],[48,32],[48,18],[57,9],[63,9],
+        // middle and ring finger front
         [64,7],[64,-48],
-        // // nock cutout
-        // [49,32],[49,18],
-        // // middle and ring finger front
-        // [64,2],[64,-48],
         // bottom front curve
         [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-71],[7,-67],
         // rear bottom join
@@ -1334,7 +1361,7 @@ module ring_finger_spacer() {
 
   union() {
     difference() {
-      jc_base_plate(scaling, ring_spacer_plate_thickness);
+      ring_base_plate(scaling, ring_spacer_plate_thickness);
       // slots (not needed but uncomment if you want to see where it would be)
       // angled_slot(ring_x_offset, ring_y_offset, 0, 4, scaling=scaling);
       // slot_y_offset=38*scaling;
@@ -1344,7 +1371,7 @@ module ring_finger_spacer() {
       //
 
       translate([30*scaling, 0, -1]) {
-            cube([40*scaling,150*scaling,ring_spacer_plate_thickness+2]);
+            // cube([40*scaling,150*scaling,ring_spacer_plate_thickness+2]);
       }
 
       // bolt holes to secure tab
@@ -1359,6 +1386,30 @@ module ring_finger_spacer() {
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
         finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
+      }
+    }
+  }
+}
+
+module ring_base_plate(scaling, plate_height=thickness) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = plate_height) {
+      translate([66, 72, 0]) {
+        polygon([
+        // top index finger front
+        [58,54], [58,42],
+        // nock cutout
+        [54,42],[48,32],[48,18],[57,9],[63,9],
+        // middle and ring finger front
+        [64,7],[64,-35],
+        // bottom front curve
+        [62,-40],[59,-46],[54,-51],[50,-54],[45,-56],[38,-57],[31,-57],[20,-53],[12,-46],
+        [7,-40],[7,50],
+        // top curve
+        [15,62],[38,66],[48,66],
+        // top front join curve
+        [54,62],[57,60],[58,57]
+        ]);
       }
     }
   }
