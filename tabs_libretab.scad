@@ -116,15 +116,17 @@ if (wedge_palm_plate) {
 }
 
 if (jezr_palm_plate) {
-  translate([70, 0, -10]) jezr_palm_plate();
+  translate([-70, 120, -10]) jezr_palm_plate();
 }
 
 if (tulip_chin_plate) {
+  translate([90, -60, 10]) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
   // translate([90, -70, 5]) 
   // tulip_chin_plate(1, 38, 20, 2, 38, false);
     tulip_chin_plate( plate_offset=-4, length=38, width=29, height=4, plate_height=36, slot_angle=0);
+  }
 }
 
 if (half_chin_plate) {
@@ -180,7 +182,7 @@ if (pinky_trigger) {
 }
 
 if (ring_finger_spacer) {
-  translate([140, 80, 0]) ring_finger_spacer();
+  rotate([180, 0, 0]) translate([140, 80, 0]) ring_finger_spacer();
 }
 
 if (tab_bb_plate) {
@@ -188,10 +190,11 @@ if (tab_bb_plate) {
 }
 
 if (mins_bb_plate) {
-  translate([130, 242, 0]) mins_bb_plate();
+  translate([70, 180, 0]) mins_bb_plate();
 }
 
 if (bb_finger_ring) {
+  rotate([180, 0, 0])
   translate([100, 180, 0]) bb_finger_ring();
 }
 
