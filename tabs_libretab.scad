@@ -7,7 +7,7 @@ palm_plate=false;
 palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
-tulip_chin_plate=true;
+tulip_chin_plate=false;
 half_chin_plate=false;
 grooved_half_chin_plate=false;
 grooved_tulip_chin_plate=false;
@@ -20,7 +20,7 @@ jezc_ring_plate=true;
 tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
-pinky_trigger=true;
+pinky_trigger=false;
 ring_finger_spacer=false;
 bb_finger_ring=false;
 
@@ -41,6 +41,9 @@ initials_font="Arial Black";
 
 // Part Specific Variables
 fixed_thumb_plate_y_pos=three_finger_width*0.76;
+
+// reversed puts the peg behind the bolt
+pinky_bolt_front=true;
 
 botp_length=25;
 botp_depth=18;
@@ -178,7 +181,7 @@ if (jezc_ring_plate) {
 
 
 if (pinky_trigger) {
-  translate([-40, -60, 0]) pinky_trigger(pin=true);
+  translate([-40, -60, 0]) pinky_trigger(pin=true, bolt_front=pinky_bolt_front);
 }
 
 if (ring_finger_spacer) {
@@ -618,7 +621,7 @@ module jezr_palm_plate_base(scaling, thickness) {
   }
 }
 
-module pinky_trigger(desired_height=35, pin=true) {
+module pinky_trigger(desired_height=35, pin=true, bolt_front=false) {
     // polygon is 84 high
     scaling=desired_height/84;
     union() {
@@ -640,18 +643,30 @@ module pinky_trigger(desired_height=35, pin=true) {
         }
       }
       if (pin) {
-        translate([6*scaling, 57*scaling, -z_slot_offset]) {
+        if (bolt_front) {
+          translate([17*scaling, 59*scaling, -z_slot_offset]) {
+            cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+          }
+        } else {
+        translate([5*scaling, 57*scaling, -z_slot_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
       }
       }
+    }
       if (pin) {
         handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
-        translate([17*scaling, 63*scaling, handed_z_offset]) {
+        if (bolt_front) {
+          translate([5*scaling, 57*scaling, handed_z_offset]) {
+            cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+          }
+        } else {
+        translate([17*scaling, 59*scaling, handed_z_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
       }
     }
+  }
 }
 
 module base_plate(square_plate=false) {
