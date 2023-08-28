@@ -463,9 +463,10 @@ module jc_base_plate(scaling, plate_height=thickness) {
       translate([66, 72, 0]) {
         polygon([
         // top index finger front
-        [58,54], [58,42],
+        [58,54], [58,40],
         // nock cutout
-        [54,42],[48,32],[48,18],[57,9],[63,9],
+        // [54,40],
+        [50,32],[50,18],[57,11],[63,11],
         // middle and ring finger front
         [64,7],[64,-35],
         // bottom front curve
