@@ -25,7 +25,6 @@ bop_height=30;
 bop_slot_angle=90;
 
 
-
 tulip_chin_plate=false;
 half_tulip_chin_plate=false;
 
@@ -500,6 +499,12 @@ module jezc_ring_plate(initials, x_scale=1) {
         jc_base_plate(scaling);
       }
     }
+    // nock cutout
+    translate([57.5*x_scale, 43, -5 ]) {
+      scale([x_scale,1,1]) {
+        nock_cutout(scaling);
+      }
+    }
 
     ring_plate_slots(scaling, x_scale);
     //
@@ -544,9 +549,22 @@ module ring_plate_slots(scaling, x_scale) {
     // bolt slots to secure tab
     angled_slot(96, 30, 0, 14*x_scale, scaling=scaling);
     angled_slot(96, 122, 0, 14*x_scale, scaling=scaling);
+}
 
-
-
+module nock_cutout(scaling=1, plate_height=10) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = plate_height*2) {
+      translate([0, 0, plate_height*0.5]) {
+        polygon([
+        [14,30], [8,30],
+        // nock cutout
+        [0,22],[0,8],[7,1],[13,1],[14,0],
+        // middle and ring finger front
+        [14,0],[14,0]
+        ]);
+      }
+    }
+  }
 }
 
 module jc_base_plate(scaling, plate_height=thickness) {
@@ -555,12 +573,9 @@ module jc_base_plate(scaling, plate_height=thickness) {
       translate([66, 72, 0]) {
         polygon([
         // top index finger front
-        [58,54], [58,40],
-        // nock cutout
-        // [54,40],
-        [50,32],[50,18],[57,11],[63,11],
+        [58,54], [58,20],
         // middle and ring finger front
-        [64,7],[64,-35],
+        [64,16],[64,5],[64,-35],
         // bottom front curve
         [62,-40],[59,-46],[54,-51],[50,-54],[45,-56],[38,-57],[31,-57],[20,-56],[7,-52],
         // rear bottom join
@@ -568,18 +583,19 @@ module jc_base_plate(scaling, plate_height=thickness) {
         // rear
         [-12,-25],[-12,24],
         // rear top join
-        [-12,37],
+        [-11,37],
         // top lifeline curve
-        [-10,45],[-9,49],[-6,56],[1,62],
+        [-10,40],[-9,44],[-6,51],[-1,57],
         // top curve
-        [9,66],[12,67],[38,67],[48,67],
+        [9,61],[12,62],[38,62],[48,62],
         // top front join curve
-        [54,64],[57,60],[58,57]
+        [54,59],[57,55],[58,52]
         ]);
       }
     }
   }
 }
+
 module jc_base_plate_larger(scaling, plate_height=thickness) {
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height) {
