@@ -15,15 +15,18 @@ palm_ball=false;
 round_palm_plate=false;
 wedge_palm_plate=false;
 
+/* [Bolt-On Plate] */
+
 // base mount plate for a chin or thumb plate to join onto
-bolt_on_plate=true;
-bop_length=25;
+bolt_on_plate=false;
+bop_length=20;
 // bolt-on-thumb-plate thickness
 bop_depth=4;
 // bolt-on-thumb-plate height proportion to main plate size
 bop_height=30;
-bop_slot_angle=90;
+bop_slot_angle=4;
 
+/* [Tulip Chin Plate] */
 
 tulip_chin_plate=false;
 half_tulip_chin_plate=false;
@@ -33,12 +36,15 @@ tulip_chin_plate_length=38;
 tulip_chin_plate_width=29;
 tulip_chin_plate_height=4;
 tulip_chin_plate_plate_height=36;
+tulip_chin_plate_slot_angle=0;
 
 grooved_half_chin_plate=false;
 
-grooved_tulip_chin_plate=false;
+/* [grooved Tulip Chin Plate] */
+
+grooved_tulip_chin_plate=true;
 // how far from centre the mount plate is
-grooved_tulip_chin_plate_offset=-4;
+grooved_tulip_chin_plate_offset=-6;
 // how long the plate is - likely you want the same as the tab width
 grooved_tulip_chin_plate_length=38;
 // how wide the plate on the top is
@@ -46,28 +52,32 @@ grooved_tulip_chin_plate_width=30;
 // how thick the top plate is
 grooved_tulip_chin_plate_height=6;
 // the angle that the plate is to the base plate
-grooved_tulip_chin_plate_angle=-5;
+grooved_tulip_chin_plate_angle=0;
 // this tilts the groove from back->front slightly
-grooved_tulip_chin_plate_tilt=2;
+grooved_tulip_chin_plate_tilt=0;
 // top->bottom height of the mounting plate
-grooved_tulip_chin_plate_plate_height=38;
+grooved_tulip_chin_plate_plate_height=30;
 // the angle of the mount plate slot from vertical
 grooved_tulip_chin_plate_slot_angle=4;
 
-tulip_chin_plate_slot_angle=0;
+/* [Fillet] */
 
-fillet=true;
+fillet=false;
 fillet_length=28;
 fillet_height=10;
 
+/* [Half Chin Plate] */
+
 half_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
+
+/* [Tab Plates] */
 
 tulip_full_plate=false;
 jezr_plate=false;
 jezr_ring_plate=false;
 jezc_plate=false;
-jezc_ring_plate=true;
+jezc_ring_plate=false;
 tab_bb_plate=false;
 mins_bb_plate=false;
 jezr_palm_plate=false;
@@ -97,6 +107,8 @@ fixed_thumb_plate_y_pos=three_finger_width*0.76;
 // reversed puts the peg behind the bolt
 pinky_bolt_front=true;
 
+/* [Bolt-on Thumb Plate] */
+
 // bolt-on-thumb-plate length
 botp_length=25;
 // bolt-on-thumb-plate thickness
@@ -123,6 +135,8 @@ tilted_slot_gap=8.6;
 tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
 tilted_slot_angle=15;
 tilted_slot_length=9;
+
+/* [Ring Spacer Plate] */
 
 // spacer ring variables
 // width around your middle finger
@@ -500,7 +514,7 @@ module jezc_ring_plate(initials, x_scale=1) {
       }
     }
     // nock cutout
-    translate([57.5*x_scale, 43, -5 ]) {
+    translate([57.5*x_scale, 43, -2 ]) {
       scale([x_scale,1,1]) {
         nock_cutout(scaling);
       }
@@ -554,7 +568,6 @@ module ring_plate_slots(scaling, x_scale) {
 module nock_cutout(scaling=1, plate_height=10) {
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height*2) {
-      translate([0, 0, plate_height*0.5]) {
         polygon([
         [14,30], [8,30],
         // nock cutout
@@ -563,7 +576,6 @@ module nock_cutout(scaling=1, plate_height=10) {
         [14,0],[14,0]
         ]);
       }
-    }
   }
 }
 
@@ -999,17 +1011,6 @@ module half_tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, pla
     scaled_tulip_base_plate(length, width, height);
   }
 
-  module myfillet(length, side) {
-    centre=side+3;
-    radius=centre*2;
-      difference() {
-        cube([side,side,length]);
-        translate([side+1,side+1,-1]) {
-        cylinder(length+2,side,side,$fn=100);
-        }
-      }
-  }
-
   union() {
     // plate
     translate([0,-2,-10+plate_offset]) {
@@ -1021,7 +1022,7 @@ module half_tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, pla
     // base_plate
     translate([plate_height,0,0]) {
       rotate([0,0,90]) {
-         // chin_plate_base(plate_height, plate_height, thickness, bolt_slot_width, slot_angle);
+         chin_plate_base(plate_height, plate_height, thickness, bolt_slot_width, slot_angle);
       }
     }
 
@@ -1030,7 +1031,7 @@ module half_tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, pla
     x_mod=plate_height/2;
     translate([height-1,x_mod+12,height-2]) {
       rotate([90,0,0]) {
-         // myfillet(plate_height/2,6);
+         myfillet(plate_height/2,6);
       }
     }
   }
@@ -1211,7 +1212,7 @@ module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, heigh
   }
 }
 
-module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=-14, plate_height=38, slot_angle=8, tilt=2) {
+module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2) {
   plate_thickness=4;
   difference() {
     union() {
@@ -1222,49 +1223,50 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
         }
       }
       // base_plate
-      translate([plate_height-(height/2),0,0]) {
-        rotate([0,0,90]) {
-           chin_plate_base(plate_height, plate_height, plate_thickness, bolt_slot_width, slot_angle);
-        }
+      translate([plate_height-(height/2)+2,2,0]) {
+        rotate([0,0,90-slot_angle]) {
+           bolt_on_plate(plate_height*0.7, plate_thickness, plate_height, slot_angle=slot_angle);
       }
-      translate([0,-5,0]) {
+      }
         // plate fillet 1
         x_mod=plate_height*0.25;
-        translate([-0.5,x_mod*2.5,plate_offset+plate_thickness+3]) {
+        translate([-0.5,x_mod*3,plate_offset+plate_thickness*2]) {
           rotate([90,0,0]) {
-             myfillet(x_mod,11);
+             myfillet(plate_height*0.5,plate_thickness*1.5);
           }
         }
-      }
     } // end main plate union
     translate([plate_height/2, -plate_height/2, 0]) {
-       cube([plate_height*2, plate_height, plate_height], true);
+       // cube([plate_height*2, plate_height, plate_height], true);
     }
   } // end difference
 }
 
-module bolt_on_plate(length, depth, height, slot_angle=90) {
-  translate([-30,30,0]) {
-    tilted_slot_length=height*0.75;
+module bolt_on_plate(length, depth, height, slot_angle=0) {
+    plate_edge_radius=2;
+    tilted_slot_length=height*0.70;
     slot_pos_x=length/2;
     slot_pos_y=0;
-    rounded_radius=length/2;
+    rounded_radius=(length/2);
+    slot_rotation=90-slot_angle;
     union() {
       difference() {
         union() {
-          roundedcube(size=[length, height, depth], radius=2);
+          roundedcube(size=[length, height, depth], radius=plate_edge_radius);
+          rotate([0, 0, slot_angle]) {
+            roundedcube(size=[length, height, depth], radius=plate_edge_radius);
+          }
           translate([rounded_radius, 0, 0]) {
             chamfercyl(rounded_radius,thickness,-2,-2);
           }
         }
       translate([slot_pos_x,slot_pos_y,1]) {
-        rotate([0,0,slot_angle]) {
+        rotate([0,0, slot_rotation]) {
           bar(tilted_slot_length,bolt_slot_width,slot_depth,0);
         }
       }
     }
   }
-}
 }
 
 module bolt_on_thumb_plate(tp_length, tp_depth, tp_height) {
@@ -1355,7 +1357,7 @@ module myfillet(length, side) {
 
 module grooved_tulip_plate(angle, length, width, height, tilt) {
   groove_radius=width*0.9;
-  y_translate=sin(tilt)-height+(height/2);
+  y_translate=sin(tilt)-(height*0.75);
   difference() {
     scaled_tulip_base_plate(length, width, height);
     translate([-1, width/2, groove_radius+height+y_translate]) {
