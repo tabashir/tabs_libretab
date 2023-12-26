@@ -25,14 +25,12 @@ preview_fn=16;
 render_fn=100;
 
 
-/* [Global Calculated Variables] */
-tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
-$fn = $preview ? preview_fn : render_fn;
-number_of_renders = 0;
-
-
-/* [Base Plate] */
-base_plate=false;
+/* [Pinky Trigger] */
+pinky_trigger=false;
+// reversed puts the peg behind the bolt
+pinky_trigger_bolt_front=true;
+// set this to false to have two bolt holes rather than a locating pin and a hole
+pinky_trigger_pin=true;
 
 /* [Fixed Thumb Plate] */
 fixed_thumb_plate=false;
@@ -110,30 +108,47 @@ fillet_height=10;
 half_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
 
+/* [Base Plate] */
+ks_base_plate=false;
+// rounds off the top and bottom of the plate (slow...)
+ks_base_plate_square_plate=false;
+
+
+/* [Tulip Full Plate] */
+tulip_full_plate=false;
+
+// Offset of chin plate to base_plate
+tulip_full_plate_plate_offset=2;
+tulip_full_plate_length=38;
+tulip_full_plate_width=30;
+tulip_full_plate_height=1.75;
+
 
 /* [Tab Plates] */
-tulip_full_plate=false;
+
+// Loosely based on WW EZR plate, with slots for cinch band and holes for finger ring
 jezr_plate=false;
+
+// Smaller version of jezr for use with finger ring only
 jezr_ring_plate=false;
+
+// jezr with rear palm plate mounting cut off, cinch band and slots
 jezc_plate=false;
+
+// above for use with finger ring only
 jezc_ring_plate=false;
+
+// Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
+
+// Barebow plate created outside of OpenScad, has nicely chamfered edges
 mins_bb_plate=false;
+
+
+// plate that can be used to extend a base plate further into the palm
 jezr_palm_plate=false;
-pinky_trigger=false;
-ring_finger_spacer=true;
-bb_finger_ring=false;
-
 jezr_palm_plate_depth=5;
-jezr_ring_plate_scaling=1.2;
-jezc_ring_plate_scaling=1.2;
 
-
-// Part Specific Variables
-fixed_thumb_plate_y_pos=three_finger_width*0.76;
-
-// reversed puts the peg behind the bolt
-pinky_bolt_front=true;
 
 /* [Bolt-on Thumb Plate] */
 
@@ -144,10 +159,9 @@ botp_depth=18;
 // bolt-on-thumb-plate height proportion to main plate size
 botp_height_mod=0.38;
 
-botp_height=three_finger_width*botp_height_mod;
-
 
 /* [Ring Spacer Plate] */
+finger_ring_with_spacer=true;
 
 // spacer ring variables
 // width around your middle finger
@@ -169,67 +183,60 @@ ring_spacer_forward_mod=2;
 // too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=2.5;
 
+/* [Barebow Ring Spacer Plate] */
+bb_finger_ring=false;
+
+/* [Global Calculated Variables] */
+tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
+$fn = $preview ? preview_fn : render_fn;
+
+// Part Specific Variables
+fixed_thumb_plate_y_pos=three_finger_width*0.76;
+botp_height=three_finger_width*botp_height_mod;
+
+
 
 number_of_cols = 4;
-// function get_translation_for_render(number_of_renders) = [ 60, 60, 0 ];
-function get_translation_for_render(number_of_renders) = [ 
-  60 * (number_of_renders % number_of_cols),
-  60 * floor(number_of_renders / number_of_cols),
+// function get_translation_for_item(number_of_renders) = [ 60, 60, 0 ];
+function get_translation_for_item(item_number) = [ 
+  80 * (item_number % number_of_cols),
+  60 * floor(item_number / number_of_cols),
   0 ];
 
 
 
-if (base_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate(get_translation_for_render(number_of_renders))
-  base_plate(false);
-}
-
-if (fixed_thumb_plate) {
-  number_of_renders = number_of_renders + 1;
-  // This plate is attached to the base plate
-  fixed_thumb_plate(0, fixed_thumb_plate_y_pos, 1, 1);
-}
-
 if (palm_plate) {
-  number_of_renders = number_of_renders + 1;
   x_size = three_finger_width*0.25;
-  translate(get_translation_for_render(number_of_renders))
+  translate(get_translation_for_item(2))
   palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
 if (palm_ball) {
-  number_of_renders = number_of_renders + 1;
   x_size = three_finger_width*0.25;
-  translate(get_translation_for_render(number_of_renders))
+  translate(get_translation_for_item(3))
   palm_ball(x_size, palm_plate_length_mod, palm_ball_depth);
 }
 
 if (bolt_on_thumb_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate(get_translation_for_render(number_of_renders))
+  translate(get_translation_for_item(4))
   bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
 }
 
 
 if (round_palm_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([-120, 40, 0]) rotate([180, 0, 0]) round_palm_plate();
+  translate(get_translation_for_item(5)) rotate([180, 0, 0]) round_palm_plate();
 }
 
 if (wedge_palm_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([-80, 60, 0]) rotate([180, 0, 0]) wedge_palm_plate();
+  translate(get_translation_for_item(6)) rotate([180, 0, 0]) wedge_palm_plate();
 }
 
 if (jezr_palm_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([-70, 120, -10]) jezr_palm_plate();
+  translate(get_translation_for_item(7)) jezr_palm_plate();
 }
 
 if (tulip_chin_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([90, -60, 10]) {
+  translate(get_translation_for_item(8)) {
     tulip_chin_plate(
       plate_offset=tulip_chin_plate_plate_offset,
       length=tulip_chin_plate_length,
@@ -242,8 +249,7 @@ if (tulip_chin_plate) {
 }
 
 if (half_tulip_chin_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([120, -60, 10]) {
+  translate(get_translation_for_item(9)) {
     half_tulip_chin_plate(
       plate_offset=tulip_chin_plate_plate_offset,
       length=tulip_chin_plate_length,
@@ -256,27 +262,23 @@ if (half_tulip_chin_plate) {
 }
 
 if (bolt_on_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([160, -60, 0]) bolt_on_plate(bop_length, bop_depth, bop_height, bop_slot_angle);
+  translate(get_translation_for_item(10)) bolt_on_plate(bop_length, bop_depth, bop_height, bop_slot_angle);
 }
 
 if (fillet) {
-  number_of_renders = number_of_renders + 1;
-  translate([140, -60, 0]) {
+  translate(get_translation_for_item(11)) {
     fillet(fillet_length, fillet_height) ;
   }
 }
 
 if (half_chin_plate) {
-  number_of_renders = number_of_renders + 1;
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate([90, -120, 0]) half_chin_plate(28, 15, 3.5);
+  translate(get_translation_for_item(12)) half_chin_plate(28, 15, 3.5);
 }
 
 if (grooved_tulip_chin_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([30, -60, 10]) {
+  translate(get_translation_for_item(13)) {
     grooved_tulip_chin_plate(
       plate_offset=grooved_tulip_chin_plate_offset,
       length=grooved_tulip_chin_plate_length,
@@ -291,70 +293,72 @@ if (grooved_tulip_chin_plate) {
 }
 
 if (half_grooved_tulip_chin_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([30, -120, 10]) {
+  translate(get_translation_for_item(14)) {
     half_grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
 
 if (grooved_half_chin_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([30, -180, 10]) {
+  translate(get_translation_for_item(15)) {
     grooved_half_chin_plate(length=25, width=7, height=4, groove_tilt=0, groove_radius=16);
   }
 }
 
+if (ks_base_plate) {
+  translate(get_translation_for_item(30))
+  ks_base_plate(ks_base_plate_square_plate);
+}
+
+if (fixed_thumb_plate) {
+  translate(get_translation_for_item(33))
+  fixed_thumb_plate(0, fixed_thumb_plate_y_pos, 1, 1);
+}
+
 
 if (tulip_full_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([10, 80, 5]) tulip_full_plate();
+  translate(get_translation_for_item(16)) tulip_full_plate(
+    tulip_full_plate_plate_offset,
+    tulip_full_plate_length,
+    tulip_full_plate_width,
+    tulip_full_plate_height
+  );
 }
 
 if (jezr_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([70, 0, 0]) jezr_plate();
+  translate(get_translation_for_item(17)) jezr_plate();
 }
 
 if (jezr_ring_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([200, 80, 0]) jezr_ring_plate(initials, 1.1);
+  translate(get_translation_for_item(18)) jezr_ring_plate(initials, 1.1);
 }
 
 if (jezc_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([140, 0, 0]) jezc_plate();
+  translate(get_translation_for_item(19)) jezc_plate();
 }
 
 if (jezc_ring_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([200, 0, 0]) jezc_ring_plate(initials, jezc_ring_plate_scaling);
+  translate(get_translation_for_item(20)) jezc_ring_plate(initials, jezc_ring_plate_scaling);
 }
 
 
 if (pinky_trigger) {
-  number_of_renders = number_of_renders + 1;
-  translate([-40, -60, 0]) pinky_trigger(pin=true, bolt_front=pinky_bolt_front);
+  translate(get_translation_for_item(21)) pinky_trigger(pin=pinky_trigger_pin, bolt_front=pinky_trigger_bolt_front);
 }
 
-if (ring_finger_spacer) {
-  number_of_renders = number_of_renders + 1;
-  rotate([180, 0, 0]) translate([140, 80, 0]) ring_finger_spacer();
+if (finger_ring_with_spacer) {
+ translate(get_translation_for_item(22))  rotate([0, 180, 0]) finger_ring_with_spacer();
 }
 
 if (tab_bb_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([150, 180, 0]) tab_bb_plate();
+  translate(get_translation_for_item(23)) tab_bb_plate();
 }
 
 if (mins_bb_plate) {
-  number_of_renders = number_of_renders + 1;
-  translate([70, 180, 0]) mins_bb_plate();
+  translate(get_translation_for_item(24)) mins_bb_plate();
 }
 
 if (bb_finger_ring) {
-  number_of_renders = number_of_renders + 1;
-  rotate([180, 0, 0])
-  translate([100, 180, 0]) bb_finger_ring();
+  translate(get_translation_for_item(25)) bb_finger_ring();
 }
 
 
@@ -842,7 +846,7 @@ module pinky_trigger(desired_height=35, pin=true, bolt_front=false) {
   }
 }
 
-module base_plate(square_plate=false) {
+module ks_base_plate(square_plate=false) {
   union() {
     difference() {
       plain_base_plate(depth, three_finger_width, thickness, square_plate);
@@ -877,21 +881,19 @@ module base_plate(square_plate=false) {
 
 module palm_plate(radius, length_mod, palm_depth) {
   // translate([-width*0.5,width,0]) { 
-  translate([-50,0,0]) {
-    cube_length=radius*length_mod;
-    difference() {
-      union() {
-        roundedcube(size=[cube_length,radius*1.5,thickness+1], radius=2);
-        translate([0,radius*0.75,0]) {
-          chamfercyl(radius,palm_depth,-2,-palm_depth/2);
-        }
-        translate([cube_length,radius*0.75,0]) {
-          chamfercyl(radius*0.75,thickness+1,-2,-2);
-        }
+  cube_length=radius*length_mod;
+  difference() {
+    union() {
+      roundedcube(size=[cube_length,radius*1.5,thickness+1], radius=2);
+      translate([0,radius*0.75,0]) {
+        chamfercyl(radius,palm_depth,-2,-palm_depth/2);
       }
-      tilted_slot(cube_length-4, tilted_slot_gap-2, tilted_slot_angle);
-      tilted_slot(cube_length-4, (tilted_slot_gap*2)-2, tilted_slot_angle);
+      translate([cube_length,radius*0.75,0]) {
+        chamfercyl(radius*0.75,thickness+1,-2,-2);
+      }
     }
+    tilted_slot(cube_length-4, tilted_slot_gap-2, tilted_slot_angle);
+    tilted_slot(cube_length-4, (tilted_slot_gap*2)-2, tilted_slot_angle);
   }
 }
 
@@ -950,12 +952,7 @@ module wedge_palm_plate(slot_length=12, tilt_angle=3, length=35, height=25, thic
   }
 }
 
-module tulip_full_plate() {
-
-  plate_offset=2;
-  length=38;
-  width=30;
-  height=1.75;
+module tulip_full_plate( plate_offset=2, length=38, width=30, height=1.75 ) {
 
   module tulip_plate() {
     intersection() {
@@ -990,7 +987,7 @@ module tulip_full_plate() {
     // base_plate
     translate([three_finger_width+height,0,0.3]) {
       rotate([0,0,90]) {
-         base_plate(true);
+         ks_base_plate(true);
       }
     }
 
@@ -1322,39 +1319,37 @@ module bolt_on_plate(length, depth, height, slot_angle=0) {
 }
 
 module bolt_on_thumb_plate(tp_length, tp_depth, tp_height) {
-  translate([-30,30,0]) {
-    mount_plate_length=tp_length*0.75;
-    slot_pos_x=(mount_plate_length-tilted_slot_length)/2;
-    tp_y_mod=tp_height*0.4;
-    union() {
-      difference() {
-        union() {
-          translate([0, tp_y_mod, 0]) {
-            roundedcube(size=[mount_plate_length,tp_height-tp_y_mod, thickness], radius=2);
-          }
-          translate([mount_plate_length*0.5, tp_y_mod, 0]) {
-            chamfercyl(mount_plate_length*0.5,thickness,-2,-2);
-          }
-          fillet_length=mount_plate_length*0.8;
-          fillet_pos=(mount_plate_length-fillet_length)/2;
-          translate([fillet_pos, tp_height-(thickness*0.8), thickness*0.8]) {
-            rotate([0, 0, 180]) {
-              rotate([0, 270, 0]) {
-                myfillet(fillet_length, 4);
-              }
+  mount_plate_length=tp_length*0.75;
+  slot_pos_x=(mount_plate_length-tilted_slot_length)/2;
+  tp_y_mod=tp_height*0.4;
+  union() {
+    difference() {
+      union() {
+        translate([0, tp_y_mod, 0]) {
+          roundedcube(size=[mount_plate_length,tp_height-tp_y_mod, thickness], radius=2);
+        }
+        translate([mount_plate_length*0.5, tp_y_mod, 0]) {
+          chamfercyl(mount_plate_length*0.5,thickness,-2,-2);
+        }
+        fillet_length=mount_plate_length*0.8;
+        fillet_pos=(mount_plate_length-fillet_length)/2;
+        translate([fillet_pos, tp_height-(thickness*0.8), thickness*0.8]) {
+          rotate([0, 0, 180]) {
+            rotate([0, 270, 0]) {
+              myfillet(fillet_length, 4);
             }
           }
         }
-        tilted_slot(slot_pos_x, tilted_slot_gap, -tilted_slot_angle);
-        tilted_slot(slot_pos_x, tilted_slot_gap*2, -tilted_slot_angle);
       }
-      translate([0, tp_height, 0]) {
-        rotate([90, 0, 0]) {
-          intersection() {
-            roundedcube(size=[tp_length, tp_depth, thickness], radius=2);
-            translate([tp_length*0.65, -tp_depth*0.4, 0]) {
-              chamfercyl(tp_length, thickness, -2, -2);
-            }
+      tilted_slot(slot_pos_x, tilted_slot_gap, -tilted_slot_angle);
+      tilted_slot(slot_pos_x, tilted_slot_gap*2, -tilted_slot_angle);
+    }
+    translate([0, tp_height, 0]) {
+      rotate([90, 0, 0]) {
+        intersection() {
+          roundedcube(size=[tp_length, tp_depth, thickness], radius=2);
+          translate([tp_length*0.65, -tp_depth*0.4, 0]) {
+            chamfercyl(tp_length, thickness, -2, -2);
           }
         }
       }
@@ -1576,7 +1571,7 @@ module cutouts() {
 
 }
 
-module ring_finger_spacer() {
+module finger_ring_with_spacer() {
   // Tab sketch is 144px high
   // Tab is 74px high
   // This is from tab with three_finger_width=65
