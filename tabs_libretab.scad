@@ -47,6 +47,7 @@ palm_plate_depth=14;
 /* [Palm Washer] */
 palm_washer=false;
 palm_washer_depth=5;
+palm_washer_radius=15;
 
 /* [Round Palm Plate] */
 round_palm_plate=false;
@@ -81,7 +82,7 @@ grooved_half_chin_plate=false;
 
 
 /* [Grooved Tulip Chin Plate] */
-grooved_tulip_chin_plate=true;
+grooved_tulip_chin_plate=false;
 // how far from centre the mount plate is
 grooved_tulip_chin_plate_offset=-6;
 // how long the plate is - likely you want the same as the tab width
@@ -165,7 +166,7 @@ botp_height_mod=0.38;
 
 
 /* [Ring Spacer Plate] */
-finger_ring_with_spacer=true;
+finger_ring_with_spacer=false;
 
 // spacer ring variables
 // width around your middle finger
@@ -219,7 +220,7 @@ if (palm_washer) {
   x_size = three_finger_width*0.25;
   translate(get_translation_for_item(3))
   rotate([180, 0, 0])
-  palm_washer(x_size, palm_plate_length_mod, palm_washer_depth);
+  palm_washer(palm_washer_radius, palm_washer_depth);
 }
 
 if (bolt_on_thumb_plate) {
@@ -906,11 +907,11 @@ module palm_plate(radius, length_mod, palm_depth) {
   }
 }
 
-module palm_washer(radius, length_mod, palm_depth) {
+module palm_washer(radius, palm_depth) {
   difference() {
     chamfercyl(radius,palm_depth,-palm_depth*0.75,-1);
-    slot_length=radius*0.75;
     slot_offset_from_edge=2;
+    slot_length=(radius-slot_offset_from_edge)*0.75;
     slot_offset=slot_offset_from_edge+(bolt_head_width/2)-radius;
 
     union() {
