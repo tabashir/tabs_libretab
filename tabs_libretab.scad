@@ -1262,8 +1262,12 @@ module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, gro
 
 module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
   cutoff=-20; // higher=less cut off
+  plate_height=38;
+  slot_angle=8;
+  tilt=2;
   difference() {
-    grooved_tulip_chin_plate(plate_offset, length, width, height, angle, groove_radius, second_fillet);
+    // grooved_tulip_chin_plate(plate_offset, length, width, height, angle, groove_radius, second_fillet);
+    grooved_tulip_chin_plate( plate_offset, length, width, height, angle, plate_height, slot_angle, tilt);
     translate([-width/2,-length/4,cutoff]) {
       cube([width,length+10,width]);
     }
