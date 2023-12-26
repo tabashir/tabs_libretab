@@ -25,6 +25,7 @@ preview_fn=16;
 render_fn=100;
 
 
+
 /* [Pinky Trigger] */
 pinky_trigger=false;
 // reversed puts the peg behind the bolt
@@ -43,9 +44,9 @@ palm_plate=false;
 palm_plate_length_mod=1.8;
 palm_plate_depth=14;
 
-/* [Palm Ball] */
-palm_ball=false;
-palm_ball_depth=5;
+/* [Palm Washer] */
+palm_washer=false;
+palm_washer_depth=5;
 
 /* [Round Palm Plate] */
 round_palm_plate=false;
@@ -75,10 +76,11 @@ tulip_chin_plate_height=4;
 tulip_chin_plate_plate_height=36;
 tulip_chin_plate_slot_angle=0;
 
+/* [grooved Half Chin Plate] */
 grooved_half_chin_plate=false;
 
 
-/* [grooved Tulip Chin Plate] */
+/* [Grooved Tulip Chin Plate] */
 grooved_tulip_chin_plate=true;
 // how far from centre the mount plate is
 grooved_tulip_chin_plate_offset=-6;
@@ -137,6 +139,7 @@ jezc_plate=false;
 
 // above for use with finger ring only
 jezc_ring_plate=false;
+jezc_ring_plate_scaling=1.2;
 
 // Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
@@ -148,6 +151,7 @@ mins_bb_plate=false;
 // plate that can be used to extend a base plate further into the palm
 jezr_palm_plate=false;
 jezr_palm_plate_depth=5;
+
 
 
 /* [Bolt-on Thumb Plate] */
@@ -198,9 +202,9 @@ botp_height=three_finger_width*botp_height_mod;
 
 number_of_cols = 4;
 // function get_translation_for_item(number_of_renders) = [ 60, 60, 0 ];
-function get_translation_for_item(item_number) = [ 
+function get_translation_for_item(item_number) = [
   80 * (item_number % number_of_cols),
-  60 * floor(item_number / number_of_cols),
+  80 * floor(item_number / number_of_cols),
   0 ];
 
 
@@ -211,10 +215,11 @@ if (palm_plate) {
   palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
-if (palm_ball) {
+if (palm_washer) {
   x_size = three_finger_width*0.25;
   translate(get_translation_for_item(3))
-  palm_ball(x_size, palm_plate_length_mod, palm_ball_depth);
+  rotate([180, 0, 0])
+  palm_washer(x_size, palm_plate_length_mod, palm_washer_depth);
 }
 
 if (bolt_on_thumb_plate) {
@@ -342,11 +347,13 @@ if (jezc_ring_plate) {
 
 
 if (pinky_trigger) {
-  translate(get_translation_for_item(21)) pinky_trigger(pin=pinky_trigger_pin, bolt_front=pinky_trigger_bolt_front);
+  translate(get_translation_for_item(32)) pinky_trigger(pin=pinky_trigger_pin, bolt_front=pinky_trigger_bolt_front);
 }
 
 if (finger_ring_with_spacer) {
- translate(get_translation_for_item(22))  rotate([0, 180, 0]) finger_ring_with_spacer();
+ translate(get_translation_for_item(22))
+ rotate([0, 180, 0])
+ finger_ring_with_spacer();
 }
 
 if (tab_bb_plate) {
@@ -358,7 +365,9 @@ if (mins_bb_plate) {
 }
 
 if (bb_finger_ring) {
-  translate(get_translation_for_item(25)) bb_finger_ring();
+  translate(get_translation_for_item(25))
+   rotate([0, 180, 0])
+  bb_finger_ring();
 }
 
 
@@ -880,7 +889,7 @@ module ks_base_plate(square_plate=false) {
 }
 
 module palm_plate(radius, length_mod, palm_depth) {
-  // translate([-width*0.5,width,0]) { 
+  // translate([-width*0.5,width,0]) {
   cube_length=radius*length_mod;
   difference() {
     union() {
@@ -897,7 +906,7 @@ module palm_plate(radius, length_mod, palm_depth) {
   }
 }
 
-module palm_ball(radius, length_mod, palm_depth) {
+module palm_washer(radius, length_mod, palm_depth) {
   difference() {
     chamfercyl(radius,palm_depth,-palm_depth*0.75,-1);
     slot_length=radius*0.75;
@@ -906,8 +915,8 @@ module palm_ball(radius, length_mod, palm_depth) {
 
     union() {
       translate([slot_offset,0,0]) {
-        bar(slot_length,bolt_head_width,palm_ball_depth/2,0);
-        bar(slot_length,bolt_slot_width,palm_ball_depth*4,0);
+        bar(slot_length,bolt_head_width,palm_washer_depth/2,0);
+        bar(slot_length,bolt_slot_width,palm_washer_depth*4,0);
       }
     }
   }
@@ -920,15 +929,15 @@ module wedge_palm_plate(slot_length=12, tilt_angle=3, length=35, height=25, thic
       // base plate
       difference(){
         // main square block
-        rotate([0,tilt_angle,0]) { 
+        rotate([0,tilt_angle,0]) {
           radiusedblock(length,height,4,3);
         }
-        translate([0,0,5]) { 
+        translate([0,0,5]) {
             cube([length+15,height+10,12]);
         }
       }
       // slots
-      translate([8,(height+tilted_slot_gap)/3,0]) { 
+      translate([8,(height+tilted_slot_gap)/3,0]) {
           union() {
             //countersink slot
             translate([0,0,-5]) { rotate([0,0,0]) { bar(slot_length,11,12,0); } }
@@ -940,11 +949,11 @@ module wedge_palm_plate(slot_length=12, tilt_angle=3, length=35, height=25, thic
             translate([6,tilted_slot_gap,0]) { rotate([0,0,0]) { bar(slot_length+5,5,25,0); } }
         }
       }
-      rotate([0,tilt_angle,0]) { 
+      rotate([0,tilt_angle,0]) {
         // rounded finger cutout
         translate([75,-45,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=75); }
       }
-      rotate([0,tilt_angle,0]) { 
+      rotate([0,tilt_angle,0]) {
         // rounded finger cutout
         translate([-20,90,0]) { chamfercyl(70,tilt_angle+8,3,3, $fn=75); }
       }
@@ -1804,7 +1813,7 @@ module radiusedblock(xlen,ylen,zlen,radius){
   hull(){
     translate([radius,radius,radius]) sphere(r=radius);
     translate([xlen + radius , radius , radius]) sphere(r=radius);
-    translate([radius , ylen + radius , radius]) sphere(r=radius);    
+    translate([radius , ylen + radius , radius]) sphere(r=radius);
     translate([xlen + radius , ylen + radius , radius]) sphere(r=radius);
     translate([radius , radius , zlen + radius]) sphere(r=radius);
     translate([xlen + radius , radius , zlen + radius]) sphere(r=radius);
@@ -1929,7 +1938,7 @@ module roundedcube(size = [1, 1, 1], center = false, radius = 0.5, apply_to = "a
 						) {
 							build_point("sphere");
 						} else {
-							rotate = 
+							rotate =
 								(apply_to == "xmin" || apply_to == "xmax" || apply_to == "x") ? [0, 90, 0] : (
 								(apply_to == "ymin" || apply_to == "ymax" || apply_to == "y") ? [90, 90, 0] :
 								[0, 0, 0]
