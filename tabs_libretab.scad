@@ -1,16 +1,22 @@
 
 /* [Global User Variables] */
+
+// This will lay items out on plate. If you are working on one item, unset.
+multiple_items=true;
+
 thickness=4;
 three_finger_width=65;
 bolt_slot_width=4.5;
 bolt_head_width=10;
 elastic_slot_width=2;
 
+// Initials/wording for some of the labels
 initials="JM";
 initials_font="Arial Black";
 
 // saves mirroring some objects in the slicer
 right_handed=false;
+
 
 depth=three_finger_width*0.6;
 slot_depth=thickness+4;
@@ -18,6 +24,7 @@ z_slot_offset=2;
 tilted_slot_gap=8.6;
 tilted_slot_angle=15;
 tilted_slot_length=9;
+mount_plate_thickness=4;
 
 // view detail for preview render (you want this low to be fast)
 preview_fn=16;
@@ -58,9 +65,10 @@ wedge_palm_plate=false;
 /* [Bolt-On Plate] */
 // base mount plate for a chin or thumb plate to join onto
 bolt_on_plate=false;
+bolt_on_plate_with_fillet=false;
 bop_length=20;
 // bolt-on-thumb-plate thickness
-bop_depth=4;
+bop_thickness=4;
 // bolt-on-thumb-plate height proportion to main plate size
 bop_height=30;
 bop_slot_angle=4;
@@ -153,6 +161,8 @@ mins_bb_plate=false;
 jezr_palm_plate=false;
 jezr_palm_plate_depth=5;
 
+// squarer plate with rounded edges
+rounded_edge_plate=false;
 
 
 /* [Bolt-on Thumb Plate] */
@@ -199,50 +209,102 @@ $fn = $preview ? preview_fn : render_fn;
 fixed_thumb_plate_y_pos=three_finger_width*0.76;
 botp_height=three_finger_width*botp_height_mod;
 
+items = [
+  pinky_trigger, 
+  fixed_thumb_plate, 
+  bolt_on_thumb_plate, 
+  palm_plate, 
+  palm_washer, 
+  round_palm_plate, 
+  wedge_palm_plate, 
+  bolt_on_plate, 
+  bolt_on_plate_with_fillet, 
+  tulip_chin_plate, 
+  half_tulip_chin_plate, 
+  grooved_half_chin_plate, 
+  grooved_tulip_chin_plate, 
+  fillet, 
+  half_chin_plate, 
+  half_grooved_tulip_chin_plate, 
+  ks_base_plate, 
+  ks_base_plate_square_plate, 
+  tulip_full_plate, 
+  jezr_plate, 
+  jezr_ring_plate, 
+  jezc_plate, 
+  jezc_ring_plate, 
+  tab_bb_plate, 
+  mins_bb_plate, 
+  jezr_palm_plate, 
+  finger_ring_with_spacer, 
+  bb_finger_ring
+];
 
+
+/*
+function is_multiple(item, found_true) = (item && found_true)
+
+
+function get_number_of_renders() = 
+let (found_true = false)
+let (multiples = false)
+
+for[ ( item = items )
+    is_multiple(item, found_true) 
+    ? multiples = true 
+    : found_true = true 
+]
+echo multiples;
+*/
 
 number_of_cols = 4;
-// function get_translation_for_item(number_of_renders) = [ 60, 60, 0 ];
 function get_translation_for_item(item_number) = [
   80 * (item_number % number_of_cols),
   80 * floor(item_number / number_of_cols),
   0 ];
 
+function get_translation(item_number) =
+  multiple_items ? get_translation_for_item(item_number) : get_translation_for_item(0);
 
 
 if (palm_plate) {
   x_size = three_finger_width*0.25;
-  translate(get_translation_for_item(2))
+  translate(get_translation(2))
   palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
 if (palm_washer) {
   x_size = three_finger_width*0.25;
-  translate(get_translation_for_item(3))
+  translate(get_translation(3))
   rotate([180, 0, 0])
   palm_washer(palm_washer_radius, palm_washer_depth);
 }
 
 if (bolt_on_thumb_plate) {
-  translate(get_translation_for_item(4))
+  translate(get_translation(4))
   bolt_on_thumb_plate(botp_length, botp_depth, botp_height);
 }
 
 
 if (round_palm_plate) {
-  translate(get_translation_for_item(5)) rotate([180, 0, 0]) round_palm_plate();
+  translate(get_translation(5)) rotate([180, 0, 0]) round_palm_plate();
 }
 
 if (wedge_palm_plate) {
-  translate(get_translation_for_item(6)) rotate([180, 0, 0]) wedge_palm_plate();
+  translate(get_translation(6)) rotate([180, 0, 0]) wedge_palm_plate();
 }
 
 if (jezr_palm_plate) {
-  translate(get_translation_for_item(7)) jezr_palm_plate();
+  translate(get_translation(7)) jezr_palm_plate();
+}
+
+if (rounded_edge_plate) {
+  // translate(get_translation(38)) rounded_edge_plate();
+  translate(get_translation(0)) rounded_edge_plate();
 }
 
 if (tulip_chin_plate) {
-  translate(get_translation_for_item(8)) {
+  translate(get_translation(8)) {
     tulip_chin_plate(
       plate_offset=tulip_chin_plate_plate_offset,
       length=tulip_chin_plate_length,
@@ -255,7 +317,7 @@ if (tulip_chin_plate) {
 }
 
 if (half_tulip_chin_plate) {
-  translate(get_translation_for_item(9)) {
+  translate(get_translation(9)) {
     half_tulip_chin_plate(
       plate_offset=tulip_chin_plate_plate_offset,
       length=tulip_chin_plate_length,
@@ -268,11 +330,15 @@ if (half_tulip_chin_plate) {
 }
 
 if (bolt_on_plate) {
-  translate(get_translation_for_item(10)) bolt_on_plate(bop_length, bop_depth, bop_height, bop_slot_angle);
+  translate(get_translation(10)) bolt_on_plate(bop_length, bop_thickness, bop_height, bop_slot_angle);
+}
+
+if (bolt_on_plate_with_fillet) {
+  translate(get_translation(11)) bolt_on_plate_with_fillet(bop_length, bop_thickness, bop_height, bop_slot_angle);
 }
 
 if (fillet) {
-  translate(get_translation_for_item(11)) {
+  translate(get_translation(36)) {
     fillet(fillet_length, fillet_height) ;
   }
 }
@@ -280,11 +346,11 @@ if (fillet) {
 if (half_chin_plate) {
   // last param is whether to include a second fillet on outside of the base plate
   // stronger, but doesn't butt up well against edge of main base plate if used
-  translate(get_translation_for_item(12)) half_chin_plate(28, 15, 3.5);
+  translate(get_translation(12)) half_chin_plate(28, 15, 3.5);
 }
 
 if (grooved_tulip_chin_plate) {
-  translate(get_translation_for_item(13)) {
+  translate(get_translation(13)) {
     grooved_tulip_chin_plate(
       plate_offset=grooved_tulip_chin_plate_offset,
       length=grooved_tulip_chin_plate_length,
@@ -299,30 +365,30 @@ if (grooved_tulip_chin_plate) {
 }
 
 if (half_grooved_tulip_chin_plate) {
-  translate(get_translation_for_item(14)) {
+  translate(get_translation(14)) {
     half_grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
   }
 }
 
 if (grooved_half_chin_plate) {
-  translate(get_translation_for_item(15)) {
+  translate(get_translation(15)) {
     grooved_half_chin_plate(length=25, width=7, height=4, groove_tilt=0, groove_radius=16);
   }
 }
 
 if (ks_base_plate) {
-  translate(get_translation_for_item(30))
+  translate(get_translation(30))
   ks_base_plate(ks_base_plate_square_plate);
 }
 
 if (fixed_thumb_plate) {
-  translate(get_translation_for_item(33))
+  translate(get_translation(33))
   fixed_thumb_plate(0, fixed_thumb_plate_y_pos, 1, 1);
 }
 
 
 if (tulip_full_plate) {
-  translate(get_translation_for_item(16)) tulip_full_plate(
+  translate(get_translation(16)) tulip_full_plate(
     tulip_full_plate_plate_offset,
     tulip_full_plate_length,
     tulip_full_plate_width,
@@ -331,42 +397,42 @@ if (tulip_full_plate) {
 }
 
 if (jezr_plate) {
-  translate(get_translation_for_item(17)) jezr_plate();
+  translate(get_translation(17)) jezr_plate();
 }
 
 if (jezr_ring_plate) {
-  translate(get_translation_for_item(18)) jezr_ring_plate(initials, 1.1);
+  translate(get_translation(18)) jezr_ring_plate(initials, 1.1);
 }
 
 if (jezc_plate) {
-  translate(get_translation_for_item(19)) jezc_plate();
+  translate(get_translation(19)) jezc_plate();
 }
 
 if (jezc_ring_plate) {
-  translate(get_translation_for_item(20)) jezc_ring_plate(initials, jezc_ring_plate_scaling);
+  translate(get_translation(20)) jezc_ring_plate(initials, jezc_ring_plate_scaling);
 }
 
 
 if (pinky_trigger) {
-  translate(get_translation_for_item(32)) pinky_trigger(pin=pinky_trigger_pin, bolt_front=pinky_trigger_bolt_front);
+  translate(get_translation(32)) pinky_trigger(pin=pinky_trigger_pin, bolt_front=pinky_trigger_bolt_front);
 }
 
 if (finger_ring_with_spacer) {
- translate(get_translation_for_item(22))
+ translate(get_translation(22))
  rotate([0, 180, 0])
  finger_ring_with_spacer();
 }
 
 if (tab_bb_plate) {
-  translate(get_translation_for_item(23)) tab_bb_plate();
+  translate(get_translation(23)) tab_bb_plate();
 }
 
 if (mins_bb_plate) {
-  translate(get_translation_for_item(24)) mins_bb_plate();
+  translate(get_translation(24)) mins_bb_plate();
 }
 
 if (bb_finger_ring) {
-  translate(get_translation_for_item(25))
+  translate(get_translation(25))
    rotate([0, 180, 0])
   bb_finger_ring();
 }
@@ -632,6 +698,7 @@ module ring_plate_slots(scaling, x_scale) {
 }
 
 module nock_cutout(scaling=1, plate_height=10) {
+// overall size = 14x30;
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height*2) {
         polygon([
@@ -789,6 +856,47 @@ module jezr_palm_plate() {
       angled_slot(20*scaling, (tilted_slot_gap*slotno)+slot_y_offset3, thickness=jezr_palm_plate_depth);
     }
   }
+}
+
+module rounded_edge_plate(plate_length=65, plate_width=45, plate_height=3) {
+  scaling=65/plate_length;
+  vert_offset = 25;
+  horiz_offset = 4;
+  base_mount_gap = 92;
+  difference() {
+    translate([plate_length/2, plate_width/2, 0]) {
+      intersection() {
+        union() {
+        roundedcube(size=[plate_length, plate_width, plate_height], center=true, radius=1);
+        translate([vert_offset/2, horiz_offset/2, 0]) roundedcube(size=[plate_length-vert_offset, plate_width+horiz_offset, plate_height], center=true, radius=1);
+        }
+        translate([0-plate_length/1.8, 0, 0]) rotate([0,0,-10]) roundedcube(size=[plate_length*2, plate_width*2, plate_height], center=true, radius=1);
+      }
+    }
+    // slots for ring mount
+// module angled_slot(xpos, ypos, slot_angle=30, slot_length=5, slot_width=bolt_slot_width, scaling=1, thickness=thickness) {
+    // extra slots for ring mount
+    slot_from_back=20;
+    slot_length=12;
+    slot_from_top=9;
+    slot_gap=47;
+    angled_slot(slot_from_top, slot_from_back, slot_length=slot_length, slot_angle=90, thickness=jezr_palm_plate_depth+2);
+    angled_slot(slot_from_top+slot_gap, slot_from_back, slot_length=slot_length, slot_angle=90, thickness=jezr_palm_plate_depth);
+
+    nock_scaling=0.51;
+    nock_offset=6*nock_scaling;
+    translate([vert_offset+2,plate_width-nock_offset, -2 ]) {
+      rotate([0,0,90]) nock_cutout(nock_scaling);
+    }
+
+    // Initials
+    translate([25,15,0 ]) {
+      rotate([0,0,90])
+          initials_b();
+    }
+    angled_slot(5, 5, slot_length=30, slot_angle=10, thickness=jezr_palm_plate_depth+2);
+  }
+
 }
 
 module jezr_palm_plate_base(scaling, thickness) {
@@ -1066,35 +1174,19 @@ module scaled_tulip_base_plate(length, width, height) {
 }
 
 module half_tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_height=36, slot_angle=10) {
-  module tulip_plate(length, width, height) {
-    scaled_tulip_base_plate(length, width, height);
-  }
 
   union() {
     // plate
     translate([0,-2,-10+plate_offset]) {
       rotate([90,0,90]) {
-         tulip_plate(length, width, height);
+        intersection() {
+          scaled_tulip_base_plate(length, width, height);
+          translate([0,width/2,0]) {
+            roundedcube(size = [length, width, height], center = false, radius = 1, apply_to = "all");
+          }
+        }
       }
     }
-
-    // base_plate
-    translate([plate_height,0,0]) {
-      rotate([0,0,90]) {
-         chin_plate_base(plate_height, plate_height, thickness, bolt_slot_width, slot_angle);
-      }
-    }
-
-  translate([0,-5,0]) {
-    // plate fillet 1
-    x_mod=plate_height/2;
-    translate([height-1,x_mod+12,height-2]) {
-      rotate([90,0,0]) {
-         myfillet(plate_height/2,6);
-      }
-    }
-  }
-
   } // end main plate union
 }
 
@@ -1276,36 +1368,25 @@ module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, heigh
 }
 
 module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2) {
-  plate_thickness=4;
   difference() {
     union() {
       // plate
       translate([0.5,2,(width/2)-plate_offset]) {
-        rotate([90,180+angle,-90]) {
+        rotate([90,180+angle,-90-slot_angle]) {
              grooved_tulip_plate(angle, length, width, height, tilt);
         }
       }
       // base_plate
       translate([plate_height-(height/2)+3,2,0]) {
         rotate([0,0,90-slot_angle]) {
-           bolt_on_plate(plate_height*0.7, plate_thickness, plate_height, slot_angle=slot_angle);
-      }
-      }
-        // plate fillet 1
-        x_mod=plate_height*0.25;
-        translate([-1,x_mod*3,(plate_offset+plate_thickness*2)-1]) {
-          rotate([90,0,0]) {
-             myfillet(plate_height*0.5,plate_thickness*1.5);
-          }
+           bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
         }
+      }
     } // end main plate union
-    translate([plate_height/2, -plate_height/2, 0]) {
-       // cube([plate_height*2, plate_height, plate_height], true);
-    }
   } // end difference
 }
 
-module bolt_on_plate(length, depth, height, slot_angle=0) {
+module bolt_on_plate(length, thickness, height, slot_angle) {
     plate_edge_radius=2;
     tilted_slot_length=height*0.70;
     slot_pos_x=length/2;
@@ -1315,9 +1396,9 @@ module bolt_on_plate(length, depth, height, slot_angle=0) {
     union() {
       difference() {
         union() {
-          roundedcube(size=[length, height, depth], radius=plate_edge_radius);
+          roundedcube(size=[length, height, thickness], radius=plate_edge_radius);
           rotate([0, 0, slot_angle]) {
-            roundedcube(size=[length, height, depth], radius=plate_edge_radius);
+            roundedcube(size=[length, height, thickness], radius=plate_edge_radius);
           }
           translate([rounded_radius, 0, 0]) {
             chamfercyl(rounded_radius,thickness,-2,-2);
@@ -1326,6 +1407,28 @@ module bolt_on_plate(length, depth, height, slot_angle=0) {
       translate([slot_pos_x,slot_pos_y,1]) {
         rotate([0,0, slot_rotation]) {
           bar(tilted_slot_length,bolt_slot_width,slot_depth,0);
+        }
+      }
+    }
+  }
+}
+
+module bolt_on_plate_with_fillet(length, thickness, height, slot_angle, double_fillet=false) {
+  fillet_length=length*0.9;
+  fillet_trans_mod = 1.5;
+  fillet_trans=length-fillet_length-fillet_trans_mod;
+  union() {
+    bolt_on_plate(length, thickness, height, slot_angle);
+    if (right_handed) {
+      translate([fillet_length,height, 0]) {
+        rotate([90,90,-90]) {
+           myfillet(fillet_length,thickness*1.5);
+        }
+      }
+    } else {
+      translate([fillet_trans, height, thickness*0.75]) {
+        rotate([0,-90,180]) {
+           myfillet(fillet_length,thickness*1.5);
         }
       }
     }
@@ -1411,7 +1514,7 @@ module myfillet(length, side) {
     difference() {
       cube([side,side,length]);
       translate([side+1,side+1,-1]) {
-      cylinder(length+2,side,side,$fn=200);
+      cylinder(length+2,side,side);
       }
     }
 }
