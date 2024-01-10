@@ -1,3 +1,6 @@
+include <./lib/chamfer_extrude.scad>; 
+include <./lib/prism-chamfer.scad>;
+
 
 /* [Global User Variables] */
 
@@ -661,10 +664,8 @@ module nock_cutout(scaling=1, plate_height=10) {
 }
 
 module jc_base_plate(scaling, plate_height=thickness) {
-  scale([scaling, scaling, 1]) {
-    linear_extrude(height = plate_height) {
-      translate([66, 72, 0]) {
-        polygon([
+
+  polygon_points = [
         // top index finger front
         [58,54], [58,20],
         // middle and ring finger front
@@ -678,15 +679,24 @@ module jc_base_plate(scaling, plate_height=thickness) {
         // rear top join
         [-11,37],
         // top lifeline curve
-        [-10,40],[-9,44],[-6,51],[-1,57],
+        [-10,48],[-8,55],[-6,59],[-4,61],
         // top curve
-        [9,61],[12,62],[38,62],[48,62],
+        [-2,62],[48,62],
         // top front join curve
         [54,59],[57,55],[58,52]
-        ]);
-      }
+        ];
+
+  scale([scaling, scaling, 1]) {
+    translate([66, 72, 0]) {
+      difference() {
+        linear_extrude(height = plate_height) {
+          polygon(polygon_points, convexity=2);
+        }
+        prism_chamfer_mask(polygon_points, start_edge=0, end_edge=len(polygon_points), height=0,
+                     side=3.0, side2=2, corner_slope="deep");
     }
   }
+}
 }
 
 module jc_base_plate_larger(scaling, plate_height=thickness) {
@@ -806,7 +816,7 @@ module jezr_palm_plate() {
   }
 }
 
-module rounded_edge_plate(plate_length=65, plate_width=45, plate_height=3) {
+module rounded_edge_plate(plate_length=65, plate_width=45, plate_height=thickness) {
   scaling=65/plate_length;
   vert_offset = 25;
   horiz_offset = 4;
