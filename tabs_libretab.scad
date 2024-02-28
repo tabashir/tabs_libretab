@@ -1129,7 +1129,9 @@ module scaled_tulip_base_plate(length, width, height) {
     base_width=30;
     base_height=2;
     intersection() {
-      radiusedblock(base_length,base_width,base_height,base_height);
+      translate([base_length/8,0,0]) { 
+        radiusedblock(base_length,base_width,base_height,base_height);
+      }
       translate([36,80,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
       translate([36,-55,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
       translate([-base_length/5,-base_length-6,0]) { rotate([0,0,45]) {
