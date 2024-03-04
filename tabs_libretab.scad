@@ -143,6 +143,12 @@ jezr_plate=false;
 // Smaller version of jezr for use with finger ring only
 jezr_ring_plate=false;
 
+// update to jezr_ring for use with finger ring only
+jezr_ring_plate_2=false;
+
+// wider version of jezr for use with finger ring only
+jezr_ring_plate_3=false;
+
 // jezr with rear palm plate mounting cut off, cinch band and slots
 jezc_plate=false;
 
@@ -355,6 +361,14 @@ if (jezr_ring_plate) {
   translate(get_translation(18)) jezr_ring_plate(initials, 1.1);
 }
 
+if (jezr_ring_plate_2) {
+  translate(get_translation(38)) jezr_ring_plate_2(initials, 1.1);
+}
+
+if (jezr_ring_plate_3) {
+  translate(get_translation(39)) jezr_ring_plate_3(initials, 1.1);
+}
+
 if (jezc_plate) {
   translate(get_translation(19)) jezc_plate();
 }
@@ -400,7 +414,7 @@ module jezr_ring_plate(initials, x_scale=1) {
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
-    ww_base_plate_new(scaling);
+    ww_base_plate(scaling);
     translate([-8, 0, 0]) ring_plate_slots(scaling, x_scale);
 
     // Initials
@@ -419,6 +433,112 @@ module jezr_ring_plate(initials, x_scale=1) {
     // palm pad slot
     angled_slot(18, 54, 48, 10, scaling=scaling);
   }
+}
+
+module jezr_ring_plate_2(initials, x_scale=1) {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    ww_base_plate_2(scaling);
+    translate([-8, 0, 0]) ring_plate_slots(scaling, x_scale);
+
+    // Initials
+    translate([35*x_scale, 50*scaling, 0 ]) {
+      translate([0, 20, thickness/1.5]) {
+        initials_a();
+      }
+    }
+    // chin or thumb rest slots
+    angled_slot(106*scaling, 180*scaling, 70, 15, scaling=scaling);
+
+    // pinky mount slot
+    angled_slot(45, 44, -22, 20, scaling=scaling);
+    // angled_slot(85, 13, -3, 10, scaling=scaling);
+
+    // palm pad slot
+    angled_slot(18, 54, 48, 10, scaling=scaling);
+  }
+}
+
+module jezr_ring_plate_2(initials, x_scale=1) {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    ww_base_plate_2(scaling);
+    translate([-8, 0, 0]) ring_plate_slots(scaling, x_scale);
+
+    // Initials
+    translate([35*x_scale, 50*scaling, 0 ]) {
+      translate([0, 20, thickness/1.5]) {
+        initials_a();
+      }
+    }
+    // chin or thumb rest slots
+    angled_slot(106*scaling, 180*scaling, 70, 15, scaling=scaling);
+
+    // pinky mount slot
+    angled_slot(45, 44, -22, 20, scaling=scaling);
+    // angled_slot(85, 13, -3, 10, scaling=scaling);
+
+    // palm pad slot
+    angled_slot(18, 54, 48, 10, scaling=scaling);
+  }
+}
+
+module jezr_ring_plate_3(initials, x_scale=1) {
+  // Tab sketch is 96px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/96;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    ww_base_plate_3(scaling);
+    translate([7, -23, 0]) ring_plate_slots_3(scaling);
+
+    // nock cutout
+    translate([27, 2, -2 ]) {
+      scale([1,0.7,1]) {
+        nock_cutout(scaling);
+      }
+    }
+
+    // Initials
+      translate([-18, -29, thickness/1.5]) {
+        initials_a();
+      }
+    // chin or thumb rest slots
+    angled_slot(-18*scaling, 0*scaling, 70, 25*scaling, scaling=scaling);
+
+    // palm pad slots
+    angled_slot(-20*scaling, -20*scaling, 36, 19*scaling, scaling=scaling);
+    angled_slot(-38*scaling, -32*scaling, 78, 15*scaling, scaling=scaling);
+  }
+}
+
+module ring_plate_slots_3(scaling) {
+    // bolt slots to secure tab
+    bolt_slot_len=14;
+    angled_slot(-8, 0, 0, slot_length=26, scaling=scaling);
+    angled_slot(0, 62, 0, slot_length=bolt_slot_len, slot_width=6, scaling=scaling);
+    other_slot_len=18;
+    translate([-3, 12, 0]){
+      angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
+      angled_slot(4, 8, 0, slot_length=other_slot_len*scaling);
+      angled_slot(0, 16, 0, slot_length=other_slot_len*scaling);
+      angled_slot(2, 24, 0, slot_length=other_slot_len*scaling);
+    }
 }
 
 module jezr_plate() {
@@ -476,7 +596,37 @@ module jezr_plate() {
   }
 }
 
-module ww_base_plate_new(scaling) {
+module ww_base_plate(scaling) {
+  scale([scaling, scaling, 1]) {
+    linear_extrude(height = thickness) {
+      translate([66, 72, 0]) {
+        polygon([
+        // top index finger front
+        [58,64], [58,42],
+        // nock cutout
+        [50,32],[50,18],
+        // middle and ring finger front
+        [64,9],[64,-48],
+        // bottom front curve
+        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-70],[7,-66],
+        // rear bottom join
+        [-7,-60],[-20,-53],[-42,-40],
+        // rear curve
+        [-58,-18],[-61,-13],[-62,-7],[-62,0],[-61,4],[-58,9],
+        // top lifeline curve
+        [-54,14],[-52,15],[-48,18],[-37,25],[-23,32],[-10,48],[3,63],
+        // top curve
+        [10,68],[23,72],[38,72],
+        // top front join curve
+        [51,72],[55,70],[56,69],[58,67]
+        ]);
+      }
+    }
+  }
+}
+
+
+module ww_base_plate_2(scaling) {
   scale([scaling, scaling, 1]) {
     linear_extrude(height = thickness) {
       translate([66, 72, 0]) {
@@ -508,35 +658,26 @@ module ww_base_plate_new(scaling) {
   }
 }
 
+module ww_base_plate_3(scaling) {
+  // translate([38, 52, 0]) {
+    scale([scaling, scaling, 1]) {
+      linear_extrude(height = thickness) {
+        difference() {
+          polygon([[38,41],[41,39],
+          // cutout
+          [41,24],[40,23],[39,23],[37,21],[37,5],[40,3],[44,3],[45,2],
+          // end cutout
 
-module ww_base_plate(scaling) {
-  scale([scaling, scaling, 1]) {
-    linear_extrude(height = thickness) {
-      translate([66, 72, 0]) {
-        polygon([
-        // top index finger front
-        [58,64], [58,42],
-        // nock cutout
-        [50,32],[50,18],
-        // middle and ring finger front
-        [64,9],[64,-48],
-        // bottom front curve
-        [62,-55],[59,-61],[54,-66],[50,-69],[45,-71],[38,-72],[31,-72],[20,-70],[7,-66],
-        // rear bottom join
-        [-7,-60],[-20,-53],[-42,-40],
-        // rear curve
-        [-58,-18],[-61,-13],[-62,-7],[-62,0],[-61,4],[-58,9],
-        // top lifeline curve
-        [-54,14],[-52,15],[-48,18],[-37,25],[-23,32],[-10,48],[3,63],
-        // top curve
-        [10,68],[23,72],[38,72],
-        // top front join curve
-        [51,72],[55,70],[56,69],[58,67]
-        ]);
+          [45,-33],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-1,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-36,-32],[-38,-29],[-39,-27],[-40,-24],[-41,-20],[-41,-16],[-40,-12],[-38,-8],[-36,-6],[-32,-3],[-28,-1],[-25,1],[-22,5],[-21,8],[-19,13],[-17,19],[-15,24],[-13,28],[-11,31],[-9,34],[-6,37],[-3,39],[0,40],[4,41]]);
+          polygon([[25,30],[15,30],[15,29],[25,29]]);
+          polygon([[25,-28],[15,-28],[15,-29],[25,-29]]);
+        }
       }
     }
-  }
+  // }
 }
+
+
 
 module jezc_plate() {
   // Tab sketch is 144px high
@@ -615,7 +756,7 @@ module jezc_ring_plate(initials, x_scale=1) {
     // chin or thumb rest slots
     slot_y_offset=38*scaling;
     for (slotno=[1:1:4]) {
-      angled_slot(69*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
+      0angled_slot(69*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
     }
 
 
