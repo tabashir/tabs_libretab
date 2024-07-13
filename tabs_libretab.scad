@@ -69,6 +69,7 @@ bop_thickness=4;
 // bolt-on-thumb-plate height proportion to main plate size
 bop_height=30;
 bop_slot_angle=4;
+bop_slot_width=5;
 
 /* [Fillet] */
 fillet=false;
@@ -146,6 +147,9 @@ tulip_full_plate_height=1.75;
 
 /* [Tab Plates] */
 
+// bump slots up or down relative to the plate
+slots_y_adjust=0;
+
 // Loosely based on WW EZR plate, with slots for cinch band and holes for finger ring
 jezr_plate=false;
 
@@ -195,7 +199,7 @@ finger_ring_with_spacer=false;
 
 // spacer ring variables
 // width around your middle finger
-ring_finger_circumference=76;
+ring_finger_circumference=78;
 // 1=loose, reduce to make tighter
 ring_snug_factor=1;
 // reduce if very small hands, too small may make the ring too weak.
@@ -296,11 +300,11 @@ if (half_tulip_chin_plate) {
 }
 
 if (bolt_on_plate) {
-  translate(get_translation(10)) bolt_on_plate(bop_length, bop_thickness, bop_height, bop_slot_angle);
+  translate(get_translation(10)) bolt_on_plate(bop_length, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
 }
 
 if (bolt_on_plate_with_fillet) {
-  translate(get_translation(11)) bolt_on_plate_with_fillet(bop_length, bop_thickness, bop_height, bop_slot_angle);
+  translate(get_translation(11)) bolt_on_plate_with_fillet(bop_length, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
 }
 
 if (fillet) {
@@ -515,18 +519,18 @@ module jezr_ring_plate_3(initials, x_scale=1) {
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
-    ww_base_plate_3(scaling);
+    translate([0, slots_y_adjust, 0]) ww_base_plate_3(scaling);
     translate([7, -23, 0]) ring_plate_slots_3(scaling);
 
     // nock cutout
-    translate([27, 2, -2 ]) {
+    translate([27, 0, -2 ]) {
       scale([1,0.7,1]) {
         nock_cutout(scaling);
       }
     }
 
     // Initials
-      translate([-18, -29, thickness/1.5]) {
+      translate([-18, slots_y_adjust-29, thickness/1.5]) {
         initials_a();
       }
     // chin or thumb rest slots
@@ -541,8 +545,8 @@ module jezr_ring_plate_3(initials, x_scale=1) {
 module ring_plate_slots_3(scaling) {
     // bolt slots to secure tab
     bolt_slot_len=14;
-    angled_slot(-8, 0, 0, slot_length=26, scaling=scaling);
-    angled_slot(0, 62, 0, slot_length=bolt_slot_len, slot_width=6, scaling=scaling);
+    angled_slot(-8, 0, 0, slot_length=22, slot_width=5.5, scaling=scaling);
+    angled_slot(0, 62, 0, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
     other_slot_len=18;
     translate([-3, 12, 0]){
       angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
@@ -680,8 +684,8 @@ module ww_base_plate_3(scaling) {
           // end cutout
 
           [45,-33],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-1,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-36,-32],[-38,-29],[-39,-27],[-40,-24],[-41,-20],[-41,-16],[-40,-12],[-38,-8],[-36,-6],[-32,-3],[-28,-1],[-25,1],[-22,5],[-21,8],[-19,13],[-17,19],[-15,24],[-13,28],[-11,31],[-9,34],[-6,37],[-3,39],[0,40],[4,41]]);
-          polygon([[25,30],[15,30],[15,29],[25,29]]);
-          polygon([[25,-28],[15,-28],[15,-29],[25,-29]]);
+          // polygon([[25,30],[15,30],[15,29],[25,29]]);
+          // polygon([[25,-28],[15,-28],[15,-29],[25,-29]]);
         }
       }
     }
@@ -915,24 +919,36 @@ module jc_base_plate_old(scaling, plate_height=thickness) {
 
 module bb_base_plate(scaling, plate_height=thickness) {
 
+    polygon_points = [
+      // middle and ring finger front
+      [64,127], [64,3],
+      // bottom front curve
+      [61,0],[31,1],[20,5],
+      // rear bottom join
+      [7,20], [0,39],
+      // top rear corner
+      [20,132], [22,134], [26,136],
+      // top
+      [48,140],[62,140],[64,138]
+    ];
+
+  module chamfered_polygon() {
+    difference() {
+      linear_extrude(height = plate_height) {
+        polygon(polygon_points, convexity=2);
+      }
+      prism_chamfer_mask(polygon_points, 
+      start_edge=0, 
+      end_edge=13 
+     //  height=plate_height,
+     // side=1.0,  corner_slope="medium"
+     );
+    }
+  }
+
   difference() {
     scale([scaling, scaling, 1]) {
-      linear_extrude(height = plate_height) {
-          polygon([
-          // top index finger front
-          [64,127],
-          // middle and ring finger front
-          [64,75],[64,3],
-          // bottom front curve
-          [61,0],[31,1],[20,5],
-          // rear bottom join
-          [7,20], [0,39],
-          // top rear corner
-          [20,132], [22,134], [26,136],
-          // top
-          [48,140],[62,140],[64,138]
-          ]);
-      }
+      chamfered_polygon();
     }
     // bolt holes to secure tab
     translate([34*scaling, 22*scaling, -z_slot_offset]) {
@@ -940,6 +956,10 @@ module bb_base_plate(scaling, plate_height=thickness) {
     }
     translate([34*scaling, 120*scaling, -z_slot_offset]) {
       cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    }
+    // Initials
+    translate([12, 20, thickness]) {
+      initials_b();
     }
   }
 
@@ -1445,7 +1465,7 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
   } // end difference
 }
 
-module bolt_on_plate(length, thickness, height, slot_angle) {
+module bolt_on_plate(length, thickness, height, slot_angle, slot_width=bolt_slot_width) {
     plate_edge_radius=2;
     tilted_slot_length=height*0.70;
     slot_pos_x=length/2;
@@ -1460,24 +1480,24 @@ module bolt_on_plate(length, thickness, height, slot_angle) {
             roundedcube(size=[length, height, thickness], radius=plate_edge_radius);
           }
           translate([rounded_radius, 0, 0]) {
-            chamfercyl(rounded_radius,thickness,-2,-2);
+            chamfercyl(rounded_radius,thickness*0.98,-plate_edge_radius,-plate_edge_radius);
           }
         }
       translate([slot_pos_x,slot_pos_y,1]) {
         rotate([0,0, slot_rotation]) {
-          bar(tilted_slot_length,bolt_slot_width,slot_depth,0);
+          bar(tilted_slot_length,slot_width,slot_depth,0);
         }
       }
     }
   }
 }
 
-module bolt_on_plate_with_fillet(length, thickness, height, slot_angle, double_fillet=false) {
+module bolt_on_plate_with_fillet(length, thickness, height, slot_angle, slot_width=bolt_slot_width, double_fillet=false) {
   fillet_length=length*0.9;
   fillet_trans_mod = 1.5;
   fillet_trans=length-fillet_length-fillet_trans_mod;
   union() {
-    bolt_on_plate(length, thickness, height, slot_angle);
+    bolt_on_plate(length, thickness, height, slot_angle, slot_width);
     if (right_handed) {
       translate([fillet_length,height, 0]) {
         rotate([90,90,-90]) {
@@ -1571,6 +1591,11 @@ module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth,
   z_move = right_handed ? 0 : ring_spacer_plate_thickness;
   // z_move = right_handed ? ring_spacer_plate_thickness-0.5 : 0.5;
 
+  translate([9,-26,1]) {
+    rotate([ring_rotation,90,0]) {
+      myfillet(ring_depth-2, 6);
+    }
+  }
   translate([0,0,z_move]) {
     rotate([ring_rotation,0,0]) {
       // finger spacer
@@ -1769,7 +1794,6 @@ module finger_ring_with_spacer() {
       //   angled_slot(57*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=11);
       // }
       //
-
       translate([30*scaling, 0, -1]) {
             // cube([40*scaling,150*scaling,ring_spacer_plate_thickness+2]);
       }
@@ -1950,9 +1974,10 @@ module initials_a() {
 }
 
 module initials_b() {
-  rotate([0,0,0]) {
+rotation = right_handed ? 180 : 0;
+  rotate([0,rotation,0]) {
     linear_extrude(height = thickness*2) {
-      text(initials, font = initials_font, size=8 );
+      text(initials, font = initials_font, size=7, halign="center" );
     }
   }
 }
@@ -2118,6 +2143,188 @@ module roundedcube(size = [1, 1, 1], center = false, radius = 0.5, apply_to = "a
 	}
 }
 
+//==============================================================================
+//
+//           prism-chamfer - the missing chamfer tool for OpenSCAD
+//
+// Author:  Heath Raftery
+// Origin:  http://github.com/hraftery/prism-chamfer
+// License: GPLv3, see LICENSE for terms.
+//
+// See the accompanying README for instructions on use.
+//
+//==============================================================================
+
+
+//===========
+// Variables
+//===========
+
+ff=0.001; // Fudge factor: amount of extra mask to prevent zero thickness planes.
+
+
+//===========
+// Functions
+//===========
+
+function translate_towards(p0, p1, dist) = p0 + (dist/norm(p1-p0))*(p1-p0);
+function min_index(v, only_first=false) = search(min(v), v, only_first?1:0);
+function max_index(v, only_first=false) = search(max(v), v, only_first?1:0);
+function mod(a,n) = (a+n)%n; // add support for (slightly) negative modulo
+
+//Find the cartesian angle of a vector from p0 to p1.
+//Note contrary to docs, atan2 returns [-180,180]
+function angle_of(p0, p1) = atan2(p1.y-p0.y, p1.x-p0.x);
+
+//Calculate angle halfway between the angles of a vertex.
+//Ref: https://math.stackexchange.com/a/4750179/787256
+function corner_angle(p0, p1, p2) =
+  let (a0       = angle_of(p0,p1),
+       a1       = angle_of(p1,p2),
+       deltaA   = a1 - a0,
+       inner_dA = deltaA < -180 ? deltaA + 360 :
+                  deltaA >  180 ? deltaA - 360 :
+                                  deltaA)
+    a0 + (inner_dA/2);
+
+//Return the three points that define the vertex at the point specified
+function vertex_points(polygon_points, point_index) =
+  let (num_pts = len(polygon_points))
+    [ polygon_points[mod(point_index-1, num_pts)],
+      polygon_points[mod(point_index  , num_pts)],
+      polygon_points[mod(point_index+1, num_pts)] ];
+
+//Determine orientation of polygon. Ref:
+//  https://en.wikipedia.org/wiki/Curve_orientation#Orientation_of_a_simple_polygon
+function is_polygon_orientation_clockwise(polygon_points) =
+  let (min_x_indices                = min_index([for (pt = polygon_points) pt.x]),
+       min_y_index_in_min_x_indices = min_index([for (i = min_x_indices) polygon_points[i].y]),
+       min_x_min_y_index            = min_x_indices[min_y_index_in_min_x_indices[0]],
+       vertex_pts                   = vertex_points(polygon_points, min_x_min_y_index))
+    is_vertex_convex(vertex_pts, true);
+
+function is_vertex_convex(pts, cw) =
+  let (A = pts[0], B = pts[1], C = pts[2],
+       //This determinate calc is the same as cross(AB,BC). But we have points,
+       //so use the simplification from the polygon orientation reference above.
+       det = (B.x-A.x)*(C.y-A.y) - (C.x-A.x)*(B.y-A.y),
+       right_turn = det < 0)
+    cw == right_turn; //right turns are convex when going cw, and vice-versa
+
+
+//===========
+//  Modules  
+//===========
+
+//Create masks for 1 or more prism edges and any corners in between.
+//See "prism-chamfer_demo.scad" for a description of the arguments.
+module prism_chamfer_mask(polygon_pts, start_edge=0, end_edge=0, height=0,
+                          side=1, side2=0, corner_slope="medium") {
+  num_pts = len(polygon_pts);
+  assert(num_pts >= 3);
+  assert(end_edge >= start_edge);
+  // Allow specifying edges past the first point, in the -ve or +ve direction,
+  // up to but not including a complete rotation. Allows the corner at the
+  // first point to be included in a contiguous range.
+  assert(start_edge > -num_pts && end_edge < 2*num_pts);
+  
+  points = [ for(i = [start_edge:end_edge+1])
+             [polygon_pts[mod(i,num_pts)].x, polygon_pts[mod(i,num_pts)].y, height] ];
+  
+  cw = is_polygon_orientation_clockwise(polygon_pts);
+  
+  include_start = is_vertex_convex(vertex_points(polygon_pts, start_edge), cw);
+  include_end   = is_vertex_convex(vertex_points(polygon_pts, end_edge+1), cw);
+  
+  prism_chamfer_mask_raw(points, side, side2, cw,
+                         corner_slope  = corner_slope,
+                         include_start = include_start,
+                         include_end   = include_end);
+}
+
+//Create masks for 1 or more prism edges and any corners inbetween,
+//but their points and end conditions must be specified.
+module prism_chamfer_mask_raw(points, side=1, side2=0, cw=false, top=undef,
+                              corner_slope="medium", include_start=false, include_end=false) {
+  num_points = len(points);
+  assert(num_points>1);
+  for(i = [0:num_points-2]) {
+    prism_chamfer_mask_e(points[i], points[i+1], side, side2, cw, top,
+                         include_p0 = i==0            ? include_start : true,
+                         include_p1 = i==num_points-2 ? include_end   : true);
+    
+    if(i<num_points-2) {
+      prism_chamfer_mask_c(points[i], points[i+1], points[i+2], side, side2, cw, top,
+                           slope = corner_slope);
+    }
+  }
+}
+
+//Create a chamfer mask for a single prism edge.
+module prism_chamfer_mask_e(p0, p1, side=1, side2=0, cw=false, top=undef,
+                            include_p0=true, include_p1=true) {
+  side2 = side2 == 0 ? side : side2;    //set sides equal unless side2 is specified
+  top = is_undef(top) ? p0.z > 0 : top; //set top to positivity of z unless specified
+  assert(p0.z == p1.z); //only points in the same x-y plane are supported
+  assert(side>0 && side2>0);
+  assert(p0!=p1);
+
+  //Conditional transforms don't seem to be supported. Fortunately mirror
+  //seems to be a nop if the argument is [0,0,0], so we can use a variable
+  //and this dodgy conditional assignment construct instead:
+  mr_args = (!top &&  cw) ? [[1,0,0],[ 90,0,-90]] : //bottom, cw
+            ( top &&  cw) ? [[0,0,0],[-90,0,-90]] : //top, cw
+            ( top && !cw) ? [[1,0,0],[-90,0, 90]] : //top, ccw
+                            [[0,0,0],[ 90,0, 90]];  //bottom, ccw
+    
+  length = norm(p1-p0) + (include_p0?ff:-ff) + (include_p1?ff:-ff);
+  p0_fudged = translate_towards(p0, p1, include_p0?-ff:ff); //shift p0 fwd or back by fudge factor
+  translate(p0_fudged) rotate([0, 0, angle_of(p0, p1)]) //align with p0 -> p1
+    mirror(mr_args[0]) rotate(mr_args[1]) //orient to x-y plane, in +x direction
+      linear_extrude(height=length)
+        polygon([[-ff,-ff],[side,-ff],[-ff,side2]]);
+}
+
+//Create a chamfer mask for the corner between two prism edges.
+module prism_chamfer_mask_c(p0, p1, p2, side=1, side2=0, cw=false, top=undef,
+                            slope="medium") {
+  side2 = side2 == 0 ? side : side2;    //set sides equal unless side2 is specified
+  top = is_undef(top) ? p0.z > 0 : top; //set top to positivity of z unless specified
+  assert(p0.z == p1.z && p1.z == p2.z); //only points in the same x-y plane are supported
+  assert(side>0 && side2>0);
+  assert(p0!=p1 && p1!=p2 && p0!=p2);
+  
+  corner_angle = corner_angle(p0, p1, p2);
+  
+  if(is_vertex_convex([p0,p1,p2],cw)) {
+    //no mask needed for outside corners
+  }
+  else if(slope=="deep") {    //then carve out as much as possible
+    intersection() {
+      //Just extend the two edge chamfers so they overlap fully.
+      prism_chamfer_mask_e(p1, translate_towards(p1,p0,-side), side, side2, cw, top);
+      prism_chamfer_mask_e(translate_towards(p1,p2,-side), p1, side, side2, cw, top);
+    }
+  }
+  else if(slope=="shallow") { //then carve out as little as possible. Inspired by corner-tools.scad
+    translate(p1) rotate([0, 0, corner_angle])
+      rotate([0, 0, 45]) //rotate to put it symmetrical around the x axis
+        polyhedron(points = [[-ff,-ff,ff], [side,-ff,ff], [-ff,side,ff], [-ff,-ff,-side2]],
+                   faces  = [[0,2,1], [0,1,3], [0,3,2], [1,2,3]],
+                   convexity = 100);
+  }
+  else {                      //otherwise, do a "medium" half-way corner
+    c0 = [p1.x - side*cos(corner_angle), p1.y - side*sin(corner_angle), p1.z];
+    c1 = [p1.x + side*cos(corner_angle), p1.y + side*sin(corner_angle), p1.z];
+    intersection() {
+      //Same as "deep", but also intersect a third mask with angle half-way between
+      //the first two. c0 and c1 just extend the edge either side of the corner point.
+      prism_chamfer_mask_e(p1, translate_towards(p1,p0,-side), side, side2, cw, top);
+      prism_chamfer_mask_e(translate_towards(p1,p2,-side), p1, side, side2, cw, top);
+      prism_chamfer_mask_e(c0, c1, side, side2, cw, top);
+    }
+  }
+}
 // end third party modules
 
 
