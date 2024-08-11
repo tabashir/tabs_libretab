@@ -5,7 +5,7 @@ include <./lib/prism-chamfer.scad>;
 /* [Global User Variables] */
 
 // This will lay items out on plate. If you are working on one item, unset.
-multiple_items=true;
+multiple_items=false;
 
 thickness=4;
 three_finger_width=65;
@@ -194,10 +194,13 @@ botp_depth=18;
 botp_height_mod=0.38;
 
 
-/* [Ring Spacer Plate] */
+/* [Ring Plates] */
+
+// Ring without finger spacer
+bb_finger_ring=false;
+// Ring with finger spacer
 finger_ring_with_spacer=false;
 
-// spacer ring variables
 // width around your middle finger
 ring_finger_circumference=78;
 // 1=loose, reduce to make tighter
@@ -206,6 +209,7 @@ ring_snug_factor=1;
 ring_thickness=4;
 // how wide the band is from front>back of the tab
 ring_depth=15;
+
 // Different shaped Spacer blocks
 spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, jez_spacer_v3.stl, jez_spacer_v3.1.stl, cphughes_tab_spacer.stl]
 // stretch the spacer from front>back
@@ -217,8 +221,7 @@ ring_spacer_forward_mod=2;
 // too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=2.5;
 
-/* [Barebow Ring Spacer Plate] */
-bb_finger_ring=false;
+
 
 /* [Global Calculated Variables] */
 tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
@@ -939,7 +942,9 @@ module bb_base_plate(scaling, plate_height=thickness) {
       }
       prism_chamfer_mask(polygon_points, 
       start_edge=0, 
-      end_edge=13 
+      end_edge=13,
+      side=1,
+      side2=0
      //  height=plate_height,
      // side=1.0,  corner_slope="medium"
      );
@@ -947,19 +952,19 @@ module bb_base_plate(scaling, plate_height=thickness) {
   }
 
   difference() {
+    z_miror = right_handed ? 0 : 1;
     scale([scaling, scaling, 1]) {
+
+    mirror([0,0,z_miror])
       chamfered_polygon();
     }
+    holes_x_offset=38+ring_spacer_forward_mod;
     // bolt holes to secure tab
-    translate([34*scaling, 22*scaling, -z_slot_offset]) {
-      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+    translate([holes_x_offset*scaling, 22*scaling, -slot_depth]) {
+      cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
-    translate([34*scaling, 120*scaling, -z_slot_offset]) {
-      cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-    }
-    // Initials
-    translate([12, 20, thickness]) {
-      initials_b();
+    translate([holes_x_offset*scaling, 120*scaling, -slot_depth]) {
+      cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
     }
   }
 
@@ -1864,7 +1869,7 @@ module bb_finger_ring() {
 
   $fn=100;
 
-  ring_x_offset=36;
+  ring_x_offset=36+ring_spacer_forward_mod;
   ring_y_offset=100;
 
   union() {
@@ -1921,6 +1926,13 @@ module tab_bb_plate() {
       long_slot = (slot % 2) == 0;
       slot_len = long_slot ? 3 : 6;
       fingernail_slot(64-(slot_len*2), 10+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
+    }
+    
+    initial_translation = right_handed ? thickness : -thickness;
+    // Initials
+    translate([12, 20, initial_translation]) {
+      scale([1,1,3])
+      initials_b();
     }
 
   }
