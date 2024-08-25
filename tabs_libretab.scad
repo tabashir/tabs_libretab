@@ -102,32 +102,35 @@ tulip_chin_plate_slot_angle=0;
 grooved_half_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
 
-/* [Grooved Tulip Chin Plate] */
+/* [Grooved Chin Plate] */
 grooved_tulip_chin_plate=false;
 // how far from centre the mount plate is
-grooved_tulip_chin_plate_offset=-1;
+grooved_oval_chin_plate=false;
+
+// how far from centre the mount plate is
+grooved_chin_plate_offset=-1;
 // how long the plate is - likely you want the same as the tab width
-grooved_tulip_chin_plate_length=38;
+grooved_chin_plate_length=38;
 // how wide the plate on the top is
-grooved_tulip_chin_plate_width=30;
+grooved_chin_plate_width=30;
 // how thick the top plate is
-grooved_tulip_chin_plate_height=6;
+grooved_chin_plate_height=6;
 // the angle that the plate is to the base plate
-grooved_tulip_chin_plate_angle=0;
+grooved_chin_plate_angle=0;
 // this tilts the groove from back->front slightly
-grooved_tulip_chin_plate_tilt=0;
+grooved_chin_plate_tilt=0;
 // top->bottom height of the mounting plate
-grooved_tulip_chin_plate_plate_height=30;
+grooved_chin_plate_plate_height=30;
 // the angle of the mount plate slot from vertical
-grooved_tulip_chin_plate_slot_angle=1;
+grooved_chin_plate_slot_angle=1;
 // move the mount plate forward/back
-grooved_tulip_chin_plate_longitudinal_offset=-5;
+grooved_chin_plate_longitudinal_offset=-5;
 // move the mount plate up/down
-grooved_tulip_chin_plate_vertical_offset=-1;
+grooved_chin_plate_vertical_offset=-1;
 // radius of the cylinder used to make the groove
-grooved_tulip_chin_plate_radius_mod=0.9;
+grooved_chin_plate_radius_mod=0.9;
 // the larger this is, the less is cut off the front
-grooved_tulip_chin_plate_front_cutoff_mod=7;
+grooved_chin_plate_front_cutoff_mod=7;
 
 /* [Base Plate] */
 ks_base_plate=false;
@@ -203,8 +206,6 @@ finger_ring_with_spacer=false;
 
 // width around your middle finger
 ring_finger_circumference=78;
-// 1=loose, reduce to make tighter
-ring_snug_factor=1;
 // reduce if very small hands, too small may make the ring too weak.
 ring_thickness=4;
 // how wide the band is from front>back of the tab
@@ -219,7 +220,7 @@ ring_spacer_width_mod=1.1;
 // greater than 0 shifts ring and spacer forward
 ring_spacer_forward_mod=2;
 // too small will likely weaken the attachment to rest of tab
-ring_spacer_plate_thickness=2.5;
+ring_spacer_plate_thickness=3.5;
 
 
 
@@ -319,16 +320,33 @@ if (fillet) {
 if (grooved_tulip_chin_plate) {
   translate(get_translation(13)) {
     grooved_tulip_chin_plate(
-      plate_offset=grooved_tulip_chin_plate_offset,
-      length=grooved_tulip_chin_plate_length,
-      width=grooved_tulip_chin_plate_width,
-      height=grooved_tulip_chin_plate_height,
-      angle=grooved_tulip_chin_plate_angle,
-      plate_height=grooved_tulip_chin_plate_plate_height,
-      slot_angle=grooved_tulip_chin_plate_slot_angle,
-      tilt=grooved_tulip_chin_plate_tilt,
-      longitudinal_offset=grooved_tulip_chin_plate_longitudinal_offset,
-      vertical_offset=grooved_tulip_chin_plate_vertical_offset
+      plate_offset=grooved_chin_plate_offset,
+      length=grooved_chin_plate_length,
+      width=grooved_chin_plate_width,
+      height=grooved_chin_plate_height,
+      angle=grooved_chin_plate_angle,
+      plate_height=grooved_chin_plate_plate_height,
+      slot_angle=grooved_chin_plate_slot_angle,
+      tilt=grooved_chin_plate_tilt,
+      longitudinal_offset=grooved_chin_plate_longitudinal_offset,
+      vertical_offset=grooved_chin_plate_vertical_offset
+    );
+  }
+}
+
+if (grooved_oval_chin_plate) {
+  translate(get_translation(13)) {
+    grooved_oval_chin_plate(
+      plate_offset=grooved_chin_plate_offset,
+      length=grooved_chin_plate_length,
+      width=grooved_chin_plate_width,
+      height=grooved_chin_plate_height,
+      angle=grooved_chin_plate_angle,
+      plate_height=grooved_chin_plate_plate_height,
+      slot_angle=grooved_chin_plate_slot_angle,
+      tilt=grooved_chin_plate_tilt,
+      longitudinal_offset=grooved_chin_plate_longitudinal_offset,
+      vertical_offset=grooved_chin_plate_vertical_offset
     );
   }
 }
@@ -1311,7 +1329,7 @@ module scaled_tulip_base_plate(length, width, height) {
       }
       translate([36,80,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
       translate([36,-55,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
-      translate([-base_length / grooved_tulip_chin_plate_front_cutoff_mod ,-base_length-6,0]) { 
+      translate([-base_length / grooved_chin_plate_front_cutoff_mod ,-base_length-6,0]) { 
         rotate([0,0,45]) {
           radiusedblock(base_length*2,(base_length*2)-3,base_height,base_height);
         }
@@ -1319,6 +1337,31 @@ module scaled_tulip_base_plate(length, width, height) {
     }
   }
 }
+
+module scaled_oval_base_plate(length, width, height) {
+  translate([length/2, 0, 0])
+  resize([length, width, height]) {
+    oval_base_plate();
+  }
+
+  module oval_base_plate() {
+    base_length=80;
+    base_width=60;
+    base_height=20;
+    rounding=8;
+    round_mod=2*rounding;
+    block_length=(base_length*2)-round_mod;
+    block_width=(base_width*2)-round_mod;
+    rotate([0,0,90])
+    intersection() {
+      chamfercyl(base_length,base_height,-rounding,-rounding); 
+      translate([-base_length,-base_width,0]) { 
+        radiusedblock(block_length,block_width,base_height-round_mod,rounding);
+      }
+    }
+  }
+}
+
 
 module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_height=36, slot_angle=10, plate_longitudinal_offset=0) {
   module tulip_plate(length, width, height) {
@@ -1470,9 +1513,28 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
   } // end difference
 }
 
+module grooved_oval_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) {
+  difference() {
+    union() {
+      // plate
+      translate([0.5,2+longitudinal_offset,(width/2)-plate_offset]) {
+        rotate([90,180+angle,-90-slot_angle]) {
+             grooved_oval_plate(angle, length, width, height, tilt);
+        }
+      }
+      // base_plate
+      translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+        rotate([0,0,90-slot_angle]) {
+           // bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+        }
+      }
+    } // end main plate union
+  } // end difference
+}
+
 module bolt_on_plate(length, thickness, height, slot_angle, slot_width=bolt_slot_width) {
     plate_edge_radius=2;
-    tilted_slot_length=height*0.70;
+    tilted_slot_length=height*0.60;
     slot_pos_x=length/2;
     slot_pos_y=0;
     rounded_radius=(length/2);
@@ -1498,13 +1560,13 @@ module bolt_on_plate(length, thickness, height, slot_angle, slot_width=bolt_slot
 }
 
 module bolt_on_plate_with_fillet(length, thickness, height, slot_angle, slot_width=bolt_slot_width, double_fillet=false) {
-  fillet_length=length*0.9;
+  fillet_length=length*0.85;
   fillet_trans_mod = 1.5;
   fillet_trans=length-fillet_length-fillet_trans_mod;
   union() {
     bolt_on_plate(length, thickness, height, slot_angle, slot_width);
     if (right_handed) {
-      translate([fillet_length,height, 0]) {
+      translate([fillet_length*1.05,height, 0.5]) {
         rotate([90,90,-90]) {
            myfillet(fillet_length,thickness*1.5);
         }
@@ -1574,7 +1636,7 @@ module myfillet(length, side) {
 }
 
 module grooved_tulip_plate(angle, length, width, height, tilt) {
-  groove_radius=width*grooved_tulip_chin_plate_radius_mod;
+  groove_radius=width*grooved_chin_plate_radius_mod;
   y_translate=sin(tilt)-(height*0.75);
   difference() {
     scaled_tulip_base_plate(length, width, height);
@@ -1586,9 +1648,22 @@ module grooved_tulip_plate(angle, length, width, height, tilt) {
   }
 }
 
-module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
+module grooved_oval_plate(angle, length, width, height, tilt) {
+  groove_radius=width*grooved_chin_plate_radius_mod;
+  y_translate=sin(tilt)-(height*0.75);
+  difference() {
+    scaled_oval_base_plate(length, width, height);
+    translate([-1, 0, groove_radius+height+y_translate]) {
+      rotate([0,90+tilt,0]) {
+        cylinder(length+8,groove_radius,groove_radius);
+      }
+    }
+  }
+}
+
+module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
   inner_diameter=ring_finger_circumference/3.142;
-  inner_radius=(inner_diameter/2)*ring_snug_factor;
+  inner_radius=(inner_diameter/2);
   outer_radius=inner_radius+ring_thickness;
   ring_rotation = right_handed ? 0 : 180;
   stl_width_shimmy=1;
@@ -1814,7 +1889,7 @@ module finger_ring_with_spacer() {
 
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
-        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
+        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
       }
     }
   }
@@ -1871,28 +1946,28 @@ module bb_finger_ring() {
 
   ring_x_offset=36+ring_spacer_forward_mod;
   ring_y_offset=100;
+  z_move = right_handed ? ring_spacer_plate_thickness : -ring_spacer_plate_thickness;
 
   union() {
-    bb_base_plate(scaling, ring_spacer_plate_thickness);
+    translate([0,0,z_move])
+    mirror([0,0,1]) bb_base_plate(scaling, ring_spacer_plate_thickness);
 
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
-        finger_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor);
+        finger_ring(ring_finger_circumference, ring_thickness, ring_depth);
       }
     }
   }
 }
 
-module finger_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_snug_factor) {
+module finger_ring(ring_finger_circumference, ring_thickness, ring_depth) {
   inner_diameter=ring_finger_circumference/3.142;
-  inner_radius=(inner_diameter/2)*ring_snug_factor;
+  inner_radius=(inner_diameter/2);
   outer_radius=inner_radius+ring_thickness;
   ring_rotation = right_handed ? 0 : 180;
   stl_width_shimmy=1;
   ring_translation = right_handed ? -outer_radius : outer_radius;
-  z_move = right_handed ? 0 : ring_spacer_plate_thickness;
 
-  translate([0,0,z_move]) {
     rotate([ring_rotation,0,0]) {
       // finger ring
       // translate([ring_thickness-2,ring_translation,inner_radius+(ring_thickness/2)]) {
@@ -1902,7 +1977,6 @@ module finger_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_s
         }
       }
     }
-  }
 
 }
 
