@@ -38,6 +38,8 @@ render_fn=100;
 
 /* [Pinky Trigger] */
 pinky_trigger=false;
+// Pinky Trigger Shape
+pinky_trigger_shape="2"; // ["1","2"]
 // reversed puts the peg behind the bolt
 pinky_trigger_bolt_front=true;
 // set this to false to have two bolt holes rather than a locating pin and a hole
@@ -1077,47 +1079,81 @@ module jezr_palm_plate_base(scaling, thickness) {
   }
 }
 
+module pinky_polygon_1() {
+  polygon([
+    [-9,43],[12,43],[18,40],[21,37],[22,32],[22,28],
+    [19,24],[15,21],[11,19],[6,14],[4,10],[3,5],[4,-3],
+    [5,-9],[7,-15],[8,-21],[9,-26],[9,-33],[7,-39],
+    [5,-40],[3,-40],[0,-40],[-3,-37],[-15,-16],[-19,0],
+    [-20,16],[-19,29],[-18,36],[-14,41]
+  ]);
+}
+
+module pinky_polygon_2() {
+  polygon([
+    [-23,16],[-21,24],[-14,28],
+    [-8,31],
+    [-3,29],
+    [2,20],
+    [3,5],
+    [4,-3],
+    [6,-9],[9,-15],[13,-21],[15,-26],[14,-30],[12,-33],
+    [9,-34],
+    [7,-33],
+    [0,-26],[-14,-5],[-18,3],
+  ]);
+}
+
 module pinky_trigger(desired_height=35, pin=true, bolt_front=false) {
     // polygon is 84 high
     scaling=desired_height/84;
+    hole_pos_a =(pinky_trigger_shape == "1") ? 40*scaling : 17*scaling;
+    hole_pos_b =(pinky_trigger_shape == "1") ? 71*scaling : 59*scaling;
+    hole_pos_c =(pinky_trigger_shape == "1") ? 15*scaling : 5*scaling;
+    hole_pos_d =(pinky_trigger_shape == "1") ? 70*scaling : 57*scaling;
     union() {
     difference() {
       linear_extrude(height = thickness) {
         scale([scaling*1.2, scaling, 1]) {
           translate([20, 40, 0]) {
-            polygon([
-              [-23,16],[-21,24],[-14,28],
-              [-8,31],
-              [-3,29],
-              [2,20],
-              [3,5],
-              [4,-3],
-              [6,-9],[9,-15],[13,-21],[15,-26],[14,-30],[12,-33],
-              [9,-33],[1,-26],[-14,-5],[-18,3],
-            ]);
+            if (pinky_trigger_shape == "1") {
+              pinky_polygon_1();
+            } else {
+              pinky_polygon_2();
+            }
           }
         }
       }
-      if (pin) {
-        if (bolt_front) {
-          translate([17*scaling, 59*scaling, -z_slot_offset]) {
-            cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-          }
-        } else {
-        translate([5*scaling, 57*scaling, -z_slot_offset]) {
+      // hole for bolt (front or rear)
+      if (bolt_front) {
+        translate([hole_pos_a, hole_pos_b, -z_slot_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
-      }
+      } else {
+      translate([hole_pos_c, hole_pos_d, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
     }
+    if (!pin) {
+      if (bolt_front) {
+      translate([hole_pos_c, hole_pos_d, -z_slot_offset]) {
+          cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+        }
+      } else {
+        translate([hole_pos_a, hole_pos_b, -z_slot_offset]) {
+        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+      }
+    }
+    }
+    }// end difference - following is union for pins
       if (pin) {
         handed_z_offset = right_handed ? 0 : -z_slot_offset*2 ;
         if (bolt_front) {
-          translate([5*scaling, 57*scaling, handed_z_offset]) {
+      translate([hole_pos_c, hole_pos_d, handed_z_offset]) {
             cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
           }
         } else {
-        translate([17*scaling, 59*scaling, handed_z_offset]) {
+        translate([hole_pos_a, hole_pos_b, handed_z_offset]) {
           cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
         }
       }
@@ -1980,10 +2016,11 @@ module finger_ring(ring_finger_circumference, ring_thickness, ring_depth) {
 
 }
 
-module tab_bb_plate() {
+module tab_bb_plate(extended=true) {
   // Tab sketch is 144px high
   // Tab is 74px high
   // This is from tab with three_finger_width=65
+  x_scale=1.5;
   pic_scale=65/138;
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
@@ -1992,6 +2029,7 @@ module tab_bb_plate() {
   number_of_slots=slot_range/slot_spacing;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
+  scale([x_scale,1,1])
     bb_base_plate(scaling);
 
         // translate([66, 72, 0]) {
@@ -1999,9 +2037,12 @@ module tab_bb_plate() {
     for(slot = [0 : 3 : number_of_slots]) {
       long_slot = (slot % 2) == 0;
       slot_len = long_slot ? 3 : 6;
-      fingernail_slot(64-(slot_len*2), 10+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
+      fingernail_slot(67-(slot_len*2), 10+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
     }
-    
+    translate([0,0,-4]) 
+    angled_slot(23, 19, slot_angle=90, slot_length=25, slot_width=bolt_slot_width);
+
+
     initial_translation = right_handed ? thickness : -thickness;
     // Initials
     translate([12, 20, initial_translation]) {
@@ -2011,7 +2052,7 @@ module tab_bb_plate() {
 
   }
   module fingernail_slot(xpos, ypos, thickness, slot_len, scaling=1) {
-    translate([xpos*scaling,ypos*scaling,0]) {
+    translate([xpos*scaling*x_scale,ypos*scaling,0]) {
       rotate([0,5,0]) {
         bar(slot_len,1,10,0);
       }
