@@ -216,13 +216,18 @@ ring_depth=15;
 // Different shaped Spacer blocks
 spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, jez_spacer_v3.stl, jez_spacer_v3.1.stl, cphughes_tab_spacer.stl]
 // stretch the spacer from front>back
-ring_spacer_length_mod=0.9;
+ring_spacer_length=31.9;
 // stretch the spacer from top>bottom
-ring_spacer_width_mod=1.1;
+ring_spacer_width=10.1;
 // greater than 0 shifts ring and spacer forward
 ring_spacer_forward_mod=2;
 // too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=3.5;
+// this allows fine tuning of how high the ring sits proud over the plate
+ring_vertical_height_mod = 0.8;
+  
+// this allows fine tuning of how much of the ring is embedded in the spacer
+ring_joint_spacer_overlap=0.1;
 
 
 
@@ -1542,7 +1547,7 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
       // base_plate
       translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
         rotate([0,0,90-slot_angle]) {
-           bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+           // bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
         }
       }
     } // end main plate union
@@ -1697,33 +1702,41 @@ module grooved_oval_plate(angle, length, width, height, tilt) {
   }
 }
 
-module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length_mod, ring_spacer_width_mod, right_handed) {
+module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length, ring_spacer_width, right_handed) {
   inner_diameter=ring_finger_circumference/3.142;
   inner_radius=(inner_diameter/2);
   outer_radius=inner_radius+ring_thickness;
+  fillet_translation=inner_radius+(ring_thickness/2);
   ring_rotation = right_handed ? 0 : 180;
-  stl_width_shimmy=1;
-  ring_translation = right_handed ? 1-outer_radius-stl_width_shimmy : outer_radius+stl_width_shimmy-1;
-  z_move = right_handed ? 0 : ring_spacer_plate_thickness;
-  // z_move = right_handed ? ring_spacer_plate_thickness-0.5 : 0.5;
+  ring_translation = right_handed ? 1-outer_radius-ring_joint_spacer_overlap : outer_radius+ring_joint_spacer_overlap-1;
+  z_move = right_handed ? 0 : ring_spacer_plate_thickness/2;
 
-  translate([9,-26,1]) {
-    rotate([ring_rotation,90,0]) {
-      myfillet(ring_depth-2, 6);
-    }
-  }
   translate([0,0,z_move]) {
     rotate([ring_rotation,0,0]) {
       // finger spacer
-      scale([ring_spacer_length_mod,ring_spacer_width_mod,1]) {
+      resize([ring_spacer_length,ring_spacer_width,inner_diameter]) {
           import(spacer_stl_file);
       }
       // finger ring
-      // translate([ring_thickness-2,ring_translation,inner_radius+(ring_thickness/2)]) {
-      x_move = ring_thickness-(ring_thickness * ring_spacer_length_mod*0.5);
-      translate([x_move,ring_translation,outer_radius]) {
+      x_move = ring_thickness-(ring_thickness * ring_spacer_length*0.5);
+      translate([3,ring_translation,outer_radius-ring_vertical_height_mod]) {
         rotate([90,0,90]) {
-          resize([0,0,ring_depth]) torus(outer_radius, inner_radius);
+          union() {
+            //ring
+            resize([0,0,ring_depth]) {
+              torus(outer_radius, inner_radius);
+            }
+            //fillet 1
+            rotate([0,180,0]) {
+              translate([-fillet_translation,-fillet_translation,-(ring_depth-1)/2]) {
+                myfillet(ring_depth-1, inner_radius);
+              }
+            }
+            //fillet 2
+            translate([-fillet_translation,-fillet_translation,-(ring_depth-1)/2]) {
+              myfillet(ring_depth-1, inner_radius);
+            }
+          }
         }
       }
     }
@@ -1925,7 +1938,7 @@ module finger_ring_with_spacer() {
 
     translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
       rotate([0,0,0]) {
-        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length_mod, ring_spacer_width_mod, right_handed);
+        finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length, ring_spacer_width, right_handed);
       }
     }
   }
@@ -1940,7 +1953,7 @@ module ring_base_plate_basic(scaling, plate_height=thickness) {
   scale([scaling, scaling, 1]) {
     translate([100, 40, 1]) {
       rotate([0, 0, 90]) {
-        bar(70,51,3,0);
+        bar(70,51,plate_height,0);
       }
     }
   }
@@ -2001,7 +2014,6 @@ module finger_ring(ring_finger_circumference, ring_thickness, ring_depth) {
   inner_radius=(inner_diameter/2);
   outer_radius=inner_radius+ring_thickness;
   ring_rotation = right_handed ? 0 : 180;
-  stl_width_shimmy=1;
   ring_translation = right_handed ? -outer_radius : outer_radius;
 
     rotate([ring_rotation,0,0]) {
