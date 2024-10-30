@@ -109,6 +109,9 @@ grooved_tulip_chin_plate=false;
 // how far from centre the mount plate is
 grooved_oval_chin_plate=false;
 
+// mounting / base plate included (if not then you need to join in the slicer)
+grooved_chin_plate_mount=false;
+
 // how far from centre the mount plate is
 grooved_chin_plate_offset=-1;
 // how long the plate is - likely you want the same as the tab width
@@ -1545,9 +1548,11 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
         }
       }
       // base_plate
-      translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
-        rotate([0,0,90-slot_angle]) {
-           // bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+      if (grooved_chin_plate_mount) {
+        translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+          rotate([0,0,90-slot_angle]) {
+             bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+          }
         }
       }
     } // end main plate union
@@ -1564,9 +1569,11 @@ module grooved_oval_chin_plate( plate_offset=-3, length=28, width=30, height=4, 
         }
       }
       // base_plate
-      translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
-        rotate([0,0,90-slot_angle]) {
-           // bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+      if (grooved_chin_plate_mount) {
+        translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+          rotate([0,0,90-slot_angle]) {
+             bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+          }
         }
       }
     } // end main plate union
