@@ -177,6 +177,10 @@ jezc_plate=false;
 jezc_ring_plate=false;
 jezc_ring_plate_scaling=1.2;
 
+// above for use with finger ring but matrix of holes and not slots
+jezc_holes_plate=false;
+jezc_holes_plate_scaling=1.2;
+
 // Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
 
@@ -421,6 +425,10 @@ if (jezc_plate) {
 
 if (jezc_ring_plate) {
   translate(get_translation(20)) jezc_ring_plate(initials, jezc_ring_plate_scaling);
+}
+
+if (jezc_holes_plate) {
+  translate(get_translation(21)) jezc_holes_plate(initials, jezc_holes_plate_scaling);
 }
 
 
@@ -802,13 +810,57 @@ module jezc_ring_plate(initials, x_scale=1) {
     // chin or thumb rest slots
     slot_y_offset=38*scaling;
     for (slotno=[1:1:4]) {
-      0angled_slot(69*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
+      angled_slot(69*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
     }
 
 
     // pinky mount slot
     angled_slot(79, 35, -16, 8, scaling=scaling);
 
+  }
+
+}
+
+module jezc_holes_plate(initials, x_scale=1) {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/144;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  bolt_rad=bolt_slot_width/2;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    translate([ -3, 0, 0 ]) {
+      scale([x_scale,1.05,1]) {
+        jc_base_plate(scaling);
+      }
+    }
+    // ring_plate_slots(scaling, x_scale);
+    // nock cutout
+    translate([57.5*x_scale, 43, -2 ]) {
+      scale([x_scale,1,1]) {
+        nock_cutout(scaling);
+      }
+    }
+    slot_x_offset=22*x_scale;
+    slot_y_offset=9*scaling;
+    slot_alt_x_offset=bolt_slot_width;
+    for (yslotno=[1:1:4]) {
+      for (xslotno=[1:1:3]) {
+        translate([(xslotno*bolt_slot_width*2)+slot_x_offset, (yslotno*bolt_slot_width*2)+slot_y_offset+bolt_slot_width, -1 ]) {
+          cylinder(thickness+2,bolt_rad,bolt_rad);
+        }
+        }
+    for (yslotno=[1:1:5]) {
+      slot_count=(yslotno==4) ? 2 : 3;
+      for (xslotno=[1:1:slot_count]) {
+        translate([(xslotno*bolt_slot_width*2)+slot_x_offset+bolt_slot_width, (yslotno*bolt_slot_width*2)+slot_y_offset, -1 ]) {
+          cylinder(thickness+2,bolt_rad,bolt_rad);
+        }
+      }
+    }
+    }
   }
 
 }
@@ -980,7 +1032,7 @@ module bb_base_plate(scaling, plate_height=thickness) {
   }
 
   difference() {
-    z_miror = right_handed ? 0 : 1;
+    z_miror = right_handed ? -1 : 1;
     scale([scaling, scaling, 1]) {
 
     mirror([0,0,z_miror])
