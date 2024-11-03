@@ -65,13 +65,28 @@ wedge_palm_plate=false;
 // base mount plate for a chin or thumb plate to join onto
 bolt_on_plate=false;
 bolt_on_plate_with_fillet=false;
+bop_slot_angle=4;
+bop_slot_width=5;
 bop_length=20;
 // bolt-on-thumb-plate thickness
 bop_thickness=4;
 // bolt-on-thumb-plate height proportion to main plate size
 bop_height=30;
-bop_slot_angle=4;
-bop_slot_width=5;
+// base mount plate for a chin or thumb plate to join onto
+
+/* [Bolt-On Bar] */
+// rounded bar for mounting a pad or rest, has divider for strength 
+bolt_on_bar=false;
+// percentage how far along the bar should the divider be
+bob_split=65;
+// length of bar
+bob_length=70;
+// bolt-on-thumb-plate thickness
+bob_thickness=5;
+// bolt-on-thumb-plate height proportion to main plate size
+bob_width=16;
+bob_slot_width=5.9;
+
 
 /* [Fillet] */
 fillet=false;
@@ -90,6 +105,7 @@ standard_plate_angle=30;
 /* [Tulip Chin/Thumb Plates] */
 tulip_chin_plate=false;
 half_tulip_chin_plate=false;
+tulip_chin_plate_mount=false;
 
 tulip_chin_plate_plate_lateral_offset=-4;
 tulip_chin_plate_plate_=-4;
@@ -98,13 +114,14 @@ tulip_chin_plate_width=29;
 tulip_chin_plate_height=4;
 tulip_chin_plate_plate_height=36;
 tulip_chin_plate_slot_angle=0;
+// move the mount plate up/down
+tulip_chin_plate_vertical_offset=-1;
 
 
 /* [Grooved Chin/Thumb Plates] */
 grooved_half_chin_plate=false;
 half_grooved_tulip_chin_plate=false;
 
-/* [Grooved Chin Plate] */
 grooved_tulip_chin_plate=false;
 // how far from centre the mount plate is
 grooved_oval_chin_plate=false;
@@ -323,6 +340,10 @@ if (bolt_on_plate) {
 
 if (bolt_on_plate_with_fillet) {
   translate(get_translation(11)) bolt_on_plate_with_fillet(bop_length, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
+}
+
+if (bolt_on_bar) {
+  translate(get_translation(11)) bolt_on_bar(bob_length, bob_thickness, bob_width, bob_split, bob_slot_width);
 }
 
 if (fillet) {
@@ -781,13 +802,14 @@ module jezc_ring_plate(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
   // This is from tab with three_finger_width=65
+  bolt_rad=bolt_slot_width/2;
   pic_scale=74/144;
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
     translate([ -3, 0, 0 ]) {
-      scale([x_scale,1,1]) {
+      scale([x_scale,1.07,1]) {
         jc_base_plate(scaling);
       }
     }
@@ -798,10 +820,10 @@ module jezc_ring_plate(initials, x_scale=1) {
       }
     }
 
-    ring_plate_slots(scaling, x_scale);
+    ring_plate_slots_2(scaling, x_scale);
     //
     // decorative
-    translate([40*x_scale, 50*scaling, 0 ]) {
+    translate([43*x_scale, 51*scaling, 0 ]) {
       translate([0, 20, -1]) {
         initials_a();
       }
@@ -809,13 +831,13 @@ module jezc_ring_plate(initials, x_scale=1) {
     //
     // chin or thumb rest slots
     slot_y_offset=38*scaling;
-    for (slotno=[1:1:4]) {
+    for (slotno=[1:1:5]) {
       angled_slot(69*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=8);
     }
 
 
     // pinky mount slot
-    angled_slot(79, 35, -16, 8, scaling=scaling);
+    angled_slot(74, 41, -29, 9, scaling=scaling);
 
   }
 
@@ -885,6 +907,25 @@ module ring_plate_slots(scaling, x_scale, left=38, top=50) {
     // bolt slots to secure tab
     angled_slot(96, 30, 0, 14*x_scale, scaling=scaling);
     angled_slot(96, 122, 0, 14*x_scale, scaling=scaling);
+}
+
+module ring_plate_slots_2(scaling, x_scale, left=38, top=50) {
+    slot_len=12*scaling;
+    // decorative
+    translate([left*x_scale, top*scaling, 0 ]) {
+      angled_slot(4, 37, 0, slot_len-2);
+      angled_slot(16, 37, 0, slot_len);
+      angled_slot(3, 27, 0, 1);
+      angled_slot(4, 16, 0, slot_len);
+      angled_slot(18, 16, 0, slot_len-3);
+      angled_slot(4, 8, 0, slot_len);
+      angled_slot(18, 8, 0, slot_len);
+      angled_slot(0, 0, 0, slot_len);
+      angled_slot(14, 0, 0, slot_len);
+      angled_slot(2, -10, 0, slot_len);
+      angled_slot(16, -10, 0, slot_len);
+    }
+
 }
 
 module nock_cutout(scaling=1, plate_height=10) {
@@ -1459,21 +1500,11 @@ module scaled_oval_base_plate(length, width, height) {
 }
 
 
-module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_height=36, slot_angle=10, plate_longitudinal_offset=0) {
+module tulip_chin_plate(plate_offset=0, length=28, width=25, height=3, plate_height=36, slot_angle=0, plate_longitudinal_offset=0, vertical_offset=tulip_chin_plate_vertical_offset, mount_plate_thickness=4) {
   module tulip_plate(length, width, height) {
     scaled_tulip_base_plate(length, width, height);
   }
 
-  module myfillet(length, side) {
-    centre=side+3;
-    radius=centre*2;
-      difference() {
-        cube([side,side,length]);
-        translate([side+1,side+1,-1]) {
-        cylinder(length+2,side,side,$fn=100);
-        }
-      }
-  }
 
   union() {
     // plate
@@ -1483,22 +1514,14 @@ module tulip_chin_plate( plate_offset=0, length=28, width=25, height=3, plate_he
       }
     }
 
-    // base_plate
-    translate([plate_height,0,0]) {
-      rotate([0,0,90]) {
-         // chin_plate_base(plate_height, plate_height, thickness, bolt_slot_width, slot_angle);
+      // base_plate
+      if (tulip_chin_plate_mount) {
+        translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+          rotate([0,0,90-slot_angle]) {
+             bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+          }
+        }
       }
-    }
-
-  translate([0,-5,0]) {
-    // plate fillet 1
-    x_mod=plate_height/2;
-    translate([height-1,x_mod+12,height-2]) {
-      rotate([90,0,0]) {
-         // myfillet(plate_height/2,6);
-      }
-    }
-  }
 
   } // end main plate union
 }
@@ -1654,6 +1677,39 @@ module bolt_on_plate(length, thickness, height, slot_angle, slot_width=bolt_slot
         rotate([0,0, slot_rotation]) {
           bar(tilted_slot_length,slot_width,slot_depth,0);
         }
+      }
+    }
+  }
+}
+
+module bolt_on_bar(length, thickness, width, split, slot_width=bolt_slot_width) {
+    plate_edge_radius=2;
+    slot_a_length=length * (split/100);
+    slot_b_length=length - slot_a_length;
+    slot_gap_radius_adjustment = slot_width * 1.0;
+    slot_pos_x=width/2;
+    rounded_radius=(width/2);
+    slot_rotation=90;
+    resize([width, length, thickness]) {
+      difference() {
+          union() {
+            roundedcube(size=[width, length, thickness], radius=plate_edge_radius);
+            translate([rounded_radius,0,0]) {
+              chamfercyl(rounded_radius,thickness*0.98,-plate_edge_radius,-plate_edge_radius);
+            }
+            translate([rounded_radius,length,0]) {
+              chamfercyl(rounded_radius,thickness*0.98,-plate_edge_radius,-plate_edge_radius);
+            }
+          }
+      translate([slot_pos_x,0,1]) {
+      rotate([0, 0,90]) {
+        bar(slot_a_length-slot_gap_radius_adjustment,slot_width,slot_depth,0);
+      }
+      }
+      translate([slot_pos_x,slot_a_length+slot_gap_radius_adjustment,1]) {
+      rotate([0, 0,90]) {
+        bar(slot_b_length-slot_gap_radius_adjustment,slot_width,slot_depth,0);
+      }
       }
     }
   }
