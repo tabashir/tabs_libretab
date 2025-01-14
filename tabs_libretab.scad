@@ -7,11 +7,11 @@ include <./lib/prism-chamfer.scad>;
 // This will lay items out on plate. If you are working on one item, unset.
 multiple_items=false;
 
-thickness=4;
+thickness=4.1;
 three_finger_width=65;
 bolt_slot_width=4.5;
-bolt_head_width=10;
-elastic_slot_width=2;
+bolt_head_width=10.0;
+elastic_slot_width=2.0;
 
 // Initials/wording for some of the labels
 initials="JM";
@@ -388,7 +388,18 @@ if (grooved_oval_chin_plate) {
 
 if (half_grooved_tulip_chin_plate) {
   translate(get_translation(14)) {
-    half_grooved_tulip_chin_plate(plate_offset=13, length=38, width=25, height=2, angle=0, groove_radius=10);
+    half_grooved_tulip_chin_plate(
+      plate_offset=grooved_chin_plate_offset,
+      length=grooved_chin_plate_length,
+      width=grooved_chin_plate_width,
+      height=grooved_chin_plate_height,
+      angle=grooved_chin_plate_angle,
+      plate_height=grooved_chin_plate_plate_height,
+      slot_angle=grooved_chin_plate_slot_angle,
+      tilt=grooved_chin_plate_tilt,
+      longitudinal_offset=grooved_chin_plate_longitudinal_offset,
+      vertical_offset=grooved_chin_plate_vertical_offset
+    );
   }
 }
 
@@ -594,19 +605,22 @@ module jezr_ring_plate_3(initials, x_scale=1) {
         initials_a();
       }
     // chin or thumb rest slots
-    angled_slot(-14*scaling, 2*scaling, 70, 25*scaling, scaling=scaling);
+    angled_slot(-3*scaling, 30*scaling, 40, 12*scaling, scaling=scaling);
+    angled_slot(-19*scaling, -2*scaling, 64, 16*scaling, scaling=scaling);
 
     // palm pad slots
-    angled_slot(-20*scaling, -20*scaling, 36, 19*scaling, scaling=scaling);
-    angled_slot(-38*scaling, -32*scaling, 78, 15*scaling, scaling=scaling);
+    angled_slot(-16*scaling, -24*scaling, 52, 19*scaling, scaling=scaling);
+    angled_slot(-38*scaling, -35*scaling, 78, 15*scaling, scaling=scaling);
   }
 }
 
 module ring_plate_slots_3(scaling) {
     // bolt slots to secure tab
-    bolt_slot_len=14;
-    angled_slot(-8, 0, 0, slot_length=22, slot_width=5.5, scaling=scaling);
-    angled_slot(0, 62, 0, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+    bolt_slot_len=5;
+    translate([14, 0, 0]) {
+      angled_slot(0, 0, 180, slot_length=bolt_slot_len+12, slot_width=5.5, scaling=scaling);
+      angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+    }
     other_slot_len=18;
     translate([-3, 12, 0]){
       angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
@@ -1624,16 +1638,12 @@ module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, gro
 }
 
 
-module half_grooved_tulip_chin_plate( plate_offset=0, length=38, width=30, height=2, angle=-8, groove_radius=12, second_fillet=true) {
-  cutoff=-20; // higher=less cut off
-  plate_height=38;
-  slot_angle=8;
-  tilt=2;
+module half_grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) { 
+  resize([height, length, width])
   difference() {
-    // grooved_tulip_chin_plate(plate_offset, length, width, height, angle, groove_radius, second_fillet);
     grooved_tulip_chin_plate( plate_offset, length, width, height, angle, plate_height, slot_angle, tilt);
-    translate([-width/2,-length/4,cutoff]) {
-      cube([width,length+10,width]);
+    translate([-height,0,-width]) {
+      cube([height*2,length*2,width]);
     }
   }
 }
