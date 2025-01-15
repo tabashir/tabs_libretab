@@ -29,9 +29,9 @@ depth=three_finger_width*0.6;
 slot_depth=thickness+4;
 z_slot_offset=2;
 tilted_slot_gap=8.6;
-tilted_slot_angle=15;
-tilted_slot_length=9;
-mount_plate_thickness=4;
+tilted_slot_angle=15.0;
+tilted_slot_length=9.0;
+mount_plate_thickness=4.0;
 
 // view detail for preview render (you want this low to be fast)
 preview_fn=16;
@@ -177,7 +177,7 @@ tulip_full_plate_height=1.75;
 /* [Tab Plates] */
 
 // bump slots up or down relative to the plate
-slots_y_adjust=0;
+slots_y_adjust=0.1;
 
 // Loosely based on WW EZR plate, with slots for cinch band and holes for finger ring
 jezr_plate=false;
@@ -190,6 +190,9 @@ jezr_ring_plate_2=false;
 
 // wider version of jezr for use with finger ring only
 jezr_ring_plate_3=false;
+
+// wider version of jezr for use with finger ring only
+jezr_ring_plate_4=false;
 
 // jezr with rear palm plate mounting cut off, cinch band and slots
 jezc_plate=false;
@@ -455,6 +458,10 @@ if (jezr_ring_plate_3) {
   translate(get_translation(39)) jezr_ring_plate_3(initials, 1.1);
 }
 
+if (jezr_ring_plate_4) {
+  translate(get_translation(40)) jezr_ring_plate_4(initials, 1.1);
+}
+
 if (jezc_plate) {
   translate(get_translation(19)) jezc_plate();
 }
@@ -618,6 +625,7 @@ module jezr_ring_plate_3(initials, x_scale=1) {
   }
 }
 
+
 module ring_plate_slots_3(scaling) {
     // bolt slots to secure tab
     bolt_slot_len=5;
@@ -627,6 +635,57 @@ module ring_plate_slots_3(scaling) {
     }
     other_slot_len=18;
     translate([-3, 12, 0]){
+      angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
+      angled_slot(4, 8, 0, slot_length=other_slot_len*scaling);
+      angled_slot(0, 16, 0, slot_length=other_slot_len*scaling);
+      angled_slot(2, 24, 0, slot_length=other_slot_len*scaling);
+    }
+}
+
+module jezr_ring_plate_4(initials, x_scale=1) {
+  // Tab sketch is 96px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/96;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    translate([0, slots_y_adjust, 0]) ww_base_plate_4(scaling);
+    translate([7, -23, 0]) ring_plate_slots_4(scaling);
+
+    // nock cutout
+    translate([27, 2, -2 ]) {
+      scale([1,0.7,1]) {
+        nock_cutout_2(scaling);
+      }
+    }
+
+    // Initials
+      translate([-18, slots_y_adjust-29, thickness/1.5]) {
+        initials();
+      }
+      translate([3, 0, 0]) {
+    // chin or thumb rest slots
+    angled_slot(-3*scaling, 30*scaling, 40, 12*scaling, scaling=scaling);
+    angled_slot(-19*scaling, -2*scaling, 64, 16*scaling, scaling=scaling);
+
+    // palm pad slots
+    angled_slot(-16*scaling, -24*scaling, 52, 19*scaling, scaling=scaling);
+    angled_slot(-38*scaling, -35*scaling, 78, 15*scaling, scaling=scaling);
+	  }
+  }
+}
+
+module ring_plate_slots_4(scaling) {
+    // bolt slots to secure tab
+    bolt_slot_len=3;
+    translate([14, 0, 0]) {
+      angled_slot(6, 0, 177, slot_length=bolt_slot_len+18, slot_width=5.5, scaling=scaling);
+      angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+    }
+    other_slot_len=14;
+    translate([1, 12, 0]){
       angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
       angled_slot(4, 8, 0, slot_length=other_slot_len*scaling);
       angled_slot(0, 16, 0, slot_length=other_slot_len*scaling);
@@ -771,6 +830,19 @@ module ww_base_plate_3(scaling) {
   // }
 }
 
+module ww_base_plate_4(scaling) {
+  // translate([38, 52, 0]) {
+    scale([scaling, scaling, 1]) {
+      linear_extrude(height = thickness) {
+        difference() {
+          polygon([
+		[35,41],[39,38],[39,9],[42,9],[45,9],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-3,32],[-1,34],[6,37],[26,41]
+		]);
+        }
+      }
+    }
+  // }
+}
 
 
 module jezc_plate() {
