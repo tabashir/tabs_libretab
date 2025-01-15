@@ -668,17 +668,17 @@ module jezr_ring_plate_4(initials, x_scale=1) {
     }
 
     // Initials
-      translate([-18, slots_y_adjust-29, thickness/1.5]) {
+      translate([-15, slots_y_adjust-29, thickness/1.5]) {
         initials();
       }
       translate([3, 0, 0]) {
     // chin or thumb rest slots
-    angled_slot(-3*scaling, 30*scaling, 40, 12*scaling, scaling=scaling);
+    angled_slot(1*scaling, 32*scaling, -15, 20*scaling, scaling=scaling);
     angled_slot(-19*scaling, -2*scaling, 64, 16*scaling, scaling=scaling);
 
     // palm pad slots
-    angled_slot(-16*scaling, -24*scaling, 52, 19*scaling, scaling=scaling);
-    angled_slot(-38*scaling, -35*scaling, 78, 15*scaling, scaling=scaling);
+    angled_slot(-16*scaling, -29*scaling, 60, 21*scaling, scaling=scaling);
+    angled_slot(-42*scaling, -31*scaling, 52, 15*scaling, scaling=scaling);
 	  }
   }
 }
@@ -695,7 +695,6 @@ module ring_plate_slots_4(scaling) {
       angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
       angled_slot(4, 8, 0, slot_length=other_slot_len*scaling);
       angled_slot(0, 16, 0, slot_length=other_slot_len*scaling);
-      angled_slot(2, 24, 0, slot_length=other_slot_len*scaling);
     }
 }
 
@@ -842,7 +841,7 @@ module ww_base_plate_4(scaling) {
       linear_extrude(height = thickness) {
         difference() {
           polygon([
-		[35,41],[39,38],[39,9],[42,9],[45,9],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-3,32],[-1,34],[6,37],[26,41]
+		[35,41],[39,38],[39,9],[42,9],[45,9],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]
 		]);
         }
       }
