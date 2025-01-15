@@ -658,7 +658,7 @@ module jezr_ring_plate_4(initials, x_scale=1) {
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
     translate([0, slots_y_adjust, 0]) ww_base_plate_4(scaling);
-    translate([7, -23, 0]) ring_plate_slots_4(scaling);
+    translate([3, 0, 0]) ring_plate_slots_4(scaling);
 
     // nock cutout
     translate([27, 2, -2 ]) {
@@ -671,19 +671,19 @@ module jezr_ring_plate_4(initials, x_scale=1) {
       translate([-15, slots_y_adjust-29, thickness/1.5]) {
         initials();
       }
-      translate([3, 0, 0]) {
-    // chin or thumb rest slots
-    angled_slot(1*scaling, 32*scaling, -15, 20*scaling, scaling=scaling);
-    angled_slot(-19*scaling, -2*scaling, 64, 16*scaling, scaling=scaling);
-
-    // palm pad slots
-    angled_slot(-16*scaling, -29*scaling, 60, 21*scaling, scaling=scaling);
-    angled_slot(-42*scaling, -31*scaling, 52, 15*scaling, scaling=scaling);
-	  }
   }
 }
 
 module ring_plate_slots_4(scaling) {
+  // chin or thumb rest slots
+  angled_slot(-3*scaling, 25*scaling, 0, 22*scaling, scaling=scaling);
+  angled_slot(-19*scaling, -2*scaling, 64, 10*scaling, scaling=scaling);
+
+  // palm pad slots
+  angled_slot(-16*scaling, -29*scaling, 60, 21*scaling, scaling=scaling);
+  angled_slot(-42*scaling, -31*scaling, 52, 15*scaling, scaling=scaling);
+
+  translate([4, -23, 0]) {
     // bolt slots to secure tab
     bolt_slot_len=3;
     translate([14, 0, 0]) {
@@ -691,11 +691,12 @@ module ring_plate_slots_4(scaling) {
       angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
     }
     other_slot_len=14;
-    translate([1, 12, 0]){
-      angled_slot(0, 0, 0, slot_length=other_slot_len*scaling);
-      angled_slot(4, 8, 0, slot_length=other_slot_len*scaling);
-      angled_slot(0, 16, 0, slot_length=other_slot_len*scaling);
+    translate([1, 10, 0]){
+      angled_slot(0, 0, 0, slot_length=8+other_slot_len*scaling);
+      angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
+      angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
     }
+  }
 }
 
 module jezr_plate() {
