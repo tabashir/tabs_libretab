@@ -1,4 +1,4 @@
-include <./lib/chamfer_extrude.scad>; 
+include <./lib/chamfer_extrude.scad>;
 include <./lib/prism-chamfer.scad>;
 
 
@@ -9,7 +9,7 @@ multiple_items=false;
 
 thickness=4.1;
 three_finger_width=65;
-bolt_slot_width=4.5;
+bolt_slot_width=5.5;
 bolt_head_width=10.0;
 elastic_slot_width=2.0;
 
@@ -70,8 +70,8 @@ wedge_palm_plate=false;
 bolt_on_plate=false;
 bolt_on_plate_with_fillet=false;
 bop_slot_angle=4;
-bop_slot_width=5;
-bop_length=20;
+bop_slot_width=5.5;
+bop_width=20;
 // bolt-on-thumb-plate thickness
 bop_thickness=4;
 // bolt-on-thumb-plate height proportion to main plate size
@@ -79,7 +79,7 @@ bop_height=30;
 // base mount plate for a chin or thumb plate to join onto
 
 /* [Bolt-On Bar] */
-// rounded bar for mounting a pad or rest, has divider for strength 
+// rounded bar for mounting a pad or rest, has divider for strength
 bolt_on_bar=false;
 // percentage how far along the bar should the divider be
 bob_split=65;
@@ -111,12 +111,11 @@ tulip_chin_plate=false;
 half_tulip_chin_plate=false;
 tulip_chin_plate_mount=false;
 
-tulip_chin_plate_plate_lateral_offset=-4;
-tulip_chin_plate_plate_=-4;
+tulip_chin_plate_mount_lateral_offset=-4;
 tulip_chin_plate_length=38;
 tulip_chin_plate_width=29;
 tulip_chin_plate_height=4;
-tulip_chin_plate_plate_height=36;
+tulip_chin_plate_mount_height=25.5;
 tulip_chin_plate_slot_angle=0;
 // move the mount plate up/down
 tulip_chin_plate_vertical_offset=-1;
@@ -134,29 +133,33 @@ grooved_oval_chin_plate=false;
 grooved_chin_plate_mount=false;
 
 // how far from centre the mount plate is
-grooved_chin_plate_offset=-1;
+grooved_chin_plate_offset=-1.0;
 // how long the plate is - likely you want the same as the tab width
-grooved_chin_plate_length=38;
-// how wide the plate on the top is
-grooved_chin_plate_width=30;
+grooved_chin_plate_length=38.0;
+// how wide the plate on the top of the full plate
+grooved_chin_plate_width=30.0;
+// how wide the plate on the top of the half plate
+half_grooved_chin_plate_width=20.1;
 // how thick the top plate is
-grooved_chin_plate_height=6;
+grooved_chin_plate_height=6.0;
 // the angle that the plate is to the base plate
-grooved_chin_plate_angle=0;
+grooved_chin_plate_angle=0.0;
 // this tilts the groove from back->front slightly
-grooved_chin_plate_tilt=0;
+grooved_chin_plate_tilt=0.0;
+// width of the mounting plate
+grooved_chin_plate_mount_width=20.5;
 // top->bottom height of the mounting plate
-grooved_chin_plate_plate_height=30;
+grooved_chin_plate_mount_height=22.5;
 // the angle of the mount plate slot from vertical
 grooved_chin_plate_slot_angle=1;
 // move the mount plate forward/back
-grooved_chin_plate_longitudinal_offset=-5;
+grooved_chin_plate_longitudinal_offset=-5.0;
 // move the mount plate up/down
 grooved_chin_plate_vertical_offset=-1;
 // radius of the cylinder used to make the groove
 grooved_chin_plate_radius_mod=0.9;
 // the larger this is, the less is cut off the front
-grooved_chin_plate_front_cutoff_mod=7;
+grooved_chin_plate_front_cutoff_mod=7.0;
 
 /* [Base Plate] */
 ks_base_plate=false;
@@ -168,7 +171,7 @@ ks_base_plate_square_plate=false;
 tulip_full_plate=false;
 
 // Offset of chin plate to base_plate
-tulip_full_plate_plate_offset=2;
+tulip_full_plate_mount_offset=2;
 tulip_full_plate_length=38;
 tulip_full_plate_width=30;
 tulip_full_plate_height=1.75;
@@ -256,7 +259,7 @@ ring_spacer_forward_mod=2.0;
 ring_spacer_plate_thickness=3.5;
 // this allows fine tuning of how high the ring sits proud over the plate
 ring_vertical_height_mod = 0.8;
-  
+
 // this allows fine tuning of how much of the ring is embedded in the spacer
 ring_joint_spacer_overlap=0.9;
 
@@ -318,7 +321,7 @@ if (rounded_edge_plate) {
 if (tulip_chin_plate) {
   translate(get_translation(8)) {
     tulip_chin_plate(
-      plate_offset=tulip_chin_plate_plate_lateral_offset,
+      plate_offset=tulip_chin_plate_mount_lateral_offset,
       length=tulip_chin_plate_length,
       width=tulip_chin_plate_width,
       height=tulip_chin_plate_height,
@@ -331,7 +334,7 @@ if (tulip_chin_plate) {
 if (half_tulip_chin_plate) {
   translate(get_translation(9)) {
     half_tulip_chin_plate(
-      plate_offset=tulip_chin_plate_plate_lateral_offset,
+      plate_offset=tulip_chin_plate_mount_lateral_offset,
       length=tulip_chin_plate_length,
       width=tulip_chin_plate_width,
       height=tulip_chin_plate_height,
@@ -342,11 +345,11 @@ if (half_tulip_chin_plate) {
 }
 
 if (bolt_on_plate) {
-  translate(get_translation(10)) bolt_on_plate(bop_length, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
+  translate(get_translation(10)) bolt_on_plate(bop_width, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
 }
 
 if (bolt_on_plate_with_fillet) {
-  translate(get_translation(11)) bolt_on_plate_with_fillet(bop_length, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
+  translate(get_translation(11)) bolt_on_plate_with_fillet(bop_width, bop_thickness, bop_height, bop_slot_angle, bop_slot_width);
 }
 
 if (bolt_on_bar) {
@@ -367,7 +370,8 @@ if (grooved_tulip_chin_plate) {
       width=grooved_chin_plate_width,
       height=grooved_chin_plate_height,
       angle=grooved_chin_plate_angle,
-      plate_height=grooved_chin_plate_plate_height,
+      plate_height=grooved_chin_plate_mount_height,
+      plate_width=grooved_chin_plate_mount_width,
       slot_angle=grooved_chin_plate_slot_angle,
       tilt=grooved_chin_plate_tilt,
       longitudinal_offset=grooved_chin_plate_longitudinal_offset,
@@ -384,7 +388,8 @@ if (grooved_oval_chin_plate) {
       width=grooved_chin_plate_width,
       height=grooved_chin_plate_height,
       angle=grooved_chin_plate_angle,
-      plate_height=grooved_chin_plate_plate_height,
+      plate_height=grooved_chin_plate_mount_height,
+      plate_width=grooved_chin_plate_mount_width,
       slot_angle=grooved_chin_plate_slot_angle,
       tilt=grooved_chin_plate_tilt,
       longitudinal_offset=grooved_chin_plate_longitudinal_offset,
@@ -398,10 +403,11 @@ if (half_grooved_tulip_chin_plate) {
     half_grooved_tulip_chin_plate(
       plate_offset=grooved_chin_plate_offset,
       length=grooved_chin_plate_length,
-      width=grooved_chin_plate_width,
+      width=half_grooved_chin_plate_width,
       height=grooved_chin_plate_height,
       angle=grooved_chin_plate_angle,
-      plate_height=grooved_chin_plate_plate_height,
+      plate_height=grooved_chin_plate_mount_height,
+      plate_width=grooved_chin_plate_mount_width,
       slot_angle=grooved_chin_plate_slot_angle,
       tilt=grooved_chin_plate_tilt,
       longitudinal_offset=grooved_chin_plate_longitudinal_offset,
@@ -435,7 +441,7 @@ if (standard_plate) {
 
 if (tulip_full_plate) {
   translate(get_translation(16)) tulip_full_plate(
-    tulip_full_plate_plate_offset,
+    tulip_full_plate_mount_offset,
     tulip_full_plate_length,
     tulip_full_plate_width,
     tulip_full_plate_height
@@ -1168,8 +1174,8 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
       linear_extrude(height = plate_height) {
         polygon(polygon_points, convexity=2);
       }
-      prism_chamfer_mask(polygon_points, 
-      start_edge=0, 
+      prism_chamfer_mask(polygon_points,
+      start_edge=0,
       end_edge=13,
       side=2,
       side2=0
@@ -1576,12 +1582,12 @@ module scaled_tulip_base_plate(length, width, height) {
     base_width=30;
     base_height=2;
     intersection() {
-      translate([base_length/8,0,0]) { 
+      translate([base_length/8,0,0]) {
         radiusedblock(base_length,base_width,base_height,base_height);
       }
       translate([36,80,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
       translate([36,-55,0]) { chamfercyl(80,base_height+2,-2,-2, $fn=tmp_fn); }
-      translate([-base_length / grooved_chin_plate_front_cutoff_mod ,-base_length-6,0]) { 
+      translate([-base_length / grooved_chin_plate_front_cutoff_mod ,-base_length-6,0]) {
         rotate([0,0,45]) {
           radiusedblock(base_length*2,(base_length*2)-3,base_height,base_height);
         }
@@ -1606,8 +1612,8 @@ module scaled_oval_base_plate(length, width, height) {
     block_width=(base_width*2)-round_mod;
     rotate([0,0,90])
     intersection() {
-      chamfercyl(base_length,base_height,-rounding,-rounding); 
-      translate([-base_length,-base_width,0]) { 
+      chamfercyl(base_length,base_height,-rounding,-rounding);
+      translate([-base_length,-base_width,0]) {
         radiusedblock(block_length,block_width,base_height-round_mod,rounding);
       }
     }
@@ -1714,30 +1720,41 @@ module grooved_half_chin_plate(length=38, width=25, height=4, groove_tilt=4, gro
 }
 
 
-module half_grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) { 
-  resize([height, length, width])
-  difference() {
-    grooved_tulip_chin_plate( plate_offset, length, width, height, angle, plate_height, slot_angle, tilt);
-    translate([-height,0,-width]) {
-      cube([height*2,length*2,width]);
+module half_grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, plate_width=22.5, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) {
+  union() {
+    resize([height, length, width]) {
+      difference() {
+        translate([0.5,2+longitudinal_offset,(width/2)-plate_offset]) {
+            grooved_tulip_base_plate(length, width, height, angle, slot_angle, tilt);
+        }
+        translate([-height,0,-width]) {
+          cube([height*2,length*2,width]);
+        }
+      }
+    }
+    // mount plate
+    if (grooved_chin_plate_mount) {
+      translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+        rotate([0,0,90-slot_angle]) {
+           bolt_on_plate_with_fillet(plate_width, mount_plate_thickness, plate_height, slot_angle);
+        }
+      }
     }
   }
 }
 
-module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) {
+module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, plate_width=22.5, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset=0) {
   difference() {
     union() {
       // plate
       translate([0.5,2+longitudinal_offset,(width/2)-plate_offset]) {
-        rotate([90,180+angle,-90-slot_angle]) {
-             grooved_tulip_plate(angle, length, width, height, tilt);
-        }
+          grooved_tulip_base_plate(length, width, height, angle, slot_angle, tilt);
       }
-      // base_plate
+      // mount_plate
       if (grooved_chin_plate_mount) {
         translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
           rotate([0,0,90-slot_angle]) {
-             bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+             bolt_on_plate_with_fillet(plate_width, mount_plate_thickness, plate_height, slot_angle);
           }
         }
       }
@@ -1745,7 +1762,13 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
   } // end difference
 }
 
-module grooved_oval_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) {
+module grooved_tulip_base_plate(length=28, width=30, height=4, angle=3, slot_angle=8, tilt=2) {
+        rotate([90,180+angle,-90-slot_angle]) {
+             grooved_tulip_plate(angle, length, width, height, tilt);
+        }
+}
+
+module grooved_oval_chin_plate( plate_offset=-3, length=28, width=30, height=4, angle=3, plate_height=38, plate_width=22.5, slot_angle=8, tilt=2, longitudinal_offset=0, vertical_offset) {
   difference() {
     union() {
       // plate
@@ -1758,7 +1781,7 @@ module grooved_oval_chin_plate( plate_offset=-3, length=28, width=30, height=4, 
       if (grooved_chin_plate_mount) {
         translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
           rotate([0,0,90-slot_angle]) {
-             bolt_on_plate_with_fillet(plate_height*0.7, mount_plate_thickness, plate_height, slot_angle);
+             bolt_on_plate_with_fillet(plate_width, mount_plate_thickness, plate_height, slot_angle);
           }
         }
       }
@@ -1826,12 +1849,12 @@ module bolt_on_bar(length, thickness, width, split, slot_width=bolt_slot_width) 
   }
 }
 
-module bolt_on_plate_with_fillet(length, thickness, height, slot_angle, slot_width=bolt_slot_width, double_fillet=false) {
-  fillet_length=length*0.85;
+module bolt_on_plate_with_fillet(width, thickness, height, slot_angle, slot_width=bolt_slot_width, double_fillet=false) {
+  fillet_length=width*0.85;
   fillet_trans_mod = 1.5;
-  fillet_trans=length-fillet_length-fillet_trans_mod;
+  fillet_trans=width-fillet_length-fillet_trans_mod;
   union() {
-    bolt_on_plate(length, thickness, height, slot_angle, slot_width);
+    bolt_on_plate(width, thickness, height, slot_angle, slot_width);
     if (right_handed) {
       translate([fillet_length*1.05,height, 0.5]) {
         rotate([90,90,-90]) {
@@ -2626,7 +2649,7 @@ function is_vertex_convex(pts, cw) =
 
 
 //===========
-//  Modules  
+//  Modules
 //===========
 
 //Create masks for 1 or more prism edges and any corners in between.
@@ -2640,15 +2663,15 @@ module prism_chamfer_mask(polygon_pts, start_edge=0, end_edge=0, height=0,
   // up to but not including a complete rotation. Allows the corner at the
   // first point to be included in a contiguous range.
   assert(start_edge > -num_pts && end_edge < 2*num_pts);
-  
+
   points = [ for(i = [start_edge:end_edge+1])
              [polygon_pts[mod(i,num_pts)].x, polygon_pts[mod(i,num_pts)].y, height] ];
-  
+
   cw = is_polygon_orientation_clockwise(polygon_pts);
-  
+
   include_start = is_vertex_convex(vertex_points(polygon_pts, start_edge), cw);
   include_end   = is_vertex_convex(vertex_points(polygon_pts, end_edge+1), cw);
-  
+
   prism_chamfer_mask_raw(points, side, side2, cw,
                          corner_slope  = corner_slope,
                          include_start = include_start,
@@ -2665,7 +2688,7 @@ module prism_chamfer_mask_raw(points, side=1, side2=0, cw=false, top=undef,
     prism_chamfer_mask_e(points[i], points[i+1], side, side2, cw, top,
                          include_p0 = i==0            ? include_start : true,
                          include_p1 = i==num_points-2 ? include_end   : true);
-    
+
     if(i<num_points-2) {
       prism_chamfer_mask_c(points[i], points[i+1], points[i+2], side, side2, cw, top,
                            slope = corner_slope);
@@ -2689,7 +2712,7 @@ module prism_chamfer_mask_e(p0, p1, side=1, side2=0, cw=false, top=undef,
             ( top &&  cw) ? [[0,0,0],[-90,0,-90]] : //top, cw
             ( top && !cw) ? [[1,0,0],[-90,0, 90]] : //top, ccw
                             [[0,0,0],[ 90,0, 90]];  //bottom, ccw
-    
+
   length = norm(p1-p0) + (include_p0?ff:-ff) + (include_p1?ff:-ff);
   p0_fudged = translate_towards(p0, p1, include_p0?-ff:ff); //shift p0 fwd or back by fudge factor
   translate(p0_fudged) rotate([0, 0, angle_of(p0, p1)]) //align with p0 -> p1
@@ -2706,9 +2729,9 @@ module prism_chamfer_mask_c(p0, p1, p2, side=1, side2=0, cw=false, top=undef,
   assert(p0.z == p1.z && p1.z == p2.z); //only points in the same x-y plane are supported
   assert(side>0 && side2>0);
   assert(p0!=p1 && p1!=p2 && p0!=p2);
-  
+
   corner_angle = corner_angle(p0, p1, p2);
-  
+
   if(is_vertex_convex([p0,p1,p2],cw)) {
     //no mask needed for outside corners
   }
