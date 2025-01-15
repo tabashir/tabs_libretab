@@ -13,9 +13,13 @@ bolt_slot_width=4.5;
 bolt_head_width=10.0;
 elastic_slot_width=2.0;
 
-// Initials/wording for some of the labels
+/* [Initials] */
+// text as defined below, custom requires your own coding
+initials_type="text";  // ["text","custom"]
 initials="JM";
-initials_font="Arial Black";
+initials_font="Liberation Sans"; // ["Liberation Mono", "Liberation Sans", "Liberation Serif","Arial Black","Courier","Inconsolata","Cantarell","Droid Sans"]
+initials_size=7; // [2,3,4,5,6,7,8,9,10,11,12,13,14,15,20,25]
+initials_style="Bold"; // ["Regular","Italic","Bold","Light","Plain","ExtraBold"]
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -506,7 +510,7 @@ module jezr_ring_plate(initials, x_scale=1) {
     // Initials
     translate([35*x_scale, 50*scaling, 0 ]) {
       translate([0, 20, thickness/1.5]) {
-        initials_a();
+        initials();
       }
     }
     // chin or thumb rest slots
@@ -536,7 +540,7 @@ module jezr_ring_plate_2(initials, x_scale=1) {
     // Initials
     translate([35*x_scale, 50*scaling, 0 ]) {
       translate([0, 20, thickness/1.5]) {
-        initials_a();
+        initials();
       }
     }
     // chin or thumb rest slots
@@ -566,7 +570,7 @@ module jezr_ring_plate_2(initials, x_scale=1) {
     // Initials
     translate([35*x_scale, 50*scaling, 0 ]) {
       translate([0, 20, thickness/1.5]) {
-        initials_a();
+        initials();
       }
     }
     // chin or thumb rest slots
@@ -602,7 +606,7 @@ module jezr_ring_plate_3(initials, x_scale=1) {
 
     // Initials
       translate([-18, slots_y_adjust-29, thickness/1.5]) {
-        initials_a();
+        initials();
       }
     // chin or thumb rest slots
     angled_slot(-3*scaling, 30*scaling, 40, 12*scaling, scaling=scaling);
@@ -840,7 +844,7 @@ module jezc_ring_plate(initials, x_scale=1) {
     // decorative
     translate([43*x_scale, 51*scaling, 0 ]) {
       translate([0, 20, -1]) {
-        initials_a();
+        initials();
       }
     }
     //
@@ -1196,7 +1200,7 @@ module rounded_edge_plate(plate_length=65, plate_width=45, plate_height=thicknes
     // Initials
     translate([22,18,0 ]) {
       rotate([0,0,90])
-          initials_b();
+          initials();
     }
   }
 
@@ -2248,7 +2252,7 @@ module tab_bb_plate(slots=true) {
     // Initials
     translate([12, 20, initial_translation]) {
       scale([1,1,3])
-      initials_b();
+      initials();
     }
 
   }
@@ -2287,25 +2291,34 @@ module mins_bb_plate() {
   }
 }
 
-module initials_a() {
+module initials() {
+	font_style_text=str(initials_font,":style=",initials_style);
+	if (initials_type == "custom") {
+		initials_custom(font_style_text);
+	} else {
+		initials_text(font_style_text);
+	}
+}
+
+module initials_custom(font_style) {
   rotate([0,0,0]) {
     linear_extrude(height = thickness*2) {
-      translate([2, 9, 0]) {
+      translate([0, 9, 0]) {
         square([12,2]);
       }
-      text("J", font = initials_font, size=8 );
-      translate([7, 1, 0]) {
-        text("M", font = initials_font, size=6 );
+      text("J", font=font_style, size=initials_size );
+      translate([5, 1, 0]) {
+        text("M", font=font_style, size=initials_size );
       }
     }
   }
 }
 
-module initials_b() {
+module initials_text(font_style) {
 rotation = right_handed ? 180 : 0;
   rotate([0,rotation,0]) {
-    linear_extrude(height = thickness*2) {
-      text(initials, font = initials_font, size=7, halign="center" );
+    linear_extrude(height=thickness*2) {
+      text(initials, font=font_style, size=initials_size );
     }
   }
 }
