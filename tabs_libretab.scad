@@ -9,6 +9,7 @@ multiple_items=false;
 
 thickness=4.1;
 three_finger_width=65;
+plate_bolt_slot_width=92;
 bolt_slot_width=5.5;
 bolt_head_width=10.0;
 elastic_slot_width=2.0;
@@ -24,6 +25,8 @@ initials_style="Bold"; // ["Regular","Italic","Bold","Light","Plain","ExtraBold"
 // saves mirroring some objects in the slicer
 right_handed=false;
 
+// thickness of various plates in the system
+mount_plate_thickness=4.1;
 
 depth=three_finger_width*0.6;
 slot_depth=thickness+4;
@@ -31,7 +34,6 @@ z_slot_offset=2;
 tilted_slot_gap=8.6;
 tilted_slot_angle=15.0;
 tilted_slot_length=9.0;
-mount_plate_thickness=4.0;
 
 // view detail for preview render (you want this low to be fast)
 preview_fn=16;
@@ -182,6 +184,9 @@ tulip_full_plate_height=1.75;
 // bump slots up or down relative to the plate
 slots_y_adjust=0.1;
 
+// bump nock groove up or down
+nock_groove_y_adjust=4.5;
+
 // Loosely based on WW EZR plate, with slots for cinch band and holes for finger ring
 jezr_plate=false;
 
@@ -262,6 +267,9 @@ ring_vertical_height_mod = 0.8;
 
 // this allows fine tuning of how much of the ring is embedded in the spacer
 ring_joint_spacer_overlap=0.9;
+
+// this allows fine tuning of how high the ring sits proud over the plate
+ring_vertical_mod = 3.0;
 
 
 
@@ -611,7 +619,7 @@ module jezr_ring_plate_3(initials, x_scale=1) {
     translate([7, -23, 0]) ring_plate_slots_3(scaling);
 
     // nock cutout
-    translate([27, 2, -2 ]) {
+    translate([27, nock_groove_y_adjust, -2 ]) {
       scale([1,0.7,1]) {
         nock_cutout_2(scaling);
       }
@@ -661,7 +669,7 @@ module jezr_ring_plate_4(initials, x_scale=1) {
     translate([3, 0, 0]) ring_plate_slots_4(scaling);
 
     // nock cutout
-    translate([27, 2, -2 ]) {
+    translate([27, nock_groove_y_adjust, -2 ]) {
       scale([1,0.7,1]) {
         nock_cutout_2(scaling);
       }
@@ -689,6 +697,7 @@ module ring_plate_slots_4(scaling) {
     translate([14, 0, 0]) {
       angled_slot(6, 0, 177, slot_length=bolt_slot_len+18, slot_width=5.5, scaling=scaling);
       angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      // ADD: angled_slot(0, plate_bolt_slot_width*scaling, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
     }
     other_slot_len=14;
     translate([1, 10, 0]){
@@ -841,9 +850,7 @@ module ww_base_plate_4(scaling) {
     scale([scaling, scaling, 1]) {
       linear_extrude(height = thickness) {
         difference() {
-          polygon([
-		[35,41],[39,38],[39,9],[42,9],[45,9],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]
-		]);
+                 polygon([[35,41],[39,38],[39,26],[39,24],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]]);
         }
       }
     }
@@ -1044,14 +1051,7 @@ module nock_cutout_2(scaling=1, plate_height=10) {
 // overall size = 14x30;
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height*2) {
-        polygon([
-          // [41,24],[40,23],[39,23],[37,21],[37,5],[40,3],[44,3],[45,2],
-        [14,30], [8,30],
-        // nock cutout
-        [0,22],[0,8],[7,1],[13,1],[14,0],
-        // middle and ring finger front
-        [14,0],[14,0]
-        ]);
+    polygon([[40,92],[8,92],[8,30],[0,22],[0,8],[7,1],[13,1],[14,0],[14,0],[22,-9],[40,-9]]);
       }
   }
 }
@@ -1724,7 +1724,7 @@ module half_grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, heig
   union() {
     resize([height, length, width]) {
       difference() {
-        translate([0.5,2+longitudinal_offset,(width/2)-plate_offset]) {
+        translate([0.5,0,(width/2)-plate_offset]) {
             grooved_tulip_base_plate(length, width, height, angle, slot_angle, tilt);
         }
         translate([-height,0,-width]) {
@@ -1734,7 +1734,7 @@ module half_grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, heig
     }
     // mount plate
     if (grooved_chin_plate_mount) {
-      translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+      translate([plate_height-(height/2)+3+vertical_offset,longitudinal_offset,0]) {
         rotate([0,0,90-slot_angle]) {
            bolt_on_plate_with_fillet(plate_width, mount_plate_thickness, plate_height, slot_angle);
         }
@@ -1747,12 +1747,12 @@ module grooved_tulip_chin_plate( plate_offset=-3, length=28, width=30, height=4,
   difference() {
     union() {
       // plate
-      translate([0.5,2+longitudinal_offset,(width/2)-plate_offset]) {
+      translate([0.5,0,(width/2)-plate_offset]) {
           grooved_tulip_base_plate(length, width, height, angle, slot_angle, tilt);
       }
       // mount_plate
       if (grooved_chin_plate_mount) {
-        translate([plate_height-(height/2)+3+vertical_offset,2,0]) {
+        translate([plate_height-(height/2)+3+vertical_offset,longitudinal_offset,0]) {
           rotate([0,0,90-slot_angle]) {
              bolt_on_plate_with_fillet(plate_width, mount_plate_thickness, plate_height, slot_angle);
           }
@@ -2179,13 +2179,13 @@ module finger_ring_with_spacer() {
       // bolt holes to secure tab
       translate([100*scaling, 30*scaling, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
-      }
-      translate([100*scaling, 122*scaling, -z_slot_offset]) {
-        cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+        translate([0, plate_bolt_slot_width*scaling, 0]) {
+          cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
+        }
       }
     }
 
-    translate([ring_x_offset*scaling,ring_y_offset*scaling,0]) {
+    translate([ring_x_offset*scaling,(ring_y_offset*scaling)+ring_vertical_mod,0]) {
       rotate([0,0,0]) {
         finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth, ring_spacer_length, ring_spacer_width, right_handed);
       }
