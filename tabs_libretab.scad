@@ -2203,11 +2203,6 @@ module finger_ring_label() {
 }
 
 module ring_base_plate(scaling, plate_height=thickness) {
-  ring_base_plate_basic(scaling, plate_height);
-  // ring_base_plate_poly(scaling, plate_height);
-}
-
-module ring_base_plate_basic(scaling, plate_height=thickness) {
   scale([scaling, scaling, 1]) {
     translate([100, 40, 1]) {
       rotate([0, 0, 90]) {
@@ -2221,29 +2216,6 @@ module ring_base_plate_basic(scaling, plate_height=thickness) {
   }
 }
 
-module ring_base_plate_poly(scaling, plate_height=thickness) {
-  scale([scaling, scaling, 1]) {
-    linear_extrude(height = plate_height) {
-      translate([66, 72, 0]) {
-        polygon([
-        // top index finger front
-        [58,54], [58,42],
-        // nock cutout
-        [54,42],[48,32],[48,18],[57,9],[63,9],
-        // middle and ring finger front
-        [64,7],[64,-35],
-        // bottom front curve
-        [62,-40],[59,-46],[54,-51],[50,-54],[45,-56],[38,-57],[31,-57],[20,-53],[12,-46],
-        [7,-40],[7,50],
-        // top curve
-        [15,62],[38,66],[48,66],
-        // top front join curve
-        [54,62],[57,60],[58,57]
-        ]);
-      }
-    }
-  }
-}
 
 module bb_finger_ring() {
   // Tab sketch is 144px high
