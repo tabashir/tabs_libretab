@@ -246,7 +246,7 @@ bb_finger_ring=false;
 finger_ring_with_spacer=false;
 
 // width around your middle finger
-ring_finger_circumference=78.1;
+ring_finger_circumference=79.1;
 // reduce if very small hands, too small may make the ring too weak.
 ring_thickness=3.1;
 // how wide the band is from front>back of the tab
@@ -257,19 +257,17 @@ spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, j
 // stretch the spacer from front>back
 ring_spacer_length=31.9;
 // stretch the spacer from top>bottom
-ring_spacer_width=8.1;
+ring_spacer_width=7.8;
 // greater than 0 shifts ring and spacer forward
 ring_spacer_forward_mod=2.0;
 // too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=3.5;
 // this allows fine tuning of how high the ring sits proud over the plate
-ring_vertical_height_mod = 0.8;
-
+ring_vertical_height_mod = 0.1;
 // this allows fine tuning of how much of the ring is embedded in the spacer
 ring_joint_spacer_overlap=0.9;
-
-// this allows fine tuning of how high the ring sits proud over the plate
-ring_vertical_mod = 3.0;
+// this allows fine tuning of how near the ring is to the top bolt hole
+ring_vertical_mod = 2.9;
 
 
 
@@ -2157,24 +2155,12 @@ module finger_ring_with_spacer() {
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
 
-  $fn=100;
-
   ring_x_offset=92+ring_spacer_forward_mod;
   ring_y_offset=100;
 
   union() {
     difference() {
-      ring_base_plate(scaling, ring_spacer_plate_thickness);
-      // slots (not needed but uncomment if you want to see where it would be)
-      // angled_slot(ring_x_offset, ring_y_offset, 0, 4, scaling=scaling);
-      // slot_y_offset=38*scaling;
-      // for (slotno=[1:1:4]) {
-      //   angled_slot(57*scaling, (tilted_slot_gap*slotno)+slot_y_offset, slot_length=11);
-      // }
-      //
-      translate([30*scaling, 0, -1]) {
-            // cube([40*scaling,150*scaling,ring_spacer_plate_thickness+2]);
-      }
+      ring_base_plate(scaling, ring_spacer_plate_thickness, "base");
 
       // bolt holes to secure tab
       translate([100*scaling, 30*scaling, -z_slot_offset]) {
@@ -2193,23 +2179,34 @@ module finger_ring_with_spacer() {
   }
 }
 
-module finger_ring_label() {
+module finger_ring_label(label_type) {
     linear_extrude(height = thickness*2) {
-      // label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", ring_spacer_length, "/", ring_spacer_width, "/", right_handed, "/", three_finger_width);
       hand_label = right_handed ? "R" : "L";
-      label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", three_finger_width, "/", hand_label, "/", ring_spacer_width);
-      text(label, font = initials_font, halign="center", size=5 );
+      if (label_type == "full") {
+        label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", three_finger_width, "/", hand_label, "/", ring_spacer_width);
+        text(label, font = initials_font, halign="center", size=5 );
+      } else {
+        label = str(ring_finger_circumference, "/", ring_thickness);
+        text(label, font = initials_font, halign="center", size=7 );
+      }
   }
 }
 
-module ring_base_plate(scaling, plate_height=thickness) {
+module ring_base_plate(scaling, plate_height=thickness, label_type="full") {
   scale([scaling, scaling, 1]) {
     translate([100, 40, 1]) {
       rotate([0, 0, 90]) {
         difference() {
-          bar(70,51,plate_height,0);
-          rotate([180,0,0])
-          translate([35, -22, 1]) finger_ring_label();
+          hull() {
+            bar(70,51,plate_height/2,0);
+            translate([1, 1, -plate_height/2]) {
+              bar(60,40,1,0);
+            }
+          }
+          if (label_type!="none") {
+            rotate([180,0,0])
+            translate([35, -22, 1]) finger_ring_label(label_type);
+          }
         }
       }
     }
@@ -2224,8 +2221,6 @@ module bb_finger_ring() {
   pic_scale=65/144;
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
-
-  $fn=100;
 
   ring_x_offset=36+ring_spacer_forward_mod;
   ring_y_offset=100;
