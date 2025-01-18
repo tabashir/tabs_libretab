@@ -182,7 +182,7 @@ tulip_full_plate_height=1.75;
 /* [Tab Plates] */
 
 // bump slots up or down relative to the plate
-slots_y_adjust=0.1;
+slots_y_adjust=2.1;
 
 // bump nock groove up or down
 nock_groove_y_adjust=4.5;
@@ -261,7 +261,7 @@ ring_spacer_width=7.8;
 // greater than 0 shifts ring and spacer forward
 ring_spacer_forward_mod=2.0;
 // too small will likely weaken the attachment to rest of tab
-ring_spacer_plate_thickness=3.5;
+ring_spacer_plate_thickness=3.1;
 // this allows fine tuning of how high the ring sits proud over the plate
 ring_vertical_height_mod = 0.1;
 // this allows fine tuning of how much of the ring is embedded in the spacer
@@ -683,23 +683,22 @@ module jezr_ring_plate_4(initials, x_scale=1) {
 module ring_plate_slots_4(scaling) {
   // chin or thumb rest slots
   angled_slot(-3*scaling, 25*scaling, 0, 22*scaling, scaling=scaling);
-  angled_slot(-19*scaling, -2*scaling, 64, 10*scaling, scaling=scaling);
+  // angled_slot(-14*scaling, -25*scaling, 114, 10*scaling, scaling=scaling);
 
   // palm pad slots
-  angled_slot(-16*scaling, -29*scaling, 60, 21*scaling, scaling=scaling);
-  angled_slot(-42*scaling, -31*scaling, 52, 15*scaling, scaling=scaling);
+  angled_slot(1*scaling, -21*scaling, 114, 27*scaling, scaling=scaling);
+  angled_slot(-42*scaling, -31*scaling, 42, 20*scaling, scaling=scaling);
 
   translate([4, -23, 0]) {
     // bolt slots to secure tab
-    bolt_slot_len=3;
+    bolt_slot_len=6;
     translate([14, 0, 0]) {
-      angled_slot(6, 0, 177, slot_length=bolt_slot_len+18, slot_width=5.5, scaling=scaling);
+      angled_slot(6, 0, 177, slot_length=bolt_slot_len+14, slot_width=5.5, scaling=scaling);
       angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
-      // ADD: angled_slot(0, plate_bolt_slot_width*scaling, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
     }
     other_slot_len=14;
     translate([1, 10, 0]){
-      angled_slot(0, 0, 0, slot_length=8+other_slot_len*scaling);
+      angled_slot(8, 0, 0, slot_length=other_slot_len*scaling);
       angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
       angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
     }
@@ -844,12 +843,23 @@ module ww_base_plate_3(scaling) {
 }
 
 module ww_base_plate_4(scaling) {
-  // translate([38, 52, 0]) {
+    points = [[35,41],[39,38],[39,26],[39,24],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]];
+    dims = polygon_dimensions(points);
+    width = dims[0];
+    height = dims[1];
+    chamfer_edge_size=4;
     scale([scaling, scaling, 1]) {
-      linear_extrude(height = thickness) {
-        difference() {
-                 polygon([[35,41],[39,38],[39,26],[39,24],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]]);
-        }
+        hull() {
+          linear_extrude(height = thickness) {
+            polygon(points);
+          }
+          translate([0,0,1]) {
+            resize([width-chamfer_edge_size,height-chamfer_edge_size,thickness]) {
+              linear_extrude(height = thickness) {
+                polygon(points);
+              }
+            }
+          }
       }
     }
   // }
@@ -1049,7 +1059,7 @@ module nock_cutout_2(scaling=1, plate_height=10) {
 // overall size = 14x30;
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height*2) {
-    polygon([[40,92],[8,92],[8,30],[0,22],[0,8],[7,1],[13,1],[14,0],[14,0],[22,-9],[40,-9]]);
+    polygon([[40,92],[4,92],[4,26],[0,22],[0,8],[7,1],[13,1],[14,0],[14,0],[22,-9],[40,-9]]);
       }
   }
 }
@@ -2613,6 +2623,15 @@ function is_vertex_convex(pts, cw) =
        det = (B.x-A.x)*(C.y-A.y) - (C.x-A.x)*(B.y-A.y),
        right_turn = det < 0)
     cw == right_turn; //right turns are convex when going cw, and vice-versa
+
+
+function polygon_dimensions(points) =
+    let (
+        x_coords = [for (i = [0 : len(points) - 1]) points[i][0]],
+        y_coords = [for (i = [0 : len(points) - 1]) points[i][1]]
+    )
+    [max(x_coords) - min(x_coords), max(y_coords) - min(y_coords)];
+
 
 
 //===========
