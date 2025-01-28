@@ -159,7 +159,7 @@ grooved_chin_plate_longitudinal_offset=-5.0;
 // move the mount plate up/down
 grooved_chin_plate_vertical_offset=-1;
 // radius of the cylinder used to make the groove
-grooved_chin_plate_radius_mod=0.9;
+grooved_chin_plate_radius_mod=0.45;
 // the larger this is, the less is cut off the front
 grooved_chin_plate_front_cutoff_mod=7.0;
 
@@ -185,7 +185,7 @@ tulip_full_plate_height=1.75;
 slots_y_adjust=2.1;
 
 // bump nock groove up or down
-nock_groove_y_adjust=4.5;
+nock_groove_y_adjust=2.5;
 
 // Loosely based on WW EZR plate, with slots for cinch band and holes for finger ring
 jezr_plate=false;
@@ -201,6 +201,9 @@ jezr_ring_plate_3=false;
 
 // wider version of jezr for use with finger ring only
 jezr_ring_plate_4=false;
+
+// even wider version of jezr with vertical slots
+jezr_ring_plate_5=false;
 
 // jezr with rear palm plate mounting cut off, cinch band and slots
 jezc_plate=false;
@@ -246,7 +249,7 @@ bb_finger_ring=false;
 finger_ring_with_spacer=false;
 
 // width around your middle finger
-ring_finger_circumference=79.1;
+ring_finger_circumference=78.1;
 // reduce if very small hands, too small may make the ring too weak.
 ring_thickness=3.1;
 // how wide the band is from front>back of the tab
@@ -254,6 +257,8 @@ ring_depth=11.1;
 
 // Different shaped Spacer blocks
 spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, jez_spacer_v3.stl, jez_spacer_v3.1.stl, cphughes_tab_spacer.stl]
+// rotate the spacer
+ring_spacer_rotation_degrees=4.5;
 // stretch the spacer from front>back
 ring_spacer_length=31.9;
 // stretch the spacer from top>bottom
@@ -474,6 +479,10 @@ if (jezr_ring_plate_4) {
   translate(get_translation(40)) jezr_ring_plate_4(initials, 1.1);
 }
 
+if (jezr_ring_plate_5) {
+  translate(get_translation(40)) jezr_ring_plate_5(initials, 1.1);
+}
+
 if (jezc_plate) {
   translate(get_translation(19)) jezc_plate();
 }
@@ -617,7 +626,7 @@ module jezr_ring_plate_3(initials, x_scale=1) {
     translate([7, -23, 0]) ring_plate_slots_3(scaling);
 
     // nock cutout
-    translate([27, nock_groove_y_adjust, -2 ]) {
+    translate([27, 7+nock_groove_y_adjust, -2 ]) {
       scale([1,0.7,1]) {
         nock_cutout_2(scaling);
       }
@@ -667,7 +676,7 @@ module jezr_ring_plate_4(initials, x_scale=1) {
     translate([3, 0, 0]) ring_plate_slots_4(scaling);
 
     // nock cutout
-    translate([27, nock_groove_y_adjust, -2 ]) {
+    translate([27, 7+nock_groove_y_adjust, -2 ]) {
       scale([1,0.7,1]) {
         nock_cutout_2(scaling);
       }
@@ -698,6 +707,67 @@ module ring_plate_slots_4(scaling) {
     }
     other_slot_len=14;
     translate([1, 10, 0]){
+      angled_slot(8, 0, 0, slot_length=other_slot_len*scaling);
+      angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
+      angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
+    }
+  }
+}
+
+module jezr_ring_plate_5(initials, x_scale=1) {
+  // Tab sketch is 96px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/96;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    translate([0, slots_y_adjust, 0]) ww_base_plate_5(scaling);
+
+    // nock cutout
+    translate([34, 7+nock_groove_y_adjust, -2 ]) {
+      scale([1,0.7,1]) {
+        nock_cutout_2(scaling);
+      }
+    }
+
+    // Initials
+      translate([-13, slots_y_adjust-26, thickness/1.5]) {
+        initials();
+      }
+
+    translate([3, 0, 0]) ring_plate_slots_5(scaling);
+  }
+}
+
+module ring_plate_slots_5(scaling) {
+  // chin or thumb rest slots
+  // angled_slot(-3*scaling, 25*scaling, 0, 22*scaling, scaling=scaling);
+  // angled_slot(-14*scaling, -25*scaling, 114, 10*scaling, scaling=scaling);
+
+  // palm pad slots
+  angled_slot(1*scaling, -16*scaling, 114, 27*scaling, scaling=scaling);
+  angled_slot(-40*scaling, -30*scaling, 42, 24*scaling, scaling=scaling);
+
+  translate([4, -23, 0]) {
+    // bolt slots to secure tab
+    bolt_slot_len=6;
+    translate([9, 40, 0]) {
+      angled_slot(15, 6, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(5, 6, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(-5, 5, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(-15, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+    }
+    translate([11, -2, 0]) {
+      // angled_slot(25, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(15, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(5, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(-5, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(-15, 0, 90, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+    }
+    other_slot_len=24;
+    translate([1, 13, 0]){
       angled_slot(8, 0, 0, slot_length=other_slot_len*scaling);
       angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
       angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
@@ -843,23 +913,52 @@ module ww_base_plate_3(scaling) {
 }
 
 module ww_base_plate_4(scaling) {
-    points = [[35,41],[39,38],[39,26],[39,24],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-30,-10],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]];
+     points = [[35,41],[41,38],[45,34],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]];
+
     dims = polygon_dimensions(points);
     width = dims[0];
     height = dims[1];
     chamfer_edge_size=4;
-    scale([scaling, scaling, 1]) {
+    resize([0, 0, thickness]) {
+      scale([scaling, scaling, 1]) {
         hull() {
           linear_extrude(height = thickness) {
             polygon(points);
           }
-          translate([0,0,1]) {
+          translate([1,0,1]) {
             resize([width-chamfer_edge_size,height-chamfer_edge_size,thickness]) {
               linear_extrude(height = thickness) {
                 polygon(points);
               }
             }
           }
+        }
+      }
+    }
+  // }
+}
+
+module ww_base_plate_5(scaling) {
+     points = [[45,41],[51,38],[55,34],[55,18],[55,-35],[54,-38],[53,-39],[46,-43],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[21,41]];
+
+    dims = polygon_dimensions(points);
+    width = dims[0];
+    height = dims[1];
+    chamfer_edge_size=4;
+    resize([0, 0, thickness]) {
+      scale([scaling, scaling, 1]) {
+        hull() {
+          linear_extrude(height = thickness) {
+            polygon(points);
+          }
+          translate([1,0,1]) {
+            resize([width-chamfer_edge_size,height-chamfer_edge_size,thickness]) {
+              linear_extrude(height = thickness) {
+                polygon(points);
+              }
+            }
+          }
+        }
       }
     }
   // }
@@ -1059,8 +1158,8 @@ module nock_cutout_2(scaling=1, plate_height=10) {
 // overall size = 14x30;
   scale([scaling, scaling, 1]) {
     linear_extrude(height = plate_height*2) {
-    polygon([[40,92],[4,92],[4,26],[0,22],[0,8],[7,1],[13,1],[14,0],[14,0],[22,-9],[40,-9]]);
-      }
+      polygon([[40,92],[4,92],[4,26],[0,22],[0,8],[7,1],[13,1],[14,0],[22,-8],[22,-58],[40,-58]]);
+    }
   }
 }
 
@@ -1964,15 +2063,17 @@ module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth,
   inner_radius=(inner_diameter/2);
   outer_radius=inner_radius+ring_thickness;
   fillet_translation=inner_radius+(ring_thickness/2);
-  ring_rotation = right_handed ? 0 : 180;
+  handedness_rotation = right_handed ? 0 : 180;
   ring_translation = right_handed ? 1-outer_radius-ring_joint_spacer_overlap : outer_radius+ring_joint_spacer_overlap-1;
   z_move = right_handed ? 0 : ring_spacer_plate_thickness/2;
 
   translate([0,0,z_move]) {
-    rotate([ring_rotation,0,0]) {
+    rotate([handedness_rotation,0,0]) {
       // finger spacer
       resize([ring_spacer_length,ring_spacer_width,inner_diameter]) {
-          import(spacer_stl_file);
+        rotate([0,0,ring_spacer_rotation_degrees]) {
+            import(spacer_stl_file);
+        }
       }
       // finger ring
       x_move = ring_thickness-(ring_thickness * ring_spacer_length*0.5);
