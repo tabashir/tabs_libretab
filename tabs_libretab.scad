@@ -1,7 +1,6 @@
 include <./lib/chamfer_extrude.scad>;
 include <./lib/prism-chamfer.scad>;
 
-
 /* [Global User Variables] */
 
 // This will lay items out on plate. If you are working on one item, unset.
@@ -21,6 +20,9 @@ initials="JM";
 initials_font="Liberation Sans"; // ["Liberation Mono", "Liberation Sans", "Liberation Serif","Arial Black","Courier","Inconsolata","Cantarell","Droid Sans"]
 initials_size=7; // [2,3,4,5,6,7,8,9,10,11,12,13,14,15,20,25]
 initials_style="Bold"; // ["Regular","Italic","Bold","Light","Plain","ExtraBold"]
+
+// the type of label information on various parts
+label_type="part"; // ["full","part","none"]
 
 // saves mirroring some objects in the slicer
 right_handed=false;
@@ -204,6 +206,9 @@ jezr_ring_plate_4=false;
 
 // even wider version of jezr with vertical slots
 jezr_ring_plate_5=false;
+//
+// even wider version of jezr with horizontal slots
+jezr_ring_plate_6=false;
 
 // jezr with rear palm plate mounting cut off, cinch band and slots
 jezc_plate=false;
@@ -219,6 +224,29 @@ jezc_holes_plate_scaling=1.2;
 // Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
 
+// Long thumbnail slot/groove for bb tab stringwalking marks 
+bb_long_slot_len=5.1;
+// short thumbnail slot/groove for bb tab stringwalking marks 
+bb_short_slot_len=4.2;
+
+// short how deep the grooves are. 0=full depth. 1=none
+bb_slot_depth=0.4;
+
+// how far apart the slots are
+bb_finger_slot_spacing=1.6;
+
+// width of shallow slot for putting distance marks
+bb_tape_slot_width=6.1;
+
+// depth of shallow slot for putting distance marks
+bb_tape_slot_depth=0.6;
+
+// manual tweak to move tape slot laterally
+bb_tape_slot_adjust=1.6;
+
+// manual tweak to move mount holes laterally
+bb_mount_holes_lateral_mod=0.1;
+//
 // Barebow plate created outside of OpenScad, has nicely chamfered edges
 mins_bb_plate=false;
 
@@ -256,15 +284,15 @@ ring_thickness=3.1;
 ring_depth=11.1;
 
 // Different shaped Spacer blocks
-spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, jez_spacer_v3.stl, jez_spacer_v3.1.stl, cphughes_tab_spacer.stl]
+spacer_stl_file="jez_spacer_v3.stl"; // [jez_spacer_v1.stl, jez_spacer_v2.stl, jez_spacer_v3.stl, fivics_style.stl, cphughes_tab_spacer.stl]
 // rotate the spacer
-ring_spacer_rotation_degrees=4.5;
+spacer_rotation_degrees=4.5;
 // stretch the spacer from front>back
 ring_spacer_length=31.9;
 // stretch the spacer from top>bottom
 ring_spacer_width=7.8;
 // greater than 0 shifts ring and spacer forward
-ring_spacer_forward_mod=2.0;
+ring_forward_mod=2.0;
 // too small will likely weaken the attachment to rest of tab
 ring_spacer_plate_thickness=3.1;
 // this allows fine tuning of how high the ring sits proud over the plate
@@ -289,6 +317,18 @@ function get_translation_for_item(item_number) = [
   80 * (item_number % number_of_cols),
   80 * floor(item_number / number_of_cols),
   0 ];
+
+// Simple logging
+module log(message) {
+  echo(str("LOG: ", message));
+}
+module info(message) {
+  echo(str("INFO: ", message));
+}
+module error(message) {
+  echo(str("ERROR: ", message));
+}
+
 
 function get_translation(item_number) =
   multiple_items ? get_translation_for_item(item_number) : get_translation_for_item(0);
@@ -481,6 +521,10 @@ if (jezr_ring_plate_4) {
 
 if (jezr_ring_plate_5) {
   translate(get_translation(40)) jezr_ring_plate_5(initials, 1.1);
+}
+
+if (jezr_ring_plate_6) {
+  translate(get_translation(40)) jezr_ring_plate_6(initials, 1.1);
 }
 
 if (jezc_plate) {
@@ -702,8 +746,8 @@ module ring_plate_slots_4(scaling) {
     // bolt slots to secure tab
     bolt_slot_len=6;
     translate([14, 0, 0]) {
-      angled_slot(6, 0, 177, slot_length=bolt_slot_len+14, slot_width=5.5, scaling=scaling);
-      angled_slot(0, 62, 180, slot_length=bolt_slot_len, slot_width=5.5, scaling=scaling);
+      angled_slot(6, 0, 177, slot_length=20, slot_width=5.5, scaling=scaling);
+      angled_slot(0, 62, 180, slot_length=11, slot_width=5.5, scaling=scaling);
     }
     other_slot_len=14;
     translate([1, 10, 0]){
@@ -768,6 +812,59 @@ module ring_plate_slots_5(scaling) {
     }
     other_slot_len=24;
     translate([1, 13, 0]){
+      angled_slot(8, 0, 0, slot_length=other_slot_len*scaling);
+      angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
+      angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
+    }
+  }
+}
+
+module jezr_ring_plate_6(initials, x_scale=1) {
+  // Tab sketch is 96px high
+  // Tab is 74px high
+  // This is from tab with three_finger_width=65
+  pic_scale=74/96;
+  resize_scale=three_finger_width/65;
+  scaling=pic_scale*resize_scale;
+  //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+  difference() {
+    translate([0, slots_y_adjust, 0]) ww_base_plate_5(scaling);
+
+    // nock cutout
+    translate([34, 7+nock_groove_y_adjust, -2 ]) {
+      scale([1,0.7,1]) {
+        nock_cutout_2(scaling);
+      }
+    }
+
+    // Initials
+      translate([-13, slots_y_adjust-26, thickness/1.5]) {
+        initials();
+      }
+
+    translate([6, 2, 0]) ring_plate_slots_6(scaling);
+  }
+}
+
+module ring_plate_slots_6(scaling) {
+    bolt_slot_len=5;
+  // chin or thumb rest slots
+  angled_slot(-3*scaling, 25*scaling, 0, 22*scaling, scaling=scaling);
+  // angled_slot(-14*scaling, -25*scaling, 114, 10*scaling, scaling=scaling);
+
+  // palm pad slots
+  angled_slot(1*scaling, -21*scaling, 114, 27*scaling, scaling=scaling);
+  angled_slot(-42*scaling, -31*scaling, 42, 20*scaling, scaling=scaling);
+
+  translate([4, -23, 0]) {
+    // bolt slots to secure tab
+    bolt_slot_len=6;
+    translate([20, 0, 0]) {
+      angled_slot(6, 0, 184, slot_length=24, slot_width=5.5, scaling=scaling);
+      angled_slot(0, 62, 184, slot_length=20, slot_width=5.5, scaling=scaling);
+    }
+    other_slot_len=20;
+    translate([1, 10, 0]){
       angled_slot(8, 0, 0, slot_length=other_slot_len*scaling);
       angled_slot(4, 9, 0, slot_length=other_slot_len*scaling);
       angled_slot(0, 18, 0, slot_length=other_slot_len*scaling);
@@ -913,7 +1010,7 @@ module ww_base_plate_3(scaling) {
 }
 
 module ww_base_plate_4(scaling) {
-     points = [[35,41],[41,38],[45,34],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-34,-15],[-25,-3],[-21,2],[-18,7],[-15,12],[-10,21],[-7,26],[-1,33],[0,34],[6,37],[26,41]];
+     points = [[35,41],[41,38],[45,34],[45,18],[45,-35],[44,-38],[43,-39],[41,-41],[39,-42],[37,-43],[35,-44],[30,-45],[9,-45],[-3,-44],[-11,-43],[-20,-41],[-28,-38],[-33,-35],[-37,-30],[-38,-24],[-37,-19],[-32,-12],[-25,-5],[-20,2],[-18,7],[-15,12],[-10,21],[-6,27],[-1,33],[4,38],[7,40],[10,41],[22,41]];
 
     dims = polygon_dimensions(points);
     width = dims[0];
@@ -1299,12 +1396,12 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
     mirror([0,0,z_miror])
       chamfered_polygon();
     }
-    holes_x_offset=42+ring_spacer_forward_mod;
+    holes_x_offset=bb_mount_holes_lateral_mod+(37+ring_forward_mod);
     // bolt holes to secure tab
     if (slots) {
       for (slotno=[0:1:2]) {
        x_pos = holes_x_offset*scaling;
-       y_pos = 16*scaling + (slotno * (42*scaling));
+       y_pos = 18*scaling + (slotno * (42*scaling));
        angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
       }
     } else {
@@ -2071,7 +2168,7 @@ module finger_spacer_ring(ring_finger_circumference, ring_thickness, ring_depth,
     rotate([handedness_rotation,0,0]) {
       // finger spacer
       resize([ring_spacer_length,ring_spacer_width,inner_diameter]) {
-        rotate([0,0,ring_spacer_rotation_degrees]) {
+        rotate([0,0,spacer_rotation_degrees]) {
             import(spacer_stl_file);
         }
       }
@@ -2266,9 +2363,22 @@ module finger_ring_with_spacer() {
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
 
-  ring_x_offset=92+ring_spacer_forward_mod;
+  ring_x_offset=92+ring_forward_mod;
   ring_y_offset=100;
-
+  info("finger_ring_with_spacer");
+  info(str(
+  spacer_stl_file,
+  "_c", ring_finger_circumference,
+  "_th", ring_thickness,
+  "_dp", ring_depth,
+  "_l", ring_spacer_length,
+  "_w", ring_spacer_width,
+  "_deg", spacer_rotation_degrees,
+  "_fm", ring_forward_mod,
+  "_hm", ring_vertical_height_mod,
+  "_ov", ring_joint_spacer_overlap,
+  "_vm", ring_vertical_mod
+  ));
   union() {
     difference() {
       ring_base_plate(scaling, ring_spacer_plate_thickness, "base");
@@ -2296,7 +2406,7 @@ module finger_ring_label(label_type) {
       if (label_type == "full") {
         label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", three_finger_width, "/", hand_label, "/", ring_spacer_width);
         text(label, font = initials_font, halign="center", size=5 );
-      } else {
+      } else if (label_type == "part") {
         label = str(ring_finger_circumference, "/", ring_thickness);
         text(label, font = initials_font, halign="center", size=7 );
       }
@@ -2333,7 +2443,7 @@ module bb_finger_ring() {
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
 
-  ring_x_offset=36+ring_spacer_forward_mod;
+  ring_x_offset=36+ring_forward_mod;
   ring_y_offset=100;
   z_move = right_handed ? ring_spacer_plate_thickness : -ring_spacer_plate_thickness;
 
@@ -2405,32 +2515,39 @@ module tab_bb_plate(slots=true) {
   pic_scale=65/138;
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
-  slot_spacing=2;
-  slot_range=124; // 144-gap for top and bottom
+  slot_spacing=bb_finger_slot_spacing;
+  slot_range=129; // 144-gap for top and bottom
   number_of_slots=slot_range/slot_spacing;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
+
   difference() {
   scale([x_scale,1,1])
     bb_base_plate(scaling);
 
-    // elastic slots
+    // tape slot
+    translate([bb_tape_slot_adjust+(47*scaling), 6*scaling,-bb_tape_slot_depth]) {
+      cube([bb_tape_slot_width, slot_range*scaling, 4]);
+    }
+
+    // fingernail slots
     for(slot = [0 : 3 : number_of_slots]) {
       long_slot = (slot % 2) == 0;
-      slot_len = long_slot ? 4 : 6;
-      fingernail_slot(69-(slot_len*2), 10+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
+      slot_len = long_slot ? bb_long_slot_len  : bb_short_slot_len;
+      fingernail_slot(69-(slot_len*2), 6+(slot*slot_spacing), thickness, slot_len, scaling=scaling);
     }
 
 
-    initial_translation = right_handed ? thickness : -thickness;
+    initial_translation = right_handed ? thickness/2 : -thickness/2;
     // Initials
-    translate([12, 20, initial_translation]) {
+    translate([3, 20, initial_translation]) {
       scale([1,1,3])
       initials();
     }
 
   }
+  slot_depth=thickness*bb_slot_depth;
   module fingernail_slot(xpos, ypos, thickness, slot_len, scaling=1) {
-    translate([xpos*scaling*x_scale,ypos*scaling,0]) {
+    translate([xpos*scaling*x_scale,ypos*scaling,slot_depth]) {
       rotate([0,5,0]) {
         bar(slot_len,1,10,0);
       }
