@@ -39,7 +39,7 @@ tilted_slot_angle=15.0;
 tilted_slot_length=9.0;
 
 // view detail for preview render (you want this low to be fast)
-preview_fn=16;
+preview_fn=26;
 // view detail for final render (this should be higher for quality)
 render_fn=80;
 
@@ -58,8 +58,11 @@ tab_bb_plate=false;
 // desired tab width 
 bb_tab_width=35;
 
+bb_ledge_vertical=1.2;
 // how thick the ledge at front of tab is
 bb_ledge_thickness=2.1;
+// how wide the ledge at the front is
+bb_ledge_width=4.1;
 // Long thumbnail slot/groove for bb tab stringwalking marks 
 bb_long_slot_len=5.1;
 // short thumbnail slot/groove for bb tab stringwalking marks 
@@ -69,7 +72,7 @@ bb_short_slot_len=4.2;
 bb_slot_depth=0.4;
 
 // diameter of hole for wire crawl_guides
-bb_guide_hole_diameter=1.8;
+bb_guide_hole_diameter=1.1;
 
 // how far apart the slots are
 bb_guide_hole_spacing=1.6;
@@ -158,7 +161,44 @@ if (bb_finger_ring) {
 
 
 
-module bb_base_plate(scaling, plate_height=thickness, slots=true) {
+module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offset=3, x_chamfer_size_mod=1.05) {
+
+      z_miror = right_handed ? -1 : 1;
+      scale([scaling, scaling, 1]) {
+
+      mirror([0,0,z_miror])
+      difference() {
+        // base polygon, hulled and scaled
+        chamfered_polygon(polygon_points);
+
+        // bolt holes to secure tab
+        if (slots) {
+          holes_x_offset=bb_mount_holes_lateral_mod+(37+ring_forward_mod);
+          for (slotno=[0:1:2]) {
+           y_pos = 18*scaling + (slotno * (40*scaling));
+           x_pos = holes_x_offset*scaling;
+           if (slotno == 1) {
+               x_pos = (holes_x_offset - 30) *scaling;
+               initial_translation = right_handed ? thickness/2 : -thickness/2;
+                // Initials
+                translate([x_pos, y_pos, initial_translation]) {
+                  scale([1,1,3])
+                  initials();
+                }
+            } else {
+                angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
+            }
+          }
+        } else {
+          translate([holes_x_offset*scaling, 22*scaling, -slot_depth]) {
+            cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
+          }
+          translate([holes_x_offset*scaling, 120*scaling, -slot_depth]) {
+            cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
+          }
+        }
+      }
+      }
 
     polygon_points = [
       // middle and ring finger front
@@ -173,7 +213,31 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
       [48,140],[62,140],[64,138]
     ];
 
-  module chamfered_polygon() {
+  module chamfered_polygon(points) {
+      scale([scaling, scaling, 1]) {
+      union() {
+        //  bottom layer (not slanted)
+        linear_extrude(height = plate_height/2) {
+          polygon(points);
+        }
+        // top layer (slanted)
+        hull() {
+          linear_extrude(height = 0.1) {
+            polygon(points);
+          }
+          translate([x_chamfer_offset,0,-plate_height/4]) {
+            scale([x_chamfer_size_mod, 1, 1]) {
+              linear_extrude(height = 0.3) {
+                polygon(points);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  module chamfered_polygon_old() {
     difference() {
       linear_extrude(height = plate_height) {
         polygon(polygon_points, convexity=2);
@@ -189,40 +253,6 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
     }
   }
 
-  difference() {
-    z_miror = right_handed ? -1 : 1;
-    scale([scaling, scaling, 1]) {
-
-    mirror([0,0,z_miror])
-      chamfered_polygon();
-    }
-    holes_x_offset=bb_mount_holes_lateral_mod+(37+ring_forward_mod);
-    // bolt holes to secure tab
-    if (slots) {
-      for (slotno=[0:1:2]) {
-       y_pos = 18*scaling + (slotno * (42*scaling));
-       x_pos = holes_x_offset*scaling;
-       if (slotno == 1) {
-           x_pos = (holes_x_offset - 30) *scaling;
-           initial_translation = right_handed ? thickness/2 : -thickness/2;
-            // Initials
-            translate([x_pos, y_pos, initial_translation]) {
-              scale([1,1,3])
-              initials();
-            }
-        } else {
-            angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
-        }
-      }
-    } else {
-      translate([holes_x_offset*scaling, 22*scaling, -slot_depth]) {
-        cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
-      }
-      translate([holes_x_offset*scaling, 120*scaling, -slot_depth]) {
-        cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
-      }
-    }
-  }
 
 }
 
@@ -506,7 +536,7 @@ module tab_bb_plate() {
   resize_scale=three_finger_width/65;
   scaling=pic_scale*resize_scale;
   slot_spacing=bb_guide_hole_spacing+bb_guide_hole_diameter;
-  top_slot_margin=4; // margin at top and bottom with no slots
+  top_slot_margin=2; // margin at top and bottom with no slots
   bottom_slot_margin=4; // margin at top and bottom with no slots
   slot_range=three_finger_width-top_slot_margin-bottom_slot_margin;
   number_of_slots=slot_range/slot_spacing;
@@ -515,35 +545,41 @@ module tab_bb_plate() {
   bb_guide_hole_radius=bb_guide_hole_diameter/2;
   // min thickness allows top/bottom to be 0.5mm and middle to be 1mm
   min_thickness=bb_top_thickness+bb_ledge_thickness+bb_bottom_thickness+(bb_guide_hole_diameter*2);
+  guide_hole_base_vertical=bb_guide_hole_vertical_mod+bb_guide_hole_radius;
   x_scale=1.0;
+  slots=true;
   // x_scale=resize_scale*bb_tab_width;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
 
-  union() {
-    difference() {
-    resize([bb_tab_width, three_finger_width, min_thickness])
-      translate([0,0,min_thickness/2])
-        bb_base_plate(scaling);
-
-      // tape slot
-
-      // fingernail slots
-      for(slot = [0 : 1 : number_of_slots]) {
-        index_hole(2+bb_tab_width, bottom_slot_margin+(slot*slot_spacing), bb_guide_hole_vertical_mod+bb_guide_hole_radius, 10);
-        index_hole(2+bb_tab_width, bottom_slot_margin+(slot*slot_spacing), bb_guide_hole_vertical_mod+bb_ledge_thickness+bb_guide_hole_diameter+bb_guide_hole_radius, 10);
+  difference() {
+    union() {
+      resize([bb_tab_width, three_finger_width, min_thickness]) {
+        translate([0,0,min_thickness/2])
+          bb_base_plate(scaling);
       }
-      translate([bb_tab_width-8+bb_tape_slot_adjust, bottom_slot_margin, -bb_guide_hole_diameter]) {
-        cube([bb_tape_slot_width, slot_range, 8]);
+      // ledge
+      translate([bb_tab_width-4, bottom_slot_margin+(slot_range/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
+        rotate([90,0,0]) {
+            bar(bb_ledge_width,bb_ledge_thickness,slot_range,0);
+        }
       }
-
     }
-    translate([bb_tab_width-1, bottom_slot_margin, 1.3]) {
-      cube([2.5, slot_range, bb_ledge_thickness]);
+
+    // wire guides
+    translate([bb_tab_width/2, bottom_slot_margin, guide_hole_base_vertical ]){
+      for(slot = [0 : 1 : number_of_slots]) {
+        index_hole(0, slot*slot_spacing, 0, 80);
+        index_hole(0, slot*slot_spacing, bb_ledge_thickness+bb_guide_hole_radius, 80);
+      }
+    }
+    // hole at back (aka tape slot)
+    translate([bb_tab_width-8+bb_tape_slot_adjust, bottom_slot_margin, bb_tape_slot_depth]) {
+      cube([bb_tape_slot_width, slot_range, 8]);
     }
   }
     module index_hole(xpos, ypos, z_pos, slot_len) {
       translate([xpos, ypos, z_pos]) {
-        rotate([0,-90,0]) {
+        rotate([0,90,0]) {
           cylinder(slot_len, d=bb_guide_hole_diameter, true);
         }
       }
@@ -611,9 +647,16 @@ rotation = right_handed ? 180 : 0;
 function get_translation(item_number) =
   multiple_items ? get_translation_for_item(item_number) : get_translation_for_item(0);
 
+// function polygon_dimensions(points) = [
+//     max([p[0] for p in points]) - min([p[0] for p in points]),
+//     max([p[1] for p in points]) - min([p[1] for p in points])
+// ];
+
 
 number_of_cols = 4;
 function get_translation_for_item(item_number) = [
   80 * (item_number % number_of_cols),
   80 * floor(item_number / number_of_cols),
   0 ];
+
+

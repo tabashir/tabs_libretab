@@ -1,17 +1,17 @@
 include <./lib/chamfer_extrude.scad>;
 include <./lib/prism-chamfer.scad>;
+include <./lib/third_party_modules.scad>;
 
 /* [Global User Variables] */
 
-// This will lay items out on plate. If you are working on one item, unset.
-multiple_items=false;
-
 thickness=4.1;
-three_finger_width=65;
+tab_height=65;
 plate_bolt_slot_width=92;
 bolt_slot_width=5.5;
 bolt_head_width=10.0;
 elastic_slot_width=2.0;
+
+multiple_items=false;
 
 /* [Initials] */
 // text as defined below, custom requires your own coding
@@ -30,7 +30,7 @@ right_handed=false;
 // thickness of various plates in the system
 mount_plate_thickness=4.1;
 
-depth=three_finger_width*0.6;
+depth=tab_height*0.6;
 slot_depth=thickness+4;
 z_slot_offset=2;
 tilted_slot_gap=8.6;
@@ -223,6 +223,9 @@ jezc_holes_plate_scaling=1.2;
 
 // Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
+//
+// proportion of height to width of tab
+bb_tab_width=65;
 
 // Long thumbnail slot/groove for bb tab stringwalking marks 
 bb_long_slot_len=5.1;
@@ -305,12 +308,12 @@ ring_vertical_mod = 2.9;
 
 
 /* [Global Calculated Variables] */
-tilted_slot_count=three_finger_width*0.8 / tilted_slot_gap;
+tilted_slot_count=tab_height*0.8 / tilted_slot_gap;
 $fn = $preview ? preview_fn : render_fn;
 
 // Part Specific Variables
-fixed_thumb_plate_y_pos=three_finger_width*0.76;
-botp_height=three_finger_width*botp_height_mod;
+fixed_thumb_plate_y_pos=tab_height*0.76;
+botp_height=tab_height*botp_height_mod;
 
 number_of_cols = 4;
 function get_translation_for_item(item_number) = [
@@ -335,13 +338,13 @@ function get_translation(item_number) =
 
 
 if (palm_plate) {
-  x_size = three_finger_width*0.25;
+  x_size = tab_height*0.25;
   translate(get_translation(2))
   palm_plate(x_size, palm_plate_length_mod, palm_plate_depth);
 }
 
 if (palm_washer) {
-  x_size = three_finger_width*0.25;
+  x_size = tab_height*0.25;
   translate(get_translation(3))
   rotate([180, 0, 0])
   palm_washer(palm_washer_radius, palm_washer_depth);
@@ -570,9 +573,9 @@ if (bb_finger_ring) {
 module jezr_ring_plate(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -600,9 +603,9 @@ module jezr_ring_plate(initials, x_scale=1) {
 module jezr_ring_plate_2(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -630,9 +633,9 @@ module jezr_ring_plate_2(initials, x_scale=1) {
 module jezr_ring_plate_2(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -660,9 +663,9 @@ module jezr_ring_plate_2(initials, x_scale=1) {
 module jezr_ring_plate_3(initials, x_scale=1) {
   // Tab sketch is 96px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/96;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -710,9 +713,9 @@ module ring_plate_slots_3(scaling) {
 module jezr_ring_plate_4(initials, x_scale=1) {
   // Tab sketch is 96px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/96;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -761,9 +764,9 @@ module ring_plate_slots_4(scaling) {
 module jezr_ring_plate_5(initials, x_scale=1) {
   // Tab sketch is 96px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/96;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -822,9 +825,9 @@ module ring_plate_slots_5(scaling) {
 module jezr_ring_plate_6(initials, x_scale=1) {
   // Tab sketch is 96px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/96;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -875,9 +878,9 @@ module ring_plate_slots_6(scaling) {
 module jezr_plate() {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -1065,9 +1068,9 @@ module ww_base_plate_5(scaling) {
 module jezc_plate() {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -1109,10 +1112,10 @@ module jezc_plate() {
 module jezc_ring_plate(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   bolt_rad=bolt_slot_width/2;
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -1154,9 +1157,9 @@ module jezc_ring_plate(initials, x_scale=1) {
 module jezc_holes_plate(initials, x_scale=1) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   bolt_rad=bolt_slot_width/2;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
@@ -1358,7 +1361,7 @@ module jc_base_plate_old(scaling, plate_height=thickness) {
   }
 }
 
-module bb_base_plate(scaling, plate_height=thickness, slots=true) {
+module chamfered_bb_base_plate(height, width, thickness, right_handed=false) {
 
     polygon_points = [
       // middle and ring finger front
@@ -1375,7 +1378,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
 
   module chamfered_polygon() {
     difference() {
-      linear_extrude(height = plate_height) {
+      linear_extrude(height = thickness) {
         polygon(polygon_points, convexity=2);
       }
       prism_chamfer_mask(polygon_points,
@@ -1389,20 +1392,38 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
     }
   }
 
+  z_miror = right_handed ? -1 : 1;
+  resize([width, height, thickness]) {
+  mirror([0,0,z_miror])
+    chamfered_polygon();
+  }
+
+}
+
+module bb_base_plate(height, width, thickness, slots=true) {
+
   difference() {
     z_miror = right_handed ? -1 : 1;
-    scale([scaling, scaling, 1]) {
+    chamfered_bb_base_plate()
 
-    mirror([0,0,z_miror])
-      chamfered_polygon();
-    }
+    chamfered_bb_base_plate(height, width, thickness, right_handed) {
     holes_x_offset=bb_mount_holes_lateral_mod+(37+ring_forward_mod);
     // bolt holes to secure tab
     if (slots) {
       for (slotno=[0:1:2]) {
-       x_pos = holes_x_offset*scaling;
        y_pos = 18*scaling + (slotno * (42*scaling));
-       angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
+       x_pos = holes_x_offset*scaling;
+       if (slotno == 1) {
+           x_pos = (holes_x_offset - 30) *scaling;
+           initial_translation = right_handed ? thickness/2 : -thickness/2;
+            // Initials
+            translate([x_pos, y_pos, initial_translation]) {
+              scale([1,1,3])
+              initials();
+            }
+        } else {
+            angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
+        }
       }
     } else {
       translate([holes_x_offset*scaling, 22*scaling, -slot_depth]) {
@@ -1413,15 +1434,16 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true) {
       }
     }
   }
+  }
 
 }
 
 module jezr_palm_plate() {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   difference() {
@@ -1590,21 +1612,21 @@ module pinky_trigger(desired_height=35, pin=true, bolt_front=false) {
 module ks_base_plate(square_plate=false) {
   union() {
     difference() {
-      plain_base_plate(depth, three_finger_width, thickness, square_plate);
-      translate([depth*0.6, three_finger_width*0.68, z_slot_offset]) {
+      plain_base_plate(depth, tab_height, thickness, square_plate);
+      translate([depth*0.6, tab_height*0.68, z_slot_offset]) {
         bar(depth/4, bolt_slot_width, slot_depth, 0);
       }
       translate([depth*0.75, 10, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
-      translate([depth*0.75, three_finger_width*0.87, -z_slot_offset]) {
+      translate([depth*0.75, tab_height*0.87, -z_slot_offset]) {
         cylinder(slot_depth, bolt_slot_width*0.55, bolt_slot_width*0.55);
       }
       offset_elastic_slot(4);
       offset_elastic_slot(17);
       offset_elastic_slot(21);
       offset_elastic_slot(38);
-      offset_elastic_slot(three_finger_width*0.95);
+      offset_elastic_slot(tab_height*0.95);
 
       for (slot=[1:1:tilted_slot_count]) {
         if (slot <= 3) {
@@ -1726,7 +1748,7 @@ module tulip_full_plate( plate_offset=2, length=38, width=30, height=1.75 ) {
     }
 
     // base_plate
-    translate([three_finger_width+height,0,0.3]) {
+    translate([tab_height+height,0,0.3]) {
       rotate([0,0,90]) {
          ks_base_plate(true);
       }
@@ -2358,9 +2380,9 @@ module cutouts() {
 module finger_ring_with_spacer() {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=74/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
 
   ring_x_offset=92+ring_forward_mod;
@@ -2404,7 +2426,7 @@ module finger_ring_label(label_type) {
     linear_extrude(height = thickness*2) {
       hand_label = right_handed ? "R" : "L";
       if (label_type == "full") {
-        label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", three_finger_width, "/", hand_label, "/", ring_spacer_width);
+        label = str(ring_finger_circumference, "/", ring_thickness, "/", ring_depth, "/", tab_height, "/", hand_label, "/", ring_spacer_width);
         text(label, font = initials_font, halign="center", size=5 );
       } else if (label_type == "part") {
         label = str(ring_finger_circumference, "/", ring_thickness);
@@ -2438,9 +2460,9 @@ module ring_base_plate(scaling, plate_height=thickness, label_type="full") {
 module bb_finger_ring() {
   // Tab sketch is 144px high
   // Tab is 65px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=65/144;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
 
   ring_x_offset=36+ring_forward_mod;
@@ -2507,13 +2529,13 @@ module finger_ring(ring_finger_circumference, ring_thickness, ring_depth) {
           //   }
           // }
 
-module tab_bb_plate(slots=true) {
+module tab_bb_plate_old(slots=true) {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   x_scale=1.0;
   pic_scale=65/138;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   slot_spacing=bb_finger_slot_spacing;
   slot_range=129; // 144-gap for top and bottom
@@ -2555,12 +2577,50 @@ module tab_bb_plate(slots=true) {
   }
 }
 
+module tab_bb_plate() {
+  // Tab sketch is 144px high
+  // Tab is 74px high
+  // This is from tab with tab_height=65
+  x_scale=1.0;
+  resize_scale=tab_height/65;
+  scaling=resize_scale;
+  slot_spacing=bb_finger_slot_spacing;
+  slot_range=129; // 144-gap for top and bottom
+  number_of_slots=slot_range/slot_spacing;
+  slot_diameter=1;
+  tab_width=bb_tab_width_ratio*tab_height;
+
+  difference() {
+    bb_base_plate(tab_height, tab_width, thickness, slots=true);
+
+    // tape slot
+    translate([bb_tape_slot_adjust+(47*scaling), 6*scaling,-bb_tape_slot_depth]) {
+      cube([bb_tape_slot_width, slot_range*scaling, 4]);
+    }
+
+  }
+    // fingernail slots
+    for(slot = [0 : 3 : number_of_slots]) {
+      slot_len = 35;
+      index_hole(99-(slot_len*2), 6+(slot*slot_spacing), -0.5-slot_diameter, slot_diameter, slot_len, scaling=scaling);
+      index_hole(99-(slot_len*2), 6+(slot*slot_spacing), -thickness+0.5+slot_diameter, slot_diameter, slot_len, scaling=scaling);
+    }
+
+  module index_hole(xpos, ypos, z_pos, slot_diameter, slot_len, scaling) {
+    translate([xpos*scaling*x_scale, ypos*scaling, z_pos]) {
+      rotate([0,90,0]) {
+        cylinder(h=slot_len, d=slot_diameter, false);
+      }
+    }
+  }
+}
+
 module mins_bb_plate() {
   // Tab sketch is 144px high
   // Tab is 74px high
-  // This is from tab with three_finger_width=65
+  // This is from tab with tab_height=65
   pic_scale=65/62;
-  resize_scale=three_finger_width/65;
+  resize_scale=tab_height/65;
   scaling=pic_scale*resize_scale;
   slot_spacing=2;
   difference() {
@@ -2613,371 +2673,3 @@ rotation = right_handed ? 180 : 0;
   }
 }
 
-
-// Third Party Modules
-//
-// modules
-
-module torus(outerRadius, innerRadius)
-{
-  r=(outerRadius-innerRadius)/2;
-  rotate_extrude() translate([innerRadius+r,0,0]) circle(r);
-}
-
-
-module oval_torus(inner_radius, thickness=[0, 0])
-{
-  rotate_extrude() translate([inner_radius+thickness[0]/2,0,0]) ellipse(width=thickness[0], height=thickness[1]);
-}
-
-
-module radiusedblock(xlen,ylen,zlen,radius){
-  hull(){
-    translate([radius,radius,radius]) sphere(r=radius);
-    translate([xlen + radius , radius , radius]) sphere(r=radius);
-    translate([radius , ylen + radius , radius]) sphere(r=radius);
-    translate([xlen + radius , ylen + radius , radius]) sphere(r=radius);
-    translate([radius , radius , zlen + radius]) sphere(r=radius);
-    translate([xlen + radius , radius , zlen + radius]) sphere(r=radius);
-    translate([radius,ylen + radius,zlen + radius]) sphere(r=radius);
-    translate([xlen + radius,ylen + radius,zlen + radius]) sphere(r=radius);
-  }
-}
-
-module ninetyDegFillet(r,n) {
-    /*
-    r - fllet radius
-    n - number of steps
-    */
-    function rad(x) = r - sqrt(pow(r,2) - pow(x - r, 2));
-    s = r/n;            //step size
-    eps = 0.001;        // a little overlap between slices
-    for(i = [0 : s : r - s]) {
-        translate([0, 0, i])
-            minkowski() {
-                linear_extrude(height = eps)
-                    children();
-                cylinder(r1 = rad(i), r2 = rad(i + s), h = s, $fn = 32);
-            }
-        }
-}
-
-// example_bar with round ends but no hole
-// bar(9,4.5,19,0);
-
-module cylinders(points, diameter, thickness){
-    for (p=points){
-        translate(p) cylinder(d=diameter, h=thickness, center=true);
-    }
-}
-
-module plate(points, diameter, thickness, hole_diameter){
-    difference(){
-        hull() cylinders(points, diameter, thickness);
-        cylinders(points, hole_diameter, thickness+1);
-    }
-}
-
-module bar(length, width, thickness, hole_diameter){
-    plate([[0,0,0], [length,0,0]], width, thickness, hole_diameter);
-}
-
-
-// chamfercyl - create a cylinder with round chamfered ends
-module chamfercyl(
-   r,              // cylinder radius
-   h,              // cylinder height
-   b=0,            // bottom chamfer radius (=0 none, >0 outside, <0 inside)
-   t=0,            // top chamfer radius (=0 none, >0 outside, <0 inside)
-   offset=[[0,0]], // optional offsets in X and Y to create
-                   // convex hulls at slice level
-   slices=10,      // number of slices used for chamfering
-   eps=0.01,       // tiny overlap of slices
-){
-    astep=90/slices;
-    hull()for(o = offset)
-       translate([o[0],o[1],abs(b)-eps])cylinder(r=r,h=h-abs(b)-abs(t)+2*eps);
-    if(b)for(a=[0:astep:89.999])hull()for(o = offset)
-       translate([o[0],o[1],abs(b)-abs(b)*sin(a+astep)-eps])
-          cylinder(r2=r+(1-cos(a))*b,r1=r+(1-cos(a+astep))*b,h=(sin(a+astep)-sin(a))*abs(b)+2*eps);
-    if(t)for(a=[0:astep:89.999])hull()for(o = offset)
-       translate([o[0],o[1],h-abs(t)+abs(t)*sin(a)-eps])
-          cylinder(r1=r+(1-cos(a))*t,r2=r+(1-cos(a+astep))*t,h=(sin(a+astep)-sin(a))*abs(t)+2*eps);
-}
-
-// now build David's example, the cube with the chamfered hole (viewed from below to make things easy...)
-// $fn=36;
-// difference(){
-//    translate([-12.5,-12.5,0])cube(25);
-//    chamfercyl(3,25,3,3,[[-2,0],[2,0]]);
-// }
-
-// roundedcube(size=[20,20,20], radius=3);
-
-module roundedcube(size = [1, 1, 1], center = false, radius = 0.5, apply_to = "all") {
-  $fs = 0.01;
-	// If single value, convert to [x, y, z] vector
-	size = (size[0] == undef) ? [size, size, size] : size;
-
-	translate_min = radius;
-	translate_xmax = size[0] - radius;
-	translate_ymax = size[1] - radius;
-	translate_zmax = size[2] - radius;
-
-	diameter = radius * 2;
-
-	module build_point(type = "sphere", rotate = [0, 0, 0]) {
-		if (type == "sphere") {
-			sphere(r = radius);
-		} else if (type == "cylinder") {
-			rotate(a = rotate)
-			cylinder(h = diameter, r = radius, center = true);
-		}
-	}
-
-	obj_translate = (center == false) ?
-		[0, 0, 0] : [
-			-(size[0] / 2),
-			-(size[1] / 2),
-			-(size[2] / 2)
-		];
-
-	translate(v = obj_translate) {
-		hull() {
-			for (translate_x = [translate_min, translate_xmax]) {
-				x_at = (translate_x == translate_min) ? "min" : "max";
-				for (translate_y = [translate_min, translate_ymax]) {
-					y_at = (translate_y == translate_min) ? "min" : "max";
-					for (translate_z = [translate_min, translate_zmax]) {
-						z_at = (translate_z == translate_min) ? "min" : "max";
-
-						translate(v = [translate_x, translate_y, translate_z])
-						if (
-							(apply_to == "all") ||
-							(apply_to == "xmin" && x_at == "min") || (apply_to == "xmax" && x_at == "max") ||
-							(apply_to == "ymin" && y_at == "min") || (apply_to == "ymax" && y_at == "max") ||
-							(apply_to == "zmin" && z_at == "min") || (apply_to == "zmax" && z_at == "max")
-						) {
-							build_point("sphere");
-						} else {
-							rotate =
-								(apply_to == "xmin" || apply_to == "xmax" || apply_to == "x") ? [0, 90, 0] : (
-								(apply_to == "ymin" || apply_to == "ymax" || apply_to == "y") ? [90, 90, 0] :
-								[0, 0, 0]
-							);
-							build_point("cylinder", rotate);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-//==============================================================================
-//
-//           prism-chamfer - the missing chamfer tool for OpenSCAD
-//
-// Author:  Heath Raftery
-// Origin:  http://github.com/hraftery/prism-chamfer
-// License: GPLv3, see LICENSE for terms.
-//
-// See the accompanying README for instructions on use.
-//
-//==============================================================================
-
-
-//===========
-// Variables
-//===========
-
-ff=0.001; // Fudge factor: amount of extra mask to prevent zero thickness planes.
-
-
-//===========
-// Functions
-//===========
-
-function translate_towards(p0, p1, dist) = p0 + (dist/norm(p1-p0))*(p1-p0);
-function min_index(v, only_first=false) = search(min(v), v, only_first?1:0);
-function max_index(v, only_first=false) = search(max(v), v, only_first?1:0);
-function mod(a,n) = (a+n)%n; // add support for (slightly) negative modulo
-
-//Find the cartesian angle of a vector from p0 to p1.
-//Note contrary to docs, atan2 returns [-180,180]
-function angle_of(p0, p1) = atan2(p1.y-p0.y, p1.x-p0.x);
-
-//Calculate angle halfway between the angles of a vertex.
-//Ref: https://math.stackexchange.com/a/4750179/787256
-function corner_angle(p0, p1, p2) =
-  let (a0       = angle_of(p0,p1),
-       a1       = angle_of(p1,p2),
-       deltaA   = a1 - a0,
-       inner_dA = deltaA < -180 ? deltaA + 360 :
-                  deltaA >  180 ? deltaA - 360 :
-                                  deltaA)
-    a0 + (inner_dA/2);
-
-//Return the three points that define the vertex at the point specified
-function vertex_points(polygon_points, point_index) =
-  let (num_pts = len(polygon_points))
-    [ polygon_points[mod(point_index-1, num_pts)],
-      polygon_points[mod(point_index  , num_pts)],
-      polygon_points[mod(point_index+1, num_pts)] ];
-
-//Determine orientation of polygon. Ref:
-//  https://en.wikipedia.org/wiki/Curve_orientation#Orientation_of_a_simple_polygon
-function is_polygon_orientation_clockwise(polygon_points) =
-  let (min_x_indices                = min_index([for (pt = polygon_points) pt.x]),
-       min_y_index_in_min_x_indices = min_index([for (i = min_x_indices) polygon_points[i].y]),
-       min_x_min_y_index            = min_x_indices[min_y_index_in_min_x_indices[0]],
-       vertex_pts                   = vertex_points(polygon_points, min_x_min_y_index))
-    is_vertex_convex(vertex_pts, true);
-
-function is_vertex_convex(pts, cw) =
-  let (A = pts[0], B = pts[1], C = pts[2],
-       //This determinate calc is the same as cross(AB,BC). But we have points,
-       //so use the simplification from the polygon orientation reference above.
-       det = (B.x-A.x)*(C.y-A.y) - (C.x-A.x)*(B.y-A.y),
-       right_turn = det < 0)
-    cw == right_turn; //right turns are convex when going cw, and vice-versa
-
-
-function polygon_dimensions(points) =
-    let (
-        x_coords = [for (i = [0 : len(points) - 1]) points[i][0]],
-        y_coords = [for (i = [0 : len(points) - 1]) points[i][1]]
-    )
-    [max(x_coords) - min(x_coords), max(y_coords) - min(y_coords)];
-
-
-
-//===========
-//  Modules
-//===========
-
-//Create masks for 1 or more prism edges and any corners in between.
-//See "prism-chamfer_demo.scad" for a description of the arguments.
-module prism_chamfer_mask(polygon_pts, start_edge=0, end_edge=0, height=0,
-                          side=1, side2=0, corner_slope="medium") {
-  num_pts = len(polygon_pts);
-  assert(num_pts >= 3);
-  assert(end_edge >= start_edge);
-  // Allow specifying edges past the first point, in the -ve or +ve direction,
-  // up to but not including a complete rotation. Allows the corner at the
-  // first point to be included in a contiguous range.
-  assert(start_edge > -num_pts && end_edge < 2*num_pts);
-
-  points = [ for(i = [start_edge:end_edge+1])
-             [polygon_pts[mod(i,num_pts)].x, polygon_pts[mod(i,num_pts)].y, height] ];
-
-  cw = is_polygon_orientation_clockwise(polygon_pts);
-
-  include_start = is_vertex_convex(vertex_points(polygon_pts, start_edge), cw);
-  include_end   = is_vertex_convex(vertex_points(polygon_pts, end_edge+1), cw);
-
-  prism_chamfer_mask_raw(points, side, side2, cw,
-                         corner_slope  = corner_slope,
-                         include_start = include_start,
-                         include_end   = include_end);
-}
-
-//Create masks for 1 or more prism edges and any corners inbetween,
-//but their points and end conditions must be specified.
-module prism_chamfer_mask_raw(points, side=1, side2=0, cw=false, top=undef,
-                              corner_slope="medium", include_start=false, include_end=false) {
-  num_points = len(points);
-  assert(num_points>1);
-  for(i = [0:num_points-2]) {
-    prism_chamfer_mask_e(points[i], points[i+1], side, side2, cw, top,
-                         include_p0 = i==0            ? include_start : true,
-                         include_p1 = i==num_points-2 ? include_end   : true);
-
-    if(i<num_points-2) {
-      prism_chamfer_mask_c(points[i], points[i+1], points[i+2], side, side2, cw, top,
-                           slope = corner_slope);
-    }
-  }
-}
-
-//Create a chamfer mask for a single prism edge.
-module prism_chamfer_mask_e(p0, p1, side=1, side2=0, cw=false, top=undef,
-                            include_p0=true, include_p1=true) {
-  side2 = side2 == 0 ? side : side2;    //set sides equal unless side2 is specified
-  top = is_undef(top) ? p0.z > 0 : top; //set top to positivity of z unless specified
-  assert(p0.z == p1.z); //only points in the same x-y plane are supported
-  assert(side>0 && side2>0);
-  assert(p0!=p1);
-
-  //Conditional transforms don't seem to be supported. Fortunately mirror
-  //seems to be a nop if the argument is [0,0,0], so we can use a variable
-  //and this dodgy conditional assignment construct instead:
-  mr_args = (!top &&  cw) ? [[1,0,0],[ 90,0,-90]] : //bottom, cw
-            ( top &&  cw) ? [[0,0,0],[-90,0,-90]] : //top, cw
-            ( top && !cw) ? [[1,0,0],[-90,0, 90]] : //top, ccw
-                            [[0,0,0],[ 90,0, 90]];  //bottom, ccw
-
-  length = norm(p1-p0) + (include_p0?ff:-ff) + (include_p1?ff:-ff);
-  p0_fudged = translate_towards(p0, p1, include_p0?-ff:ff); //shift p0 fwd or back by fudge factor
-  translate(p0_fudged) rotate([0, 0, angle_of(p0, p1)]) //align with p0 -> p1
-    mirror(mr_args[0]) rotate(mr_args[1]) //orient to x-y plane, in +x direction
-      linear_extrude(height=length)
-        polygon([[-ff,-ff],[side,-ff],[-ff,side2]]);
-}
-
-//Create a chamfer mask for the corner between two prism edges.
-module prism_chamfer_mask_c(p0, p1, p2, side=1, side2=0, cw=false, top=undef,
-                            slope="medium") {
-  side2 = side2 == 0 ? side : side2;    //set sides equal unless side2 is specified
-  top = is_undef(top) ? p0.z > 0 : top; //set top to positivity of z unless specified
-  assert(p0.z == p1.z && p1.z == p2.z); //only points in the same x-y plane are supported
-  assert(side>0 && side2>0);
-  assert(p0!=p1 && p1!=p2 && p0!=p2);
-
-  corner_angle = corner_angle(p0, p1, p2);
-
-  if(is_vertex_convex([p0,p1,p2],cw)) {
-    //no mask needed for outside corners
-  }
-  else if(slope=="deep") {    //then carve out as much as possible
-    intersection() {
-      //Just extend the two edge chamfers so they overlap fully.
-      prism_chamfer_mask_e(p1, translate_towards(p1,p0,-side), side, side2, cw, top);
-      prism_chamfer_mask_e(translate_towards(p1,p2,-side), p1, side, side2, cw, top);
-    }
-  }
-  else if(slope=="shallow") { //then carve out as little as possible. Inspired by corner-tools.scad
-    translate(p1) rotate([0, 0, corner_angle])
-      rotate([0, 0, 45]) //rotate to put it symmetrical around the x axis
-        polyhedron(points = [[-ff,-ff,ff], [side,-ff,ff], [-ff,side,ff], [-ff,-ff,-side2]],
-                   faces  = [[0,2,1], [0,1,3], [0,3,2], [1,2,3]],
-                   convexity = 100);
-  }
-  else {                      //otherwise, do a "medium" half-way corner
-    c0 = [p1.x - side*cos(corner_angle), p1.y - side*sin(corner_angle), p1.z];
-    c1 = [p1.x + side*cos(corner_angle), p1.y + side*sin(corner_angle), p1.z];
-    intersection() {
-      //Same as "deep", but also intersect a third mask with angle half-way between
-      //the first two. c0 and c1 just extend the edge either side of the corner point.
-      prism_chamfer_mask_e(p1, translate_towards(p1,p0,-side), side, side2, cw, top);
-      prism_chamfer_mask_e(translate_towards(p1,p2,-side), p1, side, side2, cw, top);
-      prism_chamfer_mask_e(c0, c1, side, side2, cw, top);
-    }
-  }
-}
-// end third party modules
-
-
-
-
-
-
-// module chamfercyl(
-//    r,              // cylinder radius
-//    h,              // cylinder height
-//    b=0,            // bottom chamfer radius (=0 none, >0 outside, <0 inside)
-//    t=0,            // top chamfer radius (=0 none, >0 outside, <0 inside)
-//    offset=[[0,0]], // optional offsets in X and Y to create
-//                    // convex hulls at slice level
-//    slices=10,      // number of slices used for chamfering
-//    eps=0.01,       // tiny overlap of slices
