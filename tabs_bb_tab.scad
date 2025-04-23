@@ -8,7 +8,7 @@ include <./lib/third_party_modules.scad>;
 multiple_items=false;
 
 thickness=4.1;
-three_finger_width=65;
+three_finger_width=70;
 plate_bolt_slot_width=92;
 bolt_slot_width=5.5;
 bolt_head_width=10.0;
@@ -38,11 +38,6 @@ tilted_slot_gap=8.6;
 tilted_slot_angle=15.0;
 tilted_slot_length=9.0;
 
-// view detail for preview render (you want this low to be fast)
-preview_fn=26;
-// view detail for final render (this should be higher for quality)
-render_fn=80;
-
 
 /* [Items] */
 finger_ring_with_spacer=false;
@@ -56,13 +51,20 @@ bb_finger_ring=false;
 tab_bb_plate=false;
 
 // desired tab width 
-bb_tab_width=35;
+bb_tab_width=23;
 
-bb_ledge_vertical=1.2;
+// diameter of hole for wire crawl_guides
+bb_guide_hole_diameter=1.1;
+// how far apart the slots are
+bb_guide_hole_spacing=1.2;
+// fine adjust holes
+bb_guide_hole_vertical_mod=0.4;
+// move ledge relative to holes
+bb_ledge_vertical=-0.01;
 // how thick the ledge at front of tab is
 bb_ledge_thickness=2.1;
 // how wide the ledge at the front is
-bb_ledge_width=4.1;
+bb_ledge_width=8.8;
 // Long thumbnail slot/groove for bb tab stringwalking marks 
 bb_long_slot_len=5.1;
 // short thumbnail slot/groove for bb tab stringwalking marks 
@@ -71,14 +73,6 @@ bb_short_slot_len=4.2;
 // short how deep the grooves are. 0=full depth. 1=none
 bb_slot_depth=0.4;
 
-// diameter of hole for wire crawl_guides
-bb_guide_hole_diameter=1.1;
-
-// how far apart the slots are
-bb_guide_hole_spacing=1.6;
-
-// fine adjust holes
-bb_guide_hole_vertical_mod=2.1;
 
 // width of shallow slot for putting distance marks
 bb_tape_slot_width=6.1;
@@ -136,7 +130,18 @@ bop_height=30;
 /* [Bolt-On Bar] */
 // rounded bar for mounting a pad or rest, has divider for strength
 
+// view detail for preview render (you want this low to be fast)
+preview_fn=26;
+// preview_fa=6;
+// preview_fs=0.5;
+// view detail for final render (this should be higher for quality)
+render_fn=95;
+// render_fa=1;
+// render_fs=0.5;
+
 $fn = $preview ? preview_fn : render_fn;
+// $fa = $preview ? preview_fa : render_fa;
+// $fs = $preview ? preview_fs : render_fs;
 
 if (finger_ring_with_spacer) {
  translate(get_translation(22))
@@ -164,7 +169,6 @@ if (bb_finger_ring) {
 module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offset=3, x_chamfer_size_mod=1.05) {
 
       z_miror = right_handed ? -1 : 1;
-      scale([scaling, scaling, 1]) {
 
       mirror([0,0,z_miror])
       difference() {
@@ -173,20 +177,18 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
 
         // bolt holes to secure tab
         if (slots) {
-          holes_x_offset=bb_mount_holes_lateral_mod+(37+ring_forward_mod);
+          holes_x_offset=bb_mount_holes_lateral_mod+(27+ring_forward_mod);
           for (slotno=[0:1:2]) {
-           y_pos = 18*scaling + (slotno * (40*scaling));
+           y_pos = 13*scaling + (slotno * (52*scaling));
            x_pos = holes_x_offset*scaling;
            if (slotno == 1) {
-               x_pos = (holes_x_offset - 30) *scaling;
-               initial_translation = right_handed ? thickness/2 : -thickness/2;
-                // Initials
-                translate([x_pos, y_pos, initial_translation]) {
-                  scale([1,1,3])
-                  initials();
+               x_pos = (holes_x_offset - 15) *scaling;
+               initial_translation = right_handed ? thickness/2 : -thickness*1.5;
+                translate([x_pos-1, y_pos-2, initial_translation]) {
+                  cube([5, 15, 4]);
                 }
             } else {
-                angled_slot(x_pos, y_pos, slot_angle=90, slot_length=25*scaling, slot_width=bolt_slot_width, thickness=10);
+                angled_slot(x_pos, y_pos, slot_angle=90, slot_length=10*scaling, slot_width=bolt_slot_width, thickness=10);
             }
           }
         } else {
@@ -197,7 +199,6 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
             cylinder(slot_depth*2, bolt_slot_width*0.55, bolt_slot_width*0.55);
           }
         }
-      }
       }
 
     polygon_points = [
@@ -214,7 +215,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
     ];
 
   module chamfered_polygon(points) {
-      scale([scaling, scaling, 1]) {
+      resize([bb_tab_width, three_finger_width, thickness]) {
       union() {
         //  bottom layer (not slanted)
         linear_extrude(height = plate_height/2) {
@@ -227,7 +228,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
           }
           translate([x_chamfer_offset,0,-plate_height/4]) {
             scale([x_chamfer_size_mod, 1, 1]) {
-              linear_extrude(height = 0.3) {
+              linear_extrude(height = 0.5) {
                 polygon(points);
               }
             }
@@ -558,9 +559,10 @@ module tab_bb_plate() {
           bb_base_plate(scaling);
       }
       // ledge
-      translate([bb_tab_width-4, bottom_slot_margin+(slot_range/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
+      // translate([bb_tab_width-4, bottom_slot_margin+(slot_range/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
+      translate([bb_tab_width-4, (three_finger_width/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
         rotate([90,0,0]) {
-            bar(bb_ledge_width,bb_ledge_thickness,slot_range,0);
+            bar(bb_ledge_width,bb_ledge_thickness,three_finger_width,0);
         }
       }
     }
@@ -574,7 +576,7 @@ module tab_bb_plate() {
     }
     // hole at back (aka tape slot)
     translate([bb_tab_width-8+bb_tape_slot_adjust, bottom_slot_margin, bb_tape_slot_depth]) {
-      cube([bb_tape_slot_width, slot_range, 8]);
+      // cube([bb_tape_slot_width, slot_range, 8]);
     }
   }
     module index_hole(xpos, ypos, z_pos, slot_len) {
