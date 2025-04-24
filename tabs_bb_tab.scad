@@ -50,7 +50,7 @@ bb_finger_ring=false;
 // Barebow plate with fingernail slots for stringwalking
 tab_bb_plate=false;
 
-// desired tab width 
+// desired tab width
 bb_tab_width=23;
 
 // diameter of hole for wire crawl_guides
@@ -65,9 +65,9 @@ bb_ledge_vertical=-0.01;
 bb_ledge_thickness=2.1;
 // how wide the ledge at the front is
 bb_ledge_width=8.8;
-// Long thumbnail slot/groove for bb tab stringwalking marks 
+// Long thumbnail slot/groove for bb tab stringwalking marks
 bb_long_slot_len=5.1;
-// short thumbnail slot/groove for bb tab stringwalking marks 
+// short thumbnail slot/groove for bb tab stringwalking marks
 bb_short_slot_len=4.2;
 
 // short how deep the grooves are. 0=full depth. 1=none
@@ -183,7 +183,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
            x_pos = holes_x_offset*scaling;
            if (slotno == 1) {
                x_pos = (holes_x_offset - 15) *scaling;
-               initial_translation = right_handed ? thickness/2 : -thickness*1.5;
+               initial_translation = right_handed ? plate_height/2 : -plate_height*1.5;
                 translate([x_pos-1, y_pos-2, initial_translation]) {
                   cube([5, 15, 4]);
                 }
@@ -215,7 +215,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
     ];
 
   module chamfered_polygon(points) {
-      resize([bb_tab_width, three_finger_width, thickness]) {
+      resize([bb_tab_width, three_finger_width, plate_height]) {
       union() {
         //  bottom layer (not slanted)
         linear_extrude(height = plate_height/2) {
@@ -545,24 +545,33 @@ module tab_bb_plate() {
   bb_top_thickness=0.5;
   bb_guide_hole_radius=bb_guide_hole_diameter/2;
   // min thickness allows top/bottom to be 0.5mm and middle to be 1mm
-  min_thickness=bb_top_thickness+bb_ledge_thickness+bb_bottom_thickness+(bb_guide_hole_diameter*2);
+  min_thickness=bb_top_thickness+(bb_ledge_thickness/2)+bb_bottom_thickness+(bb_guide_hole_diameter*2);
+  tab_overall_thickness=thickness>=min_thickness ? thickness : min_thickness;
   guide_hole_base_vertical=bb_guide_hole_vertical_mod+bb_guide_hole_radius;
   x_scale=1.0;
   slots=true;
   // x_scale=resize_scale*bb_tab_width;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
-
+  
+  resize([bb_tab_width, three_finger_width, tab_overall_thickness])
   difference() {
     union() {
-      resize([bb_tab_width, three_finger_width, min_thickness]) {
+      resize([bb_tab_width, three_finger_width, tab_overall_thickness]) {
         translate([0,0,min_thickness/2])
           bb_base_plate(scaling);
       }
       // ledge
       // translate([bb_tab_width-4, bottom_slot_margin+(slot_range/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
       translate([bb_tab_width-4, (three_finger_width/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
+        resize([bb_ledge_width, three_finger_width, bb_ledge_thickness]) {
         rotate([90,0,0]) {
-            bar(bb_ledge_width,bb_ledge_thickness,three_finger_width,0);
+            hull() {
+              bar(bb_ledge_width,bb_ledge_thickness/2,three_finger_width,0);
+              translate([0,-bb_ledge_thickness/2, 0]) {
+                bar(bb_ledge_width*0.75,bb_ledge_thickness/2,three_finger_width,0);
+              }
+            }
+          }
         }
       }
     }
@@ -571,7 +580,7 @@ module tab_bb_plate() {
     translate([bb_tab_width/2, bottom_slot_margin, guide_hole_base_vertical ]){
       for(slot = [0 : 1 : number_of_slots]) {
         index_hole(0, slot*slot_spacing, 0, 80);
-        index_hole(0, slot*slot_spacing, bb_ledge_thickness+bb_guide_hole_radius, 80);
+        index_hole(0, slot*slot_spacing, bb_ledge_thickness*0.7+bb_guide_hole_radius, 80);
       }
     }
     // hole at back (aka tape slot)
