@@ -7,7 +7,7 @@ include <./lib/third_party_modules.scad>;
 // This will lay items out on plate. If you are working on one item, unset.
 multiple_items=false;
 
-thickness=4.1;
+thickness=4.6;
 three_finger_width=70;
 plate_bolt_slot_width=92;
 bolt_slot_width=5.5;
@@ -16,11 +16,12 @@ elastic_slot_width=2.0;
 
 /* [Initials] */
 // text as defined below, custom requires your own coding
-initials_type="text";  // ["text","custom"]
+initials_type="box";  // ["text","custom", "box"]
 initials="JM";
 initials_font="Liberation Sans"; // ["Liberation Mono", "Liberation Sans", "Liberation Serif","Arial Black","Courier","Inconsolata","Cantarell","Droid Sans"]
 initials_size=7; // [2,3,4,5,6,7,8,9,10,11,12,13,14,15,20,25]
 initials_style="Bold"; // ["Regular","Italic","Bold","Light","Plain","ExtraBold"]
+initials_rotation=90; 
 
 // the type of label information on various parts
 label_type="part"; // ["full","part","none"]
@@ -48,7 +49,7 @@ bb_finger_ring=false;
 
 /* [Tab BB Plate] */
 // Barebow plate with fingernail slots for stringwalking
-tab_bb_plate=false;
+tab_bb_plate=true;
 
 // desired tab width
 bb_tab_width=23;
@@ -58,11 +59,11 @@ bb_guide_hole_diameter=1.1;
 // how far apart the slots are
 bb_guide_hole_spacing=1.2;
 // fine adjust holes
-bb_guide_hole_vertical_mod=0.4;
+bb_guide_hole_vertical_mod=-0.6;
 // move ledge relative to holes
-bb_ledge_vertical=-0.01;
+bb_ledge_vertical=-0.24;
 // how thick the ledge at front of tab is
-bb_ledge_thickness=2.1;
+bb_ledge_thickness=2.5;
 // how wide the ledge at the front is
 bb_ledge_width=8.8;
 // Long thumbnail slot/groove for bb tab stringwalking marks
@@ -72,7 +73,6 @@ bb_short_slot_len=4.2;
 
 // short how deep the grooves are. 0=full depth. 1=none
 bb_slot_depth=0.4;
-
 
 // width of shallow slot for putting distance marks
 bb_tape_slot_width=6.1;
@@ -131,7 +131,7 @@ bop_height=30;
 // rounded bar for mounting a pad or rest, has divider for strength
 
 // view detail for preview render (you want this low to be fast)
-preview_fn=26;
+preview_fn=16;
 // preview_fa=6;
 // preview_fs=0.5;
 // view detail for final render (this should be higher for quality)
@@ -178,8 +178,10 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
         // bolt holes to secure tab
         if (slots) {
           holes_x_offset=bb_mount_holes_lateral_mod+(27+ring_forward_mod);
+          slot_len=25;
+          slot_y_mod=68-slot_len;
           for (slotno=[0:1:2]) {
-           y_pos = 13*scaling + (slotno * (52*scaling));
+           y_pos = 13*scaling + (slotno * (slot_y_mod*scaling));
            x_pos = holes_x_offset*scaling;
            if (slotno == 1) {
                x_pos = (holes_x_offset - 15) *scaling;
@@ -188,7 +190,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
                   cube([5, 15, 4]);
                 }
             } else {
-                angled_slot(x_pos, y_pos, slot_angle=90, slot_length=10*scaling, slot_width=bolt_slot_width, thickness=10);
+                angled_slot(x_pos, y_pos, slot_angle=90, slot_length=slot_len*scaling, slot_width=bolt_slot_width, thickness=10);
             }
           }
         } else {
@@ -553,17 +555,16 @@ module tab_bb_plate() {
   // x_scale=resize_scale*bb_tab_width;
   //  angled_slot(xpos, ypos, slot_angle=30, slot_length=12, slot_width=bolt_slot_width) {
   
-  resize([bb_tab_width, three_finger_width, tab_overall_thickness])
+  // resize([bb_tab_width, three_finger_width, tab_overall_thickness])
   difference() {
     union() {
-      resize([bb_tab_width, three_finger_width, tab_overall_thickness]) {
-        translate([0,0,min_thickness/2])
+        translate([0,0,min_thickness/2]) {
           bb_base_plate(scaling);
       }
       // ledge
       // translate([bb_tab_width-4, bottom_slot_margin+(slot_range/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
       translate([bb_tab_width-4, (three_finger_width/2), guide_hole_base_vertical+(bb_ledge_thickness/2)+bb_ledge_vertical]) {
-        resize([bb_ledge_width, three_finger_width, bb_ledge_thickness]) {
+        // resize([bb_ledge_width, three_finger_width, bb_ledge_thickness]) {
         rotate([90,0,0]) {
             hull() {
               bar(bb_ledge_width,bb_ledge_thickness/2,three_finger_width,0);
@@ -572,7 +573,16 @@ module tab_bb_plate() {
               }
             }
           }
-        }
+        // }
+      }
+    }
+
+    initial_translation = right_handed ? -thickness/2 : thickness/2;
+    // Initials
+    translate([8, 40, initial_translation]) {
+      rotate([0,0,-90]) {
+        scale([1,1,1])
+        initials();
       }
     }
 
@@ -627,6 +637,8 @@ module initials() {
 	font_style_text=str(initials_font,":style=",initials_style);
 	if (initials_type == "custom") {
 		initials_custom(font_style_text);
+	} else if (initials_type == "box") {
+		initials_box();
 	} else {
 		initials_text(font_style_text);
 	}
@@ -652,6 +664,13 @@ rotation = right_handed ? 180 : 0;
     linear_extrude(height=thickness*2) {
       text(initials, font=font_style, size=initials_size );
     }
+  }
+}
+
+module initials_box() {
+  rotate([0,0,initials_rotation]) {
+    translate([-2,-initials_size*2,thickness/8])
+    cube([initials_size, initials_size*2, thickness/2]);
   }
 }
 
