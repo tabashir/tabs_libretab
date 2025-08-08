@@ -11,7 +11,6 @@ thickness=4.6;
 three_finger_width=70;
 plate_bolt_slot_width=92;
 bolt_slot_width=5.5;
-bolt_head_width=10.0;
 elastic_slot_width=2.0;
 
 /* [Initials] */
@@ -29,16 +28,6 @@ label_type="part"; // ["full","part","none"]
 // saves mirroring some objects in the slicer
 right_handed=false;
 
-// thickness of various plates in the system
-mount_plate_thickness=4.1;
-
-depth=three_finger_width*0.6;
-slot_depth=thickness+4;
-z_slot_offset=2;
-tilted_slot_gap=8.6;
-tilted_slot_angle=15.0;
-tilted_slot_length=9.0;
-
 
 /* [Items] */
 finger_ring_with_spacer=false;
@@ -52,14 +41,16 @@ bb_finger_ring=false;
 tab_bb_plate=true;
 
 // desired tab width
-bb_tab_width=23;
+bb_tab_width=28;
 
 // diameter of hole for wire crawl_guides
 bb_guide_hole_diameter=1.1;
 // how far apart the slots are
 bb_guide_hole_spacing=1.2;
-// fine adjust holes
+// fine adjust ledge (need to rename this)
 bb_guide_hole_vertical_mod=-0.6;
+// fine tweak holes up/down within ledge 
+bb_guide_hole_vertical_tweak=0.3;
 // move ledge relative to holes
 bb_ledge_vertical=-0.24;
 // how thick the ledge at front of tab is
@@ -84,7 +75,18 @@ bb_tape_slot_depth=0.6;
 bb_tape_slot_adjust=1.6;
 
 // manual tweak to move mount holes laterally
-bb_mount_holes_lateral_mod=0.1;
+bb_mount_holes_lateral_mod=6.5;
+
+// Top index triangle front/back position adjust
+bb_top_point_locator_lateral_mod=2.9;
+// Top index triangle up/down position adjust
+bb_top_point_locator_vertical_mod=4.0;
+// Top index triangle in/out position adjust
+bb_top_point_locator_z_mod=0.8;
+
+
+
+
 //
 // Barebow plate created outside of OpenScad, has nicely chamfered edges
 mins_bb_plate=false;
@@ -173,13 +175,21 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
       mirror([0,0,z_miror])
       difference() {
         // base polygon, hulled and scaled
-        chamfered_polygon(polygon_points);
+        union() {
+          chamfered_polygon(polygon_points);
+          translate([bb_tab_width+bb_top_point_locator_lateral_mod, three_finger_width-bb_top_point_locator_vertical_mod,bb_top_point_locator_z_mod ]) {
+              linear_extrude(plate_height/2) {
+                  polygon(points=[[0,0],[0,4],[4,4]], paths=[[0,1,2]]);
+              }
+        }
+    }
+        
 
         // bolt holes to secure tab
         if (slots) {
           holes_x_offset=bb_mount_holes_lateral_mod+(27+ring_forward_mod);
-          slot_len=25;
-          slot_y_mod=68-slot_len;
+          slot_len=15;
+          slot_y_mod=63-slot_len;
           for (slotno=[0:1:2]) {
            y_pos = 13*scaling + (slotno * (slot_y_mod*scaling));
            x_pos = holes_x_offset*scaling;
@@ -213,7 +223,7 @@ module bb_base_plate(scaling, plate_height=thickness, slots=true, x_chamfer_offs
       // top rear corner
       [20,132], [22,134], [26,136],
       // top
-      [48,140],[62,140],[64,138]
+      [48,140],[62,140],[66,140]
     ];
 
   module chamfered_polygon(points) {
@@ -576,7 +586,7 @@ module tab_bb_plate() {
         // }
       }
     }
-
+    
     initial_translation = right_handed ? -thickness/2 : thickness/2;
     // Initials
     translate([8, 40, initial_translation]) {
@@ -587,7 +597,7 @@ module tab_bb_plate() {
     }
 
     // wire guides
-    translate([bb_tab_width/2, bottom_slot_margin, guide_hole_base_vertical ]){
+    translate([bb_tab_width/2, bottom_slot_margin, guide_hole_base_vertical+bb_guide_hole_vertical_tweak ]){
       for(slot = [0 : 1 : number_of_slots]) {
         index_hole(0, slot*slot_spacing, 0, 80);
         index_hole(0, slot*slot_spacing, bb_ledge_thickness*0.7+bb_guide_hole_radius, 80);
